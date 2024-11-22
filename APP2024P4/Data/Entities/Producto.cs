@@ -16,7 +16,7 @@ namespace APP2024P4.Data.Entities
         public int ModeloId { get; set; }
         public decimal Precio { get; set; } = 0;
         public string? Descripcion { get; set; }
-        public string? Imagen { get; set; }
+        public string Imagen { get; set; } = null!;
 
         #region Metodos
         public static Producto Create(string nombre, int categoriaId, DateTime fechaL, string color, int cantidad, string imagen, int modeloId, decimal precio = 0, string? descripcion = null)
