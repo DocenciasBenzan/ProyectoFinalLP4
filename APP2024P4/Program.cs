@@ -1,5 +1,6 @@
 using APP2024P4.Components;
 using APP2024P4.Components.Account;
+using APP2024P4.Components.services;
 using APP2024P4.Data;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +17,9 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
+
+
+builder.Services.AddHttpClient<GroceryApi>(Client => { Client.BaseAddress = new Uri("https://simple-grocery-store-api.glitch.me"); });
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = IdentityConstants.ApplicationScheme;

@@ -1,8 +1,28 @@
 ﻿@inherits LayoutComponentBase
+@* <img src="https://images.unsplash.com/photo-1501082183835-b7b33db89c3f?q=80&w=2320&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" width="100%" height="200" alt="..."> *@
+<style>
+    .titulo{
+        width:100%;
+        height:150px;
+        background-color:black;
+        text-align:center;
+        color:crimson;
+    }
+    .titulo h1{
+        font-weight:700;
+        font-size:8rem;
+        font-family:'Century Gothic';
+        letter-spacing:50px;
+    }
+
+</style>
+<div class="titulo">
+        <h1 >BLACK FRIDAY</h1>
+</div>
 
 <div class="page">
 
-   
+
     <main>
         <nav class="@Black">
             <div class="container-xl">
@@ -38,6 +58,11 @@
 
                 </div>
             </div>
+                <AuthorizeView>
+                <a href="#" style="margin-right:150px" class=" p-3 avatar bg-danger rounded-circle text-white">
+                    RG
+                </a>
+                </AuthorizeView>
         </nav>
         <article class="content px-4">
             @Body
