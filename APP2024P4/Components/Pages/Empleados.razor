@@ -1,0 +1,139 @@
+﻿@page "/empleados"
+@attribute [StreamRendering]
+
+<PageTitle>Empleados</PageTitle>
+
+<h1 class="text-center mb-4">Gestión de Empleados</h1>
+
+<div class="container mt-4">
+    <!-- Botón para agregar un nuevo empleado -->
+    <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+            <i class="bi bi-plus-circle me-2"></i> Nuevo Empleado
+        </button>
+    </div>
+
+    <!-- Tabla de empleados -->
+    @if (employees == null)
+    {
+        <p class="text-center"><em>Cargando...</em></p>
+    }
+    else if (!employees.Any())
+    {
+        <p class="text-center"><em>No hay empleados registrados.</em></p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Horario de Entrada</th>
+                        <th>Horario de Salida</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var employee in employees)
+                    {
+                        <tr>
+                            <td>@employee.Nombre</td>
+                            <td>@employee.HorarioEntrada.ToString("hh:mm tt")</td>
+                            <td>@employee.HorarioSalida.ToString("hh:mm tt")</td>
+                            <td class="text-center">
+                                <button class="btn btn-warning btn-sm mx-2" title="Ver">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => EliminarEmpleado(employee)" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- Modal para agregar un nuevo empleado -->
+<div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEmployeeModalLabel">Nuevo Empleado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="nuevoEmpleado" OnValidSubmit="AgregarEmpleado">
+                    <DataAnnotationsValidator />
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <InputText @bind-Value="nuevoEmpleado.Nombre" class="form-control" placeholder="Ejemplo: Juan Pérez" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="telefono" class="form-label">Teléfono</label>
+                        <InputText @bind-Value="nuevoEmpleado.Telefono" class="form-control" placeholder="Ejemplo: 123-456-7890" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="horarioEntrada" class="form-label">Horario de Entrada</label>
+                        <InputTime @bind="nuevoEmpleado.HorarioEntrada" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="horarioSalida" class="form-label">Horario de Salida</label>
+                        <InputTime @bind="nuevoEmpleado.HorarioSalida" class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Guardar Empleado</button>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Empleado> employees = new();
+    private Empleado nuevoEmpleado = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulación de carga de datos
+        await Task.Delay(500);
+
+        employees = new List<Empleado>
+        {
+            new Empleado { Nombre = "Carlos López", Telefono = "123-456-7890", HorarioEntrada = new TimeOnly(8, 0), HorarioSalida = new TimeOnly(16, 0) },
+            new Empleado { Nombre = "María González", Telefono = "098-765-4321", HorarioEntrada = new TimeOnly(9, 0), HorarioSalida = new TimeOnly(17, 0) }
+        };
+    }
+
+    private void AgregarEmpleado()
+    {
+        if (nuevoEmpleado != null)
+        {
+            employees.Add(new Empleado
+            {
+                Nombre = nuevoEmpleado.Nombre,
+                Telefono = nuevoEmpleado.Telefono,
+                HorarioEntrada = nuevoEmpleado.HorarioEntrada,
+                HorarioSalida = nuevoEmpleado.HorarioSalida
+            });
+
+            // Resetear formulario
+            nuevoEmpleado = new Empleado();
+        }
+    }
+
+    private void EliminarEmpleado(Empleado empleado)
+    {
+        employees.Remove(empleado);
+    }
+
+    private class Empleado
+    {
+        public string Nombre { get; set; } = string.Empty;
+        public string Telefono { get; set; } = string.Empty;
+        public TimeOnly HorarioEntrada { get; set; }
+        public TimeOnly HorarioSalida { get; set; }
+    }
+}
