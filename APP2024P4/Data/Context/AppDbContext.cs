@@ -13,10 +13,10 @@ namespace APP2024P4.Data.Context
             this.confi = confi;
         }
 
-        public DbSet<Producto> productos { get; set; }
-        public DbSet<Categoria> categorias { get; set; }
-        public DbSet<Modelo> modelos { get; set; }
-        public DbSet<Marca> marcas { get; set; }
+        public DbSet<Producto> Productos { get; set; }
+        public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<Modelo> Modelos { get; set; }
+        public DbSet<Marca> Marcas { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

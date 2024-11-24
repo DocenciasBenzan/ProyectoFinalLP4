@@ -13,14 +13,13 @@ namespace APP2024P4.Data.Entities
         public DateTime FechaL { get; set; }
         public string? Color { get; set; }
         public int Cantidad { get; set; }
-        public int MarcaId { get; set; }
         public int ModeloId { get; set; }
         public decimal Precio { get; set; } = 0;
         public string? Descripcion { get; set; }
         public string Imagen { get; set; } = null!;
 
         #region Metodos
-        public static Producto Create(string nombre, int categoriaId, DateTime fechaL, string color, int cantidad, string imagen, int marcaId , int modeloId, decimal precio = 0, string? descripcion = null)
+        public static Producto Create(string nombre, int categoriaId, DateTime fechaL, string color, int cantidad, string imagen, int modeloId, decimal precio = 0, string? descripcion = null)
             => new()
             {
                 Nombre = nombre,
@@ -28,14 +27,13 @@ namespace APP2024P4.Data.Entities
                 FechaL = fechaL,
                 Color = color,
                 Cantidad = cantidad,
-                MarcaId = marcaId,
                 ModeloId = modeloId,
                 Precio = precio,
                 Descripcion = descripcion,
                 Imagen = imagen
             };
 
-        public bool Update(string nombre, int categoriaId, DateTime fechaL, string color, int cantidad, string imagen, int marcaId , int modeloId, decimal precio = 0, string? descripcion = null)
+        public bool Update(string nombre, int categoriaId, DateTime fechaL, string color, int cantidad, string imagen, int modeloId, decimal precio = 0, string? descripcion = null)
         {
             var save = false;
             if (Nombre != nombre)
@@ -61,10 +59,6 @@ namespace APP2024P4.Data.Entities
             if (Imagen != imagen)
             {
                 Imagen = imagen; save = true;
-            }
-            if (MarcaId != marcaId)
-            {
-                MarcaId = marcaId; save = true;
             }
             if (ModeloId != modeloId)
             {
