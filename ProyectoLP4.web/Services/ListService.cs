@@ -1,45 +1,47 @@
-﻿using ProyectoLP4.web;
+﻿
 using ProyectoLP4.web.Models;
 using Microsoft.EntityFrameworkCore;
 using ProyectoLP4.web.Data;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Identity.Client;
+
 
 public class ListService : IListService
 {
     //**SEGUNDA PRUEBA**
-
-    private readonly List<UserList> _userLists = new();
-
-    public Task<List<UserList>> GetListsAsync()
+    public ListService(IApplicationDbContext context)
     {
-        return Task.FromResult(_userLists);
+        this.context = context;
+    }
+    private readonly List<UserList> _userLists = new();
+    private readonly IApplicationDbContext context;
+
+    public async Task<List<UserList>> GetListsAsync()
+    {
+        return await context.UserLists.Include(x => x.Movies).ToListAsync();
     }
 
     public Task CrearListaAsync(string nombre)
     {
-        _userLists.Add(new UserList { Name = nombre });
-        return Task.CompletedTask;
+        // agregar peliculas
+        var list = new UserList { Name = nombre };
+        context.UserLists.Add(list);
+        return context.SaveChangesAsync();
     }
 
-    public Task AddMovieToListAsync(int listaId, Movie movie)
+    public async Task AddMovieToListAsync(int listaId, Movie movie)
     {
-        var lista = _userLists.Find(l => l.Id == listaId);
+
+        var lista = await context.UserLists.FirstOrDefaultAsync(l => l.Id == listaId);
         if (lista != null)
         {
-            if (!lista.Movies.Any(m => m.Id == movie.Id))
-            {
-                lista.Movies.Add(movie);
-            }
+            context.Movies.Add(movie);
+            await context.SaveChangesAsync();
         }
-        return Task.CompletedTask;
     }
 
-    public Task<UserList> GetListByIdAsync(int listaId)
+    public async Task<UserList?> GetListByIdAsync(int listaId)
     {
-        var list = _userLists.Find(l =>l.Id == listaId);
-        return Task.FromResult(list);
+        var r = await context.UserLists.Include(x => x.Movies).FirstOrDefaultAsync(l => l.Id == listaId);
+        return r;
     }
 
     //**PRIMERA PRUEBA**

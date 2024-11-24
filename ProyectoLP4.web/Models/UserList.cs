@@ -11,6 +11,6 @@ namespace ProyectoLP4.web.Models
         public int Id { get; set; }
         [Required]
         public string Name { get; set; }
-        public List<Movie> Movies { get; set; } = new();
+        public virtual List<Movie> Movies { get; set; } = new();
     }
 }

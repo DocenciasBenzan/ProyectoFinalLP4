@@ -7,5 +7,7 @@ namespace ProyectoLP4.web.Data
     {
         DbSet<UserList> UserLists { set; get; }
         DbSet<Movie> Movies { set; get; }
+
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

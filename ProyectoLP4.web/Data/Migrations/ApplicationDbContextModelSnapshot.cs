@@ -228,18 +228,23 @@ namespace ProyectoLP4.web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Descripcion")
+                    b.Property<string>("Overview")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TMBdId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Titulo")
+                    b.Property<string>("Poster_path")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserListId")
+                    b.Property<string>("Release_date")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserListId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -257,7 +262,7 @@ namespace ProyectoLP4.web.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Nombre")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -319,9 +324,13 @@ namespace ProyectoLP4.web.Migrations
 
             modelBuilder.Entity("ProyectoLP4.web.Models.Movie", b =>
                 {
-                    b.HasOne("ProyectoLP4.web.Models.UserList", null)
+                    b.HasOne("ProyectoLP4.web.Models.UserList", "UserList")
                         .WithMany("Movies")
-                        .HasForeignKey("UserListId");
+                        .HasForeignKey("UserListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserList");
                 });
 
             modelBuilder.Entity("ProyectoLP4.web.Models.UserList", b =>
