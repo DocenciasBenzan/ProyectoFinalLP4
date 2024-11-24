@@ -1,0 +1,72 @@
+﻿@page "/vehicles"
+@using APP2024P4.Shared
+@inject IJSRuntime JsRuntime
+@rendermode InteractiveServer
+<h3>Vehicles</h3>
+
+@if (AllVehicles.Any())
+{
+	<div class="d-inline-flex row gx-5 ">
+		@foreach (var x in AllVehicles)
+		{
+			<Vehicle vehicle="x"></Vehicle>
+		}
+	</div>
+}
+else
+{
+	<p class="alert">No vehicles available</p>
+
+}
+@code {
+
+	public List<VehicleResponse> AllVehicles { get; set; } = new List<VehicleResponse>();
+	public List<Data.Entities.Vehicle> Test { get; set; } = new List<Data.Entities.Vehicle>();
+
+	protected override void OnAfterRender(bool firstRender)
+	{
+		if (firstRender)
+		{
+			Cargar();
+		}
+	}
+	void NotificationRegister(Result result)
+	{
+		@if (result.Succeeded)
+		{
+			Cargar();
+		}
+	}
+
+
+
+
+	public async void Cargar()
+	{
+		var r = await serv.Get();
+
+		if (r.Succeeded)
+		{
+			AllVehicles = r.Data?.ToList() ?? AllVehicles;
+			StateHasChanged();
+		}
+		else
+		{
+			//await JsRuntime.InvokeVoidAsync("console.warn", "Error");
+			return;
+		}
+	}
+
+
+
+	public void GetModel(VehicleResponse response)
+	{
+		// var r = ServModel.GetById(response.ModelId);
+		// if (r.Succeeded)
+		// {
+		// 	response.model =  r.Data ?? new ModelResponse();
+		// }
+		return;
+
+	}
+}

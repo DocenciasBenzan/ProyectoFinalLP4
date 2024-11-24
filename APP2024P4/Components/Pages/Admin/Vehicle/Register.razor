@@ -1,0 +1,338 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using APP2024P4.Data.Request
+@using APP2024P4.Shared
+@using System.Text
+@inject IJSRuntime js
+
+
+<h3>Registrar Vehículo</h3>
+
+<EditForm Model="@vehicleRequest" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary class="text-danger mb-3" />
+
+	<div class="row">
+
+		<div class="col-md-6">
+			@* 	Brand *@
+			<div class="mb-3">
+				<label for="brand" class="form-label">Brand:</label>
+				<InputSelect class="form-control" id="brand"
+							 Value="@CurrentBrandId"
+							 ValueExpression="@(()=>CurrentBrandId)"
+							 ValueChanged="@((int x)=>BrandChangedEvent(x))">
+					<option disabled value="0" selected> Choose a brand</option>
+					@foreach (var brand in Brands)
+					{
+						<option value="@brand.Id"> @brand.Name</option>
+					}
+				</InputSelect>
+
+			</div>
+
+			@* 	Model *@
+			<div class="mb-3">
+				<label for="model" class="form-label">Model:</label>
+				<InputSelect Disabled="@{
+					CurrentBrandId==0
+}" class="form-control" id="model" @bind-Value="vehicleRequest.ModelId">
+					@if (CurrentBrandId == 0)
+					{
+						<option value="0" selected> Choose a Brand first</option>
+					}
+					<option disabled> Choose a Model</option>
+					@foreach (var model in ModelsAvailable)
+					{
+						<option value="@model.Id"> @model.Name</option>
+					}
+				</InputSelect>
+
+			</div>
+
+
+			@* 	Engine *@
+			<div class="mb-3">
+				<label for="engine" class="form-label">Engine:</label>
+				<InputSelect class="form-control" id="engine" @bind-Value="vehicleRequest.EngineId">
+					<option disabled> Choose a Engine</option>
+					@foreach (var engine in Engines)
+					{
+						<option value="@engine.Id"> @engine.Description</option>
+					}
+				</InputSelect>
+
+			</div>
+
+
+			@* 	Year *@
+			<div class="mb-3">
+				<label for="Year" class="form-label">Year:</label>
+				<InputNumber class="form-control" id="Year" @bind-Value="vehicleRequest.Year" />
+				<ValidationMessage For="@(() => vehicleRequest.Year)" class="text-danger" />
+			</div>
+
+			@* 	Price *@
+			<div class="mb-3">
+				<label for="Price" class="form-label">Precio:</label>
+				<InputNumber @bind-Value="vehicleRequest.Price" class="form-control" id="Price" />
+			</div>
+
+			@* 	Condition *@
+			<div class="mb-3">
+				<label for="Condition" class="form-label">Condición:</label>
+				<InputSelect class="form-select" id="Condition" @bind-Value="vehicleRequest.Condition">
+					<option value="" disabled>Seleccione un tipo</option>
+
+					@foreach (var c in ServConst.GetConditionsVehicle())
+					{
+						<option value="@c">@c</option>
+					}
+				</InputSelect>
+			</div>
+
+		</div>
+
+		<div class="col-md-6">
+
+			@* 	MaxWeigh *@
+			<div class="mb-3">
+				<label for="MaxWeigh" class="form-label">Peso máximo (KL):</label>
+				<InputNumber class="form-control" id="MaxWeigh" @bind-Value="vehicleRequest.MaxWeigh" />
+			</div>
+
+
+			@* 	Available *@
+			<div class="mb-3 form-check form-switch">
+				<label for="Available" class="form-label">Available:</label>
+				<InputCheckbox class="form-check-input" id="AvailableSwitch" @bind-Value="vehicleRequest.Available" Disabled="@Disable" />
+			</div>
+
+			@* 	Description *@
+			<div class="mb-3">
+				<label for="Description" class="form-label">Description:</label>
+				<InputTextArea class="form-control" id="Description" @bind-Value="vehicleRequest.Description" />
+			</div>
+
+			@* 	Doors *@
+			<div class="mb-3">
+				<label for="Doors" class="form-label">Doors:</label>
+				<InputNumber class="form-control" id="Doors" @bind-Value="vehicleRequest.Doors" />
+				<ValidationMessage For="@(() => vehicleRequest.Doors)" class="text-danger" />
+			</div>
+
+
+			@* 	Type *@
+			<div class="mb-3">
+				<label for="vehicleType" class="form-label">Tipo de Vehículo:</label>
+				<select class="form-select" id="vehicleType" @bind="vehicleRequest.Type">
+					<option value="" disabled>Seleccione un tipo</option>
+					@foreach (var type in ServConst.GetVehicleTypes())
+					{
+						<option value="@type">@type</option>
+					}
+				</select>
+			</div>
+		</div>
+		@* 	Images *@
+		<div class="mb-3">
+			<label for="ImageUpload" class="form-label">Imagen:</label>
+			<InputFile class="form-control" id="ImageUpload" OnChange="ImageLoad" accept=".jpeg, .png, .jpg" />
+		</div>
+
+	</div>
+
+	<button type="submit" class="btn btn-primary">Registrar Vehículo</button>
+</EditForm>
+
+@if (vehicleRequest.Images.Any())
+{
+	<div class="container flex-column ">
+		<h5>Imágenes cargadas:</h5>
+		@foreach (var x in vehicleRequest.Images)
+		{
+
+			<div class="card mb-2 m-1 w-25 d-inline-flex">
+				<div class="position-relative">
+					<span class="btn btn-outline-danger position-absolute top-0 end-0" @onclick="()=>DeleteImage(x)">X</span>
+				</div>
+				<div class="card-body">
+					<img src="@x" alt="Imagen no cargada" class="img-fluid rounded" />
+				</div>
+			</div>
+		}
+	</div>
+}
+
+@if (messageImages != null && messageImages.Any())
+{
+	<div class="mt-3">
+		<h5>Mensajes:</h5>
+		@foreach (var x in messageImages)
+		{
+			<div class="card mb-3 border-warning">
+				<div class="card-header bg-warning text-dark">
+					Mensaje
+				</div>
+				<div class="card-body">
+					<p class="alert alert-warning">@x</p>
+				</div>
+			</div>
+		}
+	</div>
+}
+
+@code {
+
+	#region		Properties and parameters
+	[Parameter, Required]
+	public EventCallback<Result> Notification { get; set; }
+	private VehicleRequest vehicleRequest = new VehicleRequest()
+		{
+			Year = 2020,
+			Doors = 4,
+			EngineId = 1,
+			Available = true,
+			MaxWeigh = 1000,
+			Price = 2999
+		};
+
+	public bool Disable => vehicleRequest.Id == 0;
+	public int LeftSpaceAvailable { get; set; } = ConstImage.MaxSize;
+	public int CurrentBrandId { get; set; }
+
+	private List<string> messageImages = new();
+	private List<BrandResponse> Brands = new();
+	private List<EngineResponse> Engines = new();
+
+	private List<ModelResponse> ModelsAvailable = new();
+	#endregion
+	#region			Event Componenet and events
+	protected override async Task OnInitializedAsync()
+	{
+		// Suggestion: to change this to use the property Models on brand
+		var brandR = await ServBrand.Get();
+		if (brandR.Succeeded)
+		{
+			Brands = brandR.Data?.ToList() ?? new();
+		}
+
+		var engineR = await ServEngine.Get();
+
+
+		if (engineR.Succeeded)
+		{
+			Engines = engineR.Data?.ToList() ?? new();
+		}
+		StateHasChanged();
+	}
+
+
+
+	private async Task BrandChangedEvent(int brandId)
+	{
+		CurrentBrandId = brandId;
+
+		var r = await ServModel.GetByBrandId(brandId);
+		if (r.Succeeded)
+		{
+			ModelsAvailable = r.Data?.ToList() ?? new();
+			// if(ModelsAvailable.Count == 0){
+			// 	// sweet alert para mostrar que no hay modelos disponibles
+			// }
+		}
+		StateHasChanged();
+
+		// ! CODE TO SHOW THAT THERE ISN'T MODELS
+	}
+
+	private async Task ImageLoad(InputFileChangeEventArgs e)
+	{
+		try
+		{
+			var file = e.File;
+			var contenType = file.ContentType;
+
+			var espacio = Encoding.UTF8.GetByteCount($"data:{file.ContentType};base64,");
+			if ((file.Size + espacio) <= LeftSpaceAvailable)
+			{
+				var buffer = new byte[file.Size];
+				await file.OpenReadStream().ReadAsync(buffer);
+
+				string img = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+				if (vehicleRequest.Images.Contains(img))
+				{
+					messageImages.Add($"{file.Name} has been added before");
+				}
+				else
+				{
+					vehicleRequest.Images.Add(img);
+					LeftSpaceAvailable -= (int)file.Size;
+					messageImages.Add($"{file.Name} was added");
+				}
+			}
+			else
+			{
+				messageImages.Add($"{file.Name} could not be added because there isn't enough space");
+
+			}
+		}
+		catch (Exception ex)
+		{
+			messageImages.Add($"Error trying to add an Image: {ex.Message}");
+
+		}
+		finally
+		{
+			StateHasChanged();
+		}
+
+	}
+
+	private void DeleteImage(string Image)
+	{
+		try
+		{
+			//! Add sweet alert confirmation
+			vehicleRequest.Images.Remove(Image);
+			messageImages.Add("Image was removed");
+
+		}
+		catch (Exception ex)
+		{
+			messageImages.Add("Error while removing the images ");
+		}
+		finally
+		{
+			StateHasChanged();
+		}
+	}
+
+	private async void HandleValidSubmit()
+	{
+		if (vehicleRequest.Images.Any())
+		{
+			if (vehicleRequest.Images.Count > 0)
+			{
+
+				var r = await serv.Create(vehicleRequest);
+
+				await Notification.InvokeAsync(r);
+				ResetForm();
+			}
+		}
+		// Se deben agregar mensaje por si no hay imágenes
+	}
+
+	#endregion
+
+
+	private void ResetForm()
+	{
+		vehicleRequest = new VehicleRequest();
+		messageImages = new();
+	}
+
+
+
+
+}

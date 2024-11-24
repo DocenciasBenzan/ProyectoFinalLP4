@@ -1,6 +1,8 @@
 using APP2024P4.Components;
 using APP2024P4.Components.Account;
 using APP2024P4.Data;
+using APP2024P4.Services.Vehicle;
+using APP2024P4.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,10 +26,10 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
+ConfigureServices(builder.Services);
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
@@ -61,3 +63,12 @@ app.MapRazorComponents<App>()
 app.MapAdditionalIdentityEndpoints();
 
 app.Run();
+static void ConfigureServices(IServiceCollection service)
+{
+    service.AddScoped<IVehicleService, VehicleService>();
+    service.AddScoped<IStaticDataService, StaticDataService>();
+    service.AddScoped<IBrandService, BrandService>();
+    service.AddScoped<IModelService, ModelService>();
+    service.AddScoped<IEngineService, EngineService>();
+
+}

@@ -10,7 +10,7 @@ using Microsoft.Extensions.Primitives;
 using System.Security.Claims;
 using System.Text.Json;
 
-namespace Microsoft.AspNetCore.Routing
+namespace APP2024P4.Components.Account
 {
     internal static class IdentityComponentsEndpointRouteBuilderExtensions
     {

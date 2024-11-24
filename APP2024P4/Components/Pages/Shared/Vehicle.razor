@@ -1,0 +1,117 @@
+﻿@* Mostrar detalles *@
+
+
+@if (ShowDetails)
+{
+	<span class="btn btn-outline-dark " @onclick="()=>{ShowDetails =! ShowDetails;}">Ocultar</span>
+
+	<div class="container mt-4">
+		<h1>Vehicle Detail</h1>
+		<div class="row">
+			<!-- Vehicle Images -->
+			<div class="col-md-6">
+				<h3>Images</h3>
+				<div id="vehicleCarousel" class="carousel slide" data-bs-ride="carousel">
+					<div class="carousel-inner">
+						@foreach (var image in vehicle.Images.Select((image, index) => new { image, index }))
+						{
+							<div class="carousel-item @(image.index == 0 ? "active" : "")">
+								<img src="@image.image" class="d-block w-100" alt="Vehicle Image" />
+							</div>
+						}
+					</div>
+					<button class="carousel-control-prev" type="button" data-bs-target="#vehicleCarousel" data-bs-slide="prev">
+						<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+						<span class="visually-hidden">Previous</span>
+					</button>
+					<button class="carousel-control-next" type="button" data-bs-target="#vehicleCarousel" data-bs-slide="next">
+						<span class="carousel-control-next-icon" aria-hidden="true"></span>
+						<span class="visually-hidden">Next</span>
+					</button>
+				</div>
+			</div>
+
+			<!-- Vehicle Details -->
+			<div class="col-md-6">
+				<h3>Details</h3>
+				<dl class="row">
+					<dt class="col-sm-4">Brand</dt>
+					<dd class="col-sm-8">@vehicle.model.Brand.Name</dd>
+
+					<dt class="col-sm-4">Model</dt>
+					<dd class="col-sm-8">@vehicle.model.Name</dd>
+
+					<dt class="col-sm-4">Year</dt>
+					<dd class="col-sm-8">@vehicle.Year</dd>
+
+					<dt class="col-sm-4">Condition</dt>
+					<dd class="col-sm-8">@vehicle.Condition</dd>
+
+					<dt class="col-sm-4">Type</dt>
+					<dd class="col-sm-8">@vehicle.Type</dd>
+
+					<dt class="col-sm-4">Max Weight</dt>
+					<dd class="col-sm-8">@vehicle.MaxWeigh kg</dd>
+
+					<dt class="col-sm-4">Doors</dt>
+					<dd class="col-sm-8">@vehicle.Doors</dd>
+
+					<dt class="col-sm-4">Price</dt>
+					<dd class="col-sm-8">@vehicle.Price $</dd>
+
+					<dt class="col-sm-4">Availability</dt>
+					<dd class="col-sm-8">
+						@if (vehicle.Available)
+						{
+							<span class="badge bg-success">Available</span>
+						}
+						else
+						{
+							<span class="badge bg-danger">Not Available</span>
+						}
+					</dd>
+
+					<dt class="col-sm-4">Description</dt>
+					<dd class="col-sm-8">@vehicle.Description</dd>
+
+					@* 					Put Engine.Type instead *@
+					<dt class="col-sm-4">Engine Type</dt>
+					<dd class="col-sm-8">@vehicle.Engine.CC</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+}
+else
+{
+	<div class="card col m-1 overflow-auto">
+		<div class="card-header">
+			<h5 class="card-title">  @vehicle.model.Brand.Name - @vehicle.model.Name </h5>
+		</div>
+		<div class="card-body ">
+			<img src="@vehicle.Images.First()" alt="Imagen no cargada" class="img-fluid rounded" />
+			<p class="card-text">
+
+				<span class="card-text-bold">Price:</span> @vehicle.Price
+				<br>
+				<span class="card-text-bold">State:</span> @vehicle.Condition
+			</p>
+
+		</div>
+		<div class="card-footer">
+			<div class="btn-group btn-group-sm">
+				<span class="btn btn-outline-dark " @onclick="()=>{ShowDetails =! ShowDetails;}">Detalles</span>
+				<span class="btn btn-success">Comprar</span>
+			</div>
+		</div>
+	</div>
+}
+
+
+@code {
+	[Parameter]
+	public VehicleResponse vehicle { get; set; } = null!;
+
+	[Parameter]
+	public bool ShowDetails { get; set; }
+}
