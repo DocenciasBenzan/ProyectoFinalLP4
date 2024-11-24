@@ -45,8 +45,7 @@ public class VehicleService(IApplicationDbContext context) : IVehicleService
                 Engine = new EngineResponse(x.Engine),
                 EngineId = x.EngineId,
                 Available = x.Available
-            }).ToListAsync();
-            var rr = context.Vehicles.ToList();
+            }).AsNoTracking().ToListAsync().ConfigureAwait(false);
 
             if (!All)
             {
@@ -69,7 +68,7 @@ public class VehicleService(IApplicationDbContext context) : IVehicleService
         {
             var vehicle = Data.Entities.Vehicle.Create(request);
             context.Vehicles.Add(vehicle);
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync().ConfigureAwait(true);
 
             return Result.Success("Vehicle was added");
         }

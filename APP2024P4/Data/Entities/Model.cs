@@ -19,8 +19,6 @@ namespace APP2024P4.Data.Entities
 
         public IEnumerable<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
 
-
-
     }
 
 }
