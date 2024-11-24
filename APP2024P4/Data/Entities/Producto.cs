@@ -83,8 +83,6 @@ namespace APP2024P4.Data.Entities
         #endregion Metodos
 
         #region Relaciones
-        [ForeignKey(nameof(MarcaId))]
-        public virtual Marca? Marca { get; set; }
         
         [ForeignKey(nameof(ModeloId))]
         public virtual Modelo? Modelo { get; set; }
