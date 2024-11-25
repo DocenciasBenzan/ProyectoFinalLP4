@@ -1,27 +1,31 @@
 ﻿using APP2024P4.Data;
 using APP2024P4.Data.Entities;
 using APP2024P4.Data.Request.Manage;
-using APP2024P4.Data.Request.Vehicle;
 using APP2024P4.Shared;
+
 
 namespace APP2024P4.Services.Manager;
 
-public class ManageService(IApplicationDbContext context)
+public interface IManageService
 {
-	private Result ComprarVehiculo(int VehicleId, int ClientId)
+	Task<Result> StartVehicleTransaction(int VehicleId, int ClientId);
+	Task<Result> DeleteVehicleTransaction(VehicleTransactionRequest request);
+}
+public class ManageService(IApplicationDbContext context) : IManageService
+{
+	public async Task<Result> StartVehicleTransaction(int VehicleId, int ClientId)
 	{
-		// Simulando que es al contado
 		try
 		{
-			// primero crear el payment
 			var VT = new VehicleTransaction()
 			{
 				VehicleId = VehicleId,
 				ClientId = ClientId,
-				IsPaid = true // Cambiar...
+				IsPaid = false
 			};
-			//context.VehicleTransactions.Add();
-			return Result.Success("OK");
+			context.VehicleTransactions.Add(VT);
+			await context.SaveChangesAsync().ConfigureAwait(true);
+			return Result.Success();
 
 		}
 		catch (Exception e)
@@ -30,30 +34,19 @@ public class ManageService(IApplicationDbContext context)
 		}
 
 	}
-}
 
-public class PaymentService(IApplicationDbContext context)
-{
-
-	/*
-	public DateTime Date { get; set; }
-		public decimal Amount { get; set; }
-		public int VehicleTransactionID { get; set; }
-		public string Method { get; set; } = null!; 
-
-	 */
-	private async Task<Result> AgregarPayment(PaymentRequest paymentRequest)
+	public async Task<Result> DeleteVehicleTransaction(VehicleTransactionRequest request)
 	{
-		try{
-			var p = Payment.Crear(paymentRequest);
-			context.Payments.Add(p);
-			await context.SaveChangesAsync();
-			// verificar estado de vehicle transaction y actualizar el is paid:
-			// Hacer consulta para ver si ya se llego al pago total
-			return Result.Success();
+		try
+		{
+			context.VehicleTransactions.Remove(request.ToTransaction());
+			await context.SaveChangesAsync().ConfigureAwait(true);
+			return Result.Success("Transaction eliminada correctamente");
 		}
-		catch(Exception e){
-			return Result.Failure($"Something was wrong:: {e.Message}");
+		catch (Exception ex)
+		{
+			return Result.Failure($"Something was wrong:: {ex.Message}");
+
 		}
 	}
 }

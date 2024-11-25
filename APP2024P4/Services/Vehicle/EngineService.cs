@@ -1,6 +1,7 @@
 ﻿using APP2024P4.Data;
 using APP2024P4.Data.Response.Vehicle;
 using APP2024P4.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace APP2024P4.Services.Vehicle;
 
@@ -15,7 +16,7 @@ public class EngineService(IApplicationDbContext context) : IEngineService
     {
         try
         {
-            var r = context.Engines.Select(
+            var r = context.Engines.AsNoTracking().Select(
             x => new EngineResponse()
             {
                 Id = x.Id,

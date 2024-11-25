@@ -17,7 +17,7 @@ public class ModelService(IApplicationDbContext context) : IModelService
     {
         try
         {
-            var r = context.Models.Where(x => x.Name.ToLower().Contains(filter)).Select(
+            var r = context.Models.Where(x => x.Name.ToLower().Contains(filter)).AsNoTracking().Select(
             x => new ModelResponse()
             {
                 Id = x.Id,

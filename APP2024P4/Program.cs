@@ -1,6 +1,7 @@
 using APP2024P4.Components;
 using APP2024P4.Components.Account;
 using APP2024P4.Data;
+using APP2024P4.Services.Manager;
 using APP2024P4.Services.Vehicle;
 using APP2024P4.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -70,5 +71,7 @@ static void ConfigureServices(IServiceCollection service)
     service.AddScoped<IBrandService, BrandService>();
     service.AddScoped<IModelService, ModelService>();
     service.AddScoped<IEngineService, EngineService>();
+    service.AddScoped<IPaymentService, PaymentService>();
+    service.AddScoped<IManageService, ManageService>();
 
 }

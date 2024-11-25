@@ -13,8 +13,7 @@ public interface IVehicleService
 }
 public class VehicleService(IApplicationDbContext context) : IVehicleService
 {
-
-    public async Task<ResultList<VehicleResponse>> Get(string filter = "", bool All = false)
+   public async Task<ResultList<VehicleResponse>> Get(string filter = "", bool All = false)
     {
         try
         {
@@ -34,7 +33,7 @@ public class VehicleService(IApplicationDbContext context) : IVehicleService
                 {
                     Id = x.Model.Id,
                     Name = x.Model.Name,
-                    Image = "NO",
+                    Image = x.Model.Image,
                     BrandId = x.Model.BrandId,
                     Brand = new BrandResponse()
                     {

@@ -17,6 +17,16 @@ public class VehicleTransactionRequest
 	public VehicleRequest Vehicle { get; set; } = null!;
 
 	public ClientRequest Client { get; set; } = null!;
-
+	#region Methods
+	public VehicleTransaction ToTransaction(){
+		return new VehicleTransaction()
+		{
+			Id = this.Id,
+			VehicleId = this.VehicleId,
+			IsPaid = this.IsPaid,
+			ClientId = this.ClientId
+		};
+	}
+	#endregion
 
 }
