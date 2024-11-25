@@ -117,16 +117,9 @@
                     <div>
                         <a @onclick="() => MostrarDetalles(movie)"
                            style="font-size: 1.2em; color: #007bff; font-weight: bold; text-decoration: none; cursor: pointer;">
-                            
-                           @(!string.IsNullOrEmpty(movie.Title)? movie.Title : movie.Name)
-
+                            @movie.Title
                         </a>
-                        <p style="margin: 5px 0 0; font-size: 0.9em; color: #555;"> 
-                            
-                            @(!string.IsNullOrEmpty(movie.Release_date)? movie.Release_date : movie.First_air_date)
-
-                        </p>
-                        <p style="color: forestgreen; font-size: 0.9em; font-family: Consolas;"> Calificación: @movie.Vote_average</p>
+                        <p style="margin: 5px 0 0; font-size: 0.9em; color: #555;"> Fecha Lanzamiento: @movie.Release_date</p>
                     </div>
                 </div>
 
@@ -134,9 +127,8 @@
                 @if (TituloSeleccionado?.Id == movie.Id)
                 {
                     <div style="margin-top: 10px; padding: 10px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
-                        <h4> @(!string.IsNullOrEmpty(TituloSeleccionado.Title)? TituloSeleccionado.Title : TituloSeleccionado.Name)</h4>
+                        <h4>@TituloSeleccionado.Title</h4>
                         <p>@TituloSeleccionado.Overview</p>
-                        <p>@(!string.IsNullOrEmpty(TituloSeleccionado.Release_date) ? TituloSeleccionado.Release_date : TituloSeleccionado.First_air_date)</p>
 
                         <h5>Agregar a una lista</h5>
                         <select @bind="SelectedListId">
@@ -175,7 +167,7 @@
  *@
 @if (Movies == null || !Movies.Any())
 {
-    <p> No hay resultados </p>
+    <p> No se encontraron resultados </p>
 }
 
 @code {
@@ -189,6 +181,7 @@
     private bool CanAddToList => TituloSeleccionado != null && SelectedListId.HasValue;
 
     //NEW
+    //private string query;
     private List<Movie> resultados;
 
     protected override async Task OnInitializedAsync()
@@ -199,9 +192,9 @@
     private string GetPosterUrl(string posterPath)
     {
         if (string.IsNullOrEmpty(posterPath))
-            return "https://via.placeholder.com/100x150?text=No+Image"; // Imagen de reemplazo por si no hay póster
+            return "https://via.placeholder.com/100x150?text=No+Image"; // Imagen de reemplazo si no hay póster
 
-        return $"https://image.tmdb.org/t/p/w200{posterPath}"; // "w200" es para ajustar el tamaño de imagen
+        return $"https://image.tmdb.org/t/p/w200{posterPath}"; // Cambia "w200" por el tamaño que prefieras
     }
 
 
@@ -214,6 +207,7 @@
             Console.WriteLine("El campo esta vacio");
             return;
         }
+
 
 
         IsLoading = true;
