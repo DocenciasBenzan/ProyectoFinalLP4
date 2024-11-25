@@ -10,8 +10,14 @@ namespace ProyectoLP4.web.Models
         public int Id { get; set; }
         public string Title { get; set; }
         public string Overview { get; set; }
-        //public int TMDbId { get; set; } //Id de la pelicula en la API.
+        public string TMDbId { get; set; }
         public string Poster_path { get; set; }
         public string Release_date { get; set; }
+        public decimal Vote_average { get; set; }
+
+        //Para series
+        public string Name { get; set; }
+        public string First_air_date { get; set; }
+
     }
 }
