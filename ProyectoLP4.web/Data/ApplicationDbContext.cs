@@ -9,5 +9,10 @@ namespace ProyectoLP4.web.Data
     {
         public DbSet<UserList> UserLists { get; set; }
         public DbSet<Movie> Movies { get; set; }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return base.SaveChangesAsync(cancellationToken);
+        }
     }
 }

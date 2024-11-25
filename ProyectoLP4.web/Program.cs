@@ -28,7 +28,7 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
+builder.Services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -39,10 +39,10 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddHttpClient<TMDbService>();
-builder.Services.AddSingleton<ListService>();
+//builder.Services.AddSingleton<ListService>();
 builder.Services.AddScoped<ITMDbservice, TMDbService>();
 builder.Services.AddScoped<IListService, ListService>();
-builder.Services.AddScoped<TMDbService>();
+//builder.Services.AddScoped<TMDbService>();
 
 var app = builder.Build();
 

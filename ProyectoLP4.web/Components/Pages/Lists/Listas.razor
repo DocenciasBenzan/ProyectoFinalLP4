@@ -5,101 +5,127 @@
 
 <h2>Mis listas</h2>
 
-@if (ShowOld)
+@* Formulario de creación de la lista *@
+@if (ShowForm)
 {
-    @*Formulario de creacion de la lista*@
-    @if (ShowForm)
-    {
-        <div class="card">
-            <h5 class="card-header">Crear lista</h5>
-            <div class="card-body">
-                <div class="mb-2">
-                    <label for="nombre" class="form-label">Nombre</label>
-                    <input type="text" class="form-control" id="nombre" placeholder="Nombre de la lista" />
-                </div>
-
-                @*<span class="btn btn-info" @onclick="btnAceptar"> Registrar </span>
-                <span class="btn btn-danger" @onclick="btnCancelar"> Cancelar </span>*@
+    <div class="card shadow-sm">
+        <h5 class="card-header text-center bg-success text-white">Crear Lista</h5>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre de la lista</label>
+                <input type="text" @bind="NuevaLista" class="form-control" id="nombre" placeholder="Nombre de la lista" />
+                <div class="form-text text-muted">Introduce el nombre para tu nueva lista.</div>
+            </div>
+            <div class="d-flex justify-content-between">
+                <button @onclick="CrearLista" class="btn btn-outline-success">Crear Lista</button>
+                <button @onclick="btnCancelarCrearLista" class="btn btn-outline-danger">Cancelar</button>
             </div>
         </div>
-    }
-    else
-    {
-        @*Diseño exterior de las listas*@
-        <div class="mb-3 d-flex  mb-3 justify-content-evenly">
-            @*Boton para crear listas*@
-            <div>
-                @*<span class="btn btn-outline-success" @onclick="btnRegistrar">Agregar lista</span>*@
-            </div>
-            <div>
-                @*@foreach (var list in ListasDisponibles)
-                {
-                    @if (CurrentList.Id == list.Id)
-                    {
-                        <span class="btn btn-dark ms-2" @onclick="()=>btnVerLista(list)">@list.Nombre</span>
-                    }
-                    else
-                    {
-                        <span class="btn btn-outline-dark ms-2" @onclick="()=>btnVerLista(list)">@list.Nombre</span>
-                    }
-                }*@
-            </div>
-        </div>
-
-
-        @if (ShowList)
-        {
-            @*Diseño interior de las listas (oculto)*@
-            <divc class="p-3">
-                @* <span class="btn btn-outline-dark" @onclick="btnVolver">Volver a las listas</span> *@
-                @*Botones para eliminar o editar la lista.*@
-                @*<div class="m-1 shadow-lg p-3 mb-5 bg-body-tertiary rounded">
-                    <h2>@CurrentList.Nombre</h2>
-                    <span class="btn btn-outline-warning">Editar lista</span>
-                    <span class="btn btn-outline-danger">Eliminar lista</span>
-                </div>*@
-                @*Diseño de título agregado a la lista.*@
-                @*@foreach (var movie in CurrentList.Movies)
-                {
-                    <div class="card border-0 mb-2 shadow-sm p-3 mb-5 bg-body-tertiary rounded">
-                        <div class="card-header">@movie.Titulo</div>
-                        <div class="card-body"> @movie.Overview </div>
-                    </div>
-                }*@
-            </divc>
-        }
-    }
+    </div>
+}
+else
+{
+    <button class="btn btn-outline-primary" @onclick="btnShowAddList">Crear Lista</button>
 }
 
-
-<input @bind="NuevaLista" type="text" placeholder="Nombre de la lista" class="form-control"/>
-<span @onclick="CrearLista" class="btn btn-outline-success mt-2">Crear Lista</span>
-
+@* Muestra las listas guardadas *@
 @if (Lists != null && Lists.Any())
 {
-    <ul>
-        @foreach (var list in Lists)
-        {
-            <li>
-                @list.Name (@list.Movies.Count Peliculas/series)
-            </li>
-        }
-    </ul>
+    <div class="card mt-3">
+        <h5 class="card-header text-center">Listas Creadas</h5>
+        <div class="card-body">
+            <ul class="list-group">
+                @foreach (var list in Lists)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        @list.Name
+                        <span class="btn btn-outline-dark btn-sm" @onclick="()=>btnVerMovies(list.Id)">
+                            @if (IdVerMoviesList == list.Id)
+                            {
+
+                                <i class="bi bi-arrow-bar-up"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-arrow-bar-down"></i>
+                            }
+                            <span class="m-2">
+                                @list.Movies.Count
+                                <i class="bi bi-film"></i>
+                            </span>
+
+                        </span>
+                    </li>
+                    @if (IdVerMoviesList == list.Id)
+                    {
+                        @if (list.Movies.Any())
+                        {
+                            <div class="row">
+                                @foreach (var movie in list.Movies)
+                                {
+                                    <div class="col-md-4">
+                                        <div class="card movie-card">
+                                            <img src="http://image.tmdb.org/t/p/w500/@movie.Poster_path" class="card-img-top img-fluid" alt="@movie.Title Poster">
+                                            <div class="card-body">
+                                                <h5 class="card-title">@movie.Title</h5>
+                                                <p class="card-text">@movie.Overview </p>
+                                                <p><strong>Release Date:</strong> @movie.Release_date</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="card mt-3">
+                                <div class="card-header text-center">Sin Movies Agregadas</div>
+                                <div class="card-body">
+                                    @*      agregar funcionalidad para redirigir a movies *@
+                                    <button class="btn btn-outline-info">Agregar MOVIE</button>
+                                </div>
+                            </div>
+                        }
+                        <button class="btn btn-outline-danger col-2" @onclick="()=>btnVerMovies(list.Id)">Cerrar</button>
+
+                    }
+                }
+            </ul>
+        </div>
+    </div>
 }
+else
+{
+    <div class="card mt-3">
+        <div class="card-header text-center">Sin Listas Creadas</div>
+        <div class="card-body">
+            <button class="btn btn-outline-success" @onclick="btnShowAddList">Crear Lista</button>
+        </div>
+    </div>
+}
+
+
 
 @code {
     public bool ShowForm = false;
     public bool ShowList = false;
-    public bool ShowOld = false;
 
-
+    public int IdVerMoviesList { get; set; }
     private string NuevaLista;
     private List<UserList> Lists;
 
+
     protected override async Task OnInitializedAsync()
     {
-        Lists = await ListService.GetListsAsync();
+        CargarDatos();
     }
+    public async void CargarDatos()
+    {
+
+        Lists = await ListService.GetListsAsync();
+        StateHasChanged();
+    }
+
 
     private async Task CrearLista()
     {
@@ -108,71 +134,34 @@
             await ListService.CrearListaAsync(NuevaLista);
             NuevaLista = string.Empty;
             Lists = await ListService.GetListsAsync();
+            StateHasChanged();
+            this.btnCancelarCrearLista();
         }
     }
 
-    #region OldCode
-    @*// simula la lista que estan en la base de datos
-    public List<UserList> ListasDisponibles { get; set; } = new()
-     {
-            new UserList
-            {
-                Id = 1,
-                Nombre = "Acción",
-                Movies = new List<Movie>
-                {
-                    new Movie { Id = 1, Titulo = "Mad Max: Fury Road", Overview = "Futuro post-apocalíptico lleno de acción y persecuciones", TMDbId = 12345 },
-                    new Movie { Id = 2, Titulo = "Die Hard", Overview = "Un oficial de policía lucha contra terroristas en un rascacielos", TMDbId = 23456 },
-                    new Movie { Id = 3, Titulo = "John Wick", Overview = "Un exasesino que busca venganza", TMDbId = 34567 }
-                }
-            },
-            new UserList
-            {
-                Id = 2,
-                Nombre = "Diversión",
-                Movies = new List<Movie>
-                {
-                    new Movie { Id = 4, Titulo = "The Hangover", Overview = "Un grupo de amigos intentan recordar lo que ocurrió durante una fiesta en Las Vegas", TMDbId = 45678 },
-                    new Movie { Id = 5, Titulo = "Superbad", Overview = "Dos adolescentes viven una serie de cómicas situaciones antes de graduarse de la secundaria", TMDbId = 56789 },
-                    new Movie { Id = 6, Titulo = "21 Jump Street", Overview = "Dos oficiales encubiertos deben infiltrarse en una escuela secundaria", TMDbId = 67890 }
-                }
-            },
-            new UserList
-            {
-                Id = 3,
-                Nombre = "Aventura",
-                Movies = new List<Movie>
-                {
-                    new Movie { Id = 7, Titulo = "Indiana Jones and the Raiders of the Lost Ark", Overview = "Un arqueólogo se embarca en una peligrosa aventura para encontrar el Arca Perdida", TMDbId = 78901 },
-                    new Movie { Id = 8, Titulo = "The Lord of the Rings: The Fellowship of the Ring", Overview = "Un grupo de héroes debe destruir un anillo mágico para salvar el mundo", TMDbId = 89012 },
-                    new Movie { Id = 9, Titulo = "Pirates of the Caribbean: The Curse of the Black Pearl", Overview = "Un capitán pirata busca una antigua maldición mientras navega por el Caribe", TMDbId = 90123 }
-                }
-            }
-     }; 
-     
-     
-     public UserList CurrentList { get; set; } = new();
-
-    public void btnRegistrar()
+    private void btnShowAddList()
     {
         ShowForm = true;
+        NuevaLista = "";
     }
-    public void btnAceptar()
+
+    private void btnCancelarCrearLista()
     {
         ShowForm = false;
+        NuevaLista = "";
     }
-    public void btnCancelar()
+
+    private void btnVerMovies(int idUserList)
     {
-        ShowForm = false;
+        if (this.IdVerMoviesList != 0)
+        {
+            this.IdVerMoviesList = 0;
+        }
+        else
+        {
+            this.IdVerMoviesList = idUserList;
+
+        }
+        StateHasChanged();
     }
-    public void btnVolver()
-    {
-        ShowList = false;
-    }
-    private void btnVerLista(UserList list)
-    {
-        ShowList = true;
-        CurrentList = list;
-    }*@
-    #endregion
 }
