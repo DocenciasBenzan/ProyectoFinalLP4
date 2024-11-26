@@ -1,12 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using System;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace ProyectoLP4.web.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateIdentitySchema : Migration
+    public partial class Everythingisback : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,6 +48,19 @@ namespace ProyectoLP4.web.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ListaDeUsuario",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ListaDeUsuario", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,6 +169,33 @@ namespace ProyectoLP4.web.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Titulos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Overview = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TMDbId = table.Column<int>(type: "int", nullable: false),
+                    Poster_path = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Release_date = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Vote_average = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserListId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    First_air_date = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Titulos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Titulos_ListaDeUsuario_UserListId",
+                        column: x => x.UserListId,
+                        principalTable: "ListaDeUsuario",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -194,6 +234,11 @@ namespace ProyectoLP4.web.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Titulos_UserListId",
+                table: "Titulos",
+                column: "UserListId");
         }
 
         /// <inheritdoc />
@@ -215,10 +260,16 @@ namespace ProyectoLP4.web.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Titulos");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "ListaDeUsuario");
         }
     }
 }

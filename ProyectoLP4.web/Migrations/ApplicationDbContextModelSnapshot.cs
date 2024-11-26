@@ -3,20 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoLP4.web.Data;
 
 #nullable disable
 
-namespace ProyectoLP4.web.Data.Migrations
+namespace ProyectoLP4.web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241118163653_AgregandoTablasParaTitulosYListas")]
-    partial class AgregandoTablasParaTitulosYListas
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,19 +228,39 @@ namespace ProyectoLP4.web.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Descripcion")
+                    b.Property<string>("First_air_date")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TMBdId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Titulo")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserListId")
+                    b.Property<string>("Overview")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Poster_path")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Release_date")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TMDbId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserListId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Vote_average")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -260,7 +277,7 @@ namespace ProyectoLP4.web.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Nombre")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -322,9 +339,13 @@ namespace ProyectoLP4.web.Data.Migrations
 
             modelBuilder.Entity("ProyectoLP4.web.Models.Movie", b =>
                 {
-                    b.HasOne("ProyectoLP4.web.Models.UserList", null)
+                    b.HasOne("ProyectoLP4.web.Models.UserList", "UserList")
                         .WithMany("Movies")
-                        .HasForeignKey("UserListId");
+                        .HasForeignKey("UserListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserList");
                 });
 
             modelBuilder.Entity("ProyectoLP4.web.Models.UserList", b =>

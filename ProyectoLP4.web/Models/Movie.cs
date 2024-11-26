@@ -10,11 +10,18 @@ namespace ProyectoLP4.web.Models
         public int Id { get; set; }
         public string Title { get; set; }
         public string Overview { get; set; }
-        //public int TMDbId { get; set; } //Id de la pelicula en la API.
+        public int TMDbId { get; set; } //Id de la pelicula en la API.
         public string Poster_path { get; set; }
         public string Release_date { get; set; }
+        public string Vote_average { get; set; }
         public int UserListId { get; set; }
         [ForeignKey(nameof(UserListId))]
         public virtual UserList UserList { get; set; } = new UserList();
+
+
+        //Series
+
+        public string Name { get; set; }
+        public string First_air_date { get; set; }
     }
 }
