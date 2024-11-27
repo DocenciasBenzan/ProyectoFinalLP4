@@ -39,6 +39,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 builder.Services.AddScoped<IVehiculoService, VehiculoService>();
+WebApplication.CreateBuilder(args).Services.AddScoped<IClienteService, ClienteService>();
 
 var app = builder.Build();
 
