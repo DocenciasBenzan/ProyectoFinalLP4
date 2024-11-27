@@ -12,15 +12,15 @@ using ProyectoLP4.web.Data;
 namespace ProyectoLP4.web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241125173614_Everythingisback")]
-    partial class Everythingisback
+    [Migration("20241127002239_SegundaOportunidad")]
+    partial class SegundaOportunidad
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);

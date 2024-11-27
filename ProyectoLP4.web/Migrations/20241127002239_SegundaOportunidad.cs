@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProyectoLP4.web.Migrations
 {
     /// <inheritdoc />
-    public partial class Everythingisback : Migration
+    public partial class SegundaOportunidad : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
