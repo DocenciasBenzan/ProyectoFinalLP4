@@ -361,3 +361,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/APP2024P4/Data/Migrations/00000000000000_CreateIdentitySchema.Designer.cs
