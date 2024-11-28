@@ -1,6 +1,5 @@
 using APP2024P4.Data;
 using Microsoft.AspNetCore.Identity;
-
 namespace APP2024P4.Components.Account
 {
     internal sealed class IdentityUserAccessor(UserManager<ApplicationUser> userManager, IdentityRedirectManager redirectManager)
