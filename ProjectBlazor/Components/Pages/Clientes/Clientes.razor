@@ -1,4 +1,165 @@
 ﻿@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Authorization
+@using ProjectBlazor.Dto
+@using ProjectBlazor.Services
 
-@page "/cliente"
+
+@page "/clientes"
+<h3>Listado de Clientes</h3>
+
+@if (ShowForm)
+{
+    <div class="card">
+        <h5 class="card-header">@Accion Cliente</h5>
+        <div class="card-body">
+            <div class="input-group mb-3">
+                <span class="input-group-text">Nombre</span>
+                <input @bind-value="MiCliente.Nombre" type="text" class="form-control" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Apellido</span>
+                <input @bind-value="MiCliente.Apellido" type="text" class="form-control" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Teléfono</span>
+                <input @bind-value="MiCliente.NumeroTelefonico" type="text" class="form-control" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Cédula</span>
+                <input @bind-value="MiCliente.Cedula" type="text" class="form-control" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Dirección</span>
+                <input @bind-value="MiCliente.Direccion" type="text" class="form-control" disabled="@DisableInputs">
+            </div>
+
+            @if (Accion != Constants.Acciones.Ver)
+            {
+                <span class="btn btn-primary" @onclick="Aceptar">Aceptar</span>
+            }
+            <span class="btn btn-danger" @onclick="Cancelar">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
+        </div>
+    </div>
+}
+else
+{
+    @if (ClienteList != null && ClienteList.Count > 0)
+    {
+        <div class="mb-3">
+            <button class="btn btn-primary mb-3" @onclick="AgregarClick">Agregar Cliente</button>
+        </div>
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Teléfono</th>
+                    <th>Cédula</th>
+                    <th>Dirección</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cliente in ClienteList)
+                {
+                    <tr>
+                        <td>@cliente.Nombre</td>
+                        <td>@cliente.Apellido</td>
+                        <td>@cliente.NumeroTelefonico</td>
+                        <td>@cliente.Cedula</td>
+                        <td>@cliente.Direccion</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" @onclick="() => EditarClick(cliente)">Editar</button>
+                            <button class="btn btn-danger btn-sm" @onclick="() => EliminarClick(cliente)">Eliminar</button>
+                            <button class="btn btn-primary btn-sm" @onclick="() => VerClick(cliente)">Ver</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <div class="text-center">
+            <p>No hay clientes registrados.</p>
+            <button class="btn btn-primary" @onclick="AgregarClick">Agregar Cliente</button>
+        </div>
+    }
+}
+
+@code {
+    public List<ClienteDto> ClienteList { get; set; } = new();
+    public Dto.ClienteRequest MiCliente { get; set; } = new();
+    public string Accion { get; set; } = "Registrar";
+    public bool ShowForm { get; set; } = false;
+    public bool DisableInputs { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ConsultarClientes();
+    }
+
+    async Task ConsultarClientes()
+    {
+        var result = await ClienteService.Get();
+        if (result.Succesd)
+        {
+            ClienteList = result.Data?.ToList() ?? new List<ClienteDto>();
+        }
+    }
+
+    public void AgregarClick()
+    {
+        Accion = Constants.Acciones.Registrar;
+        ShowForm = true;
+        MiCliente = new();
+        DisableInputs = false;
+    }
+
+    public void EditarClick(ClienteDto cliente)
+    {
+        Accion = Constants.Acciones.Modificar;
+        ShowForm = true;
+        MiCliente = cliente.ToRequest();
+        DisableInputs = false;
+    }
+
+    public void EliminarClick(ClienteDto cliente)
+    {
+        Accion = Constants.Acciones.Eliminar;
+        ShowForm = true;
+        MiCliente = cliente.ToRequest();
+        DisableInputs = true;
+    }
+
+    public void VerClick(ClienteDto cliente)
+    {
+        Accion = Constants.Acciones.Ver;
+        ShowForm = true;
+        MiCliente = cliente.ToRequest();
+        DisableInputs = true;
+    }
+
+    public void Cancelar()
+    {
+        ShowForm = false;
+        MiCliente = new();
+    }
+    
+    public async Task Aceptar()
+    {
+        Result result = Accion switch
+        {
+            Constants.Acciones.Registrar => await ClienteService.Create(MiCliente),
+            Constants.Acciones.Modificar => await ClienteService.Update(MiCliente),
+            Constants.Acciones.Eliminar => await ClienteService.Delete(MiCliente.ClienteId),
+            _ => Result.Failure("Acción no soportada")
+        };
+
+        if (result.Succesd)
+        {
+            await ConsultarClientes();
+            Cancelar();
+        }
+    }
+}

@@ -74,6 +74,8 @@ namespace ProjectBlazor.Services
                 return Result<ClienteDto>.Failure($"☠️ Error: {Ex.Message}");
             }
         }
+        
+
 
         public async Task<ResultList<ClienteDto>> Get(string filtro = "")
         {
@@ -91,24 +93,11 @@ namespace ProjectBlazor.Services
                 return ResultList<ClienteDto>.Failure($"☠️ Error: {Ex.Message}");
             }
         }
+        
 
-        public async Task<ResultList<ClienteDto>> Get(string filtro = "")
+        public Task<Result> Delete(int ClienteId)
         {
-            try
-            {
-                var entities = await dbContext.Clientes
-                    .Where(c => c.Nombre.ToLower().Contains(filtro.ToLower()))
-                    .Select(c => new ClienteDto(c.ClienteId, c.Nombre, c.Apellido, c.NumeroTelefonico, c.Cedula, c.Direccion))
-                    .ToListAsync();
-
-                return ResultList<ClienteDto>.Success(entities);
-            }
-            catch (Exception Ex)
-            {
-                return ResultList<ClienteDto>.Failure($"☠️ Error: {Ex.Message}");
-            }
+            throw new NotImplementedException();
         }
-
-
     }
 }
