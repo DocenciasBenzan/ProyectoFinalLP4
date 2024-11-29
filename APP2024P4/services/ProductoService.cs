@@ -6,13 +6,12 @@ using APP2024P4.Data;
 using APP2024P4.services;
 using Microsoft.EntityFrameworkCore;
 using APP2024P4;
-using APP2024P4.Data.dbcontext;
 
 public partial class ProductoService : IProductoService
 {
-    private readonly IDatabaseApp DbContext;
+    private readonly IApplicationDbContext DbContext;
 
-    public ProductoService(IDatabaseApp dbContext)
+    public ProductoService(IApplicationDbContext dbContext)
     {
         DbContext = dbContext;
     }

@@ -3,14 +3,13 @@ using APP2024P4.Data.Entities;
 using APP2024P4.Data;
 using static APP2024P4.services.ICategoriaService;
 using Microsoft.EntityFrameworkCore;
-using APP2024P4.Data.dbcontext;
 
 namespace APP2024P4.services;
 
 public partial class CategoriaService : ICategoriaService
 {
-    private readonly IDatabaseApp DbContext;
-    public CategoriaService(IDatabaseApp dbContext)
+    private readonly IApplicationDbContext DbContext;
+    public CategoriaService(ApplicationDbContext dbContext)
     {
         DbContext = dbContext;
     }
