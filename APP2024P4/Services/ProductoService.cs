@@ -5,13 +5,13 @@ using APP2024P4;
 using APP2024P4.Data;
 using APP2024P4.Data.Datos;
 using APP2024P4.Data.Entities;
-using APP2024P4.Data.Context;
+
 
 public partial class ProductoService : IProductoService
 {
-    private readonly IAppDbContext dbContext;
+    private readonly IApplicationDbContext dbContext;
 
-    public ProductoService(IAppDbContext dbContext)
+    public ProductoService(IApplicationDbContext dbContext)
     {
         this.dbContext = dbContext;
     }

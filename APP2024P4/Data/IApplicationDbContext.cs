@@ -1,9 +1,9 @@
 ﻿using APP2024P4.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace APP2024P4.Data.Context
+namespace APP2024P4.Data
 {
-    public interface IAppDbContext
+    public interface IApplicationDbContext
     {
         DbSet<Categoria> Categorias { get; set; }
         DbSet<Marca> Marcas { get; set; }

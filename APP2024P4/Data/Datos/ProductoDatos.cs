@@ -16,11 +16,9 @@
             Precio = this.Precio,
             Descripcion = this.Descripcion,
             Imagen = this.Imagen
-
-
-
         };
     };
+
     public class ProductoRequest
     {
         public int Id { get; set; } = 0;
