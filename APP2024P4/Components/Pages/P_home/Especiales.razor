@@ -3,10 +3,10 @@
     <p>
         <a href="#" class=" link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Ver Todos
             <i style="padding-left: 5px" class=" bi bi-plus-circle">
-               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
-                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
-             </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4" />
+                </svg>
             </i>
         </a>
     </p>
@@ -16,16 +16,56 @@
 
 <main class="w-100">
     <div style="background-color:darkblue; border-radius:10px; padding-top:20px; padding-bottom:20px; width:90%; " class="container-fluid d-flex">
-        @for (int i = 0; i <6; i++)
+        @if(ProductoList != null)
         {
-            <div class="card" style="margin: 0 5px 0 5px; width: 18rem;">
-                <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1999&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    <a href="#" style="margin-left:50px" class="btn btn-primary">Go somewhere</a>
-                </div>
+            @if(ProductoList.Count > 0)
+
+            {
+                @foreach (var p in ProductoList.Take(6))
+                {
+                    <div class="card" style="margin: 0 5px 0 5px; width: 18rem;">
+                        <img src="@p.ImagenUrl" style="width:100%; height:250px" class="card-img-top" alt="...">
+                        <div class="card-body">
+                            <h5 class="card-title">@p.Nombre</h5>
+                            <p class="card-text">@p.Precio</p>
+                            <a href="#" style="margin-left:50px" class="btn btn-primary">Añadir a carrito</a>
+                        </div>
+                    </div>
+                }
+            }
+        }
+        else{
+            <div class="card " style="margin: 0 5px 0 5px; width: 18rem;" aria-hidden="true">
+                <span class="placeholder col-6" style="width:100%; height:250px"></span>
+            <div class="card-body">
+                <h5 class="card-title placeholder-glow">
+                    <span class="placeholder col-6"></span>
+                </h5>
+                <p class="card-text placeholder-glow">
+                    <span class="placeholder col-7"></span>
+                    <span class="placeholder col-4"></span>
+                    <span class="placeholder col-4"></span>
+                    <span class="placeholder col-6"></span>
+                    <span class="placeholder col-8"></span>
+                </p>
+                <a class="btn btn-primary disabled placeholder col-6" aria-disabled="true"></a>
             </div>
+        </div>
         }
     </div>
 </main>
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        await Consultar();
+    }
+    public List<ProductoDto>? ProductoList { get; set; }
+    async Task Consultar()
+    {
+        var result = await service.Get();
+        if (result.Succesd)
+        {
+            ProductoList = result.Data?.ToList() ?? new List<ProductoDto>();
+        }
+    }
+}

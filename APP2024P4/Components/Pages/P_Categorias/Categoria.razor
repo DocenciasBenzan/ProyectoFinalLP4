@@ -1,4 +1,8 @@
-﻿<h3>Categoria</h3>
+﻿@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+@page "/Categorias"
+<h3>Categoria</h3>
 
 @if (ShowForm)
 {
@@ -60,9 +64,9 @@ else
     }
     else
     {
-      <div class="spinner-border text-danger" role="status">
-  <span class="visually-hidden">Loading...</span>
-</div>
+        <div class="spinner-border text-danger" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
     }
 }
 @code {
@@ -114,16 +118,25 @@ else
     #region Métodos
     async Task Consultar()
     {
-        var result = await categoriaService.GetAll();
-        if (result.Succesd)
+        try
         {
-            CategoriaList =
-            result.Data?.ToList()
-            ??
-            new List<CategoriaDto>();
+            var result = await categoriaService.GetAll();
+            if (result.Succesd && result.Data != null)
+            {
+                CategoriaList = result.Data.ToList();
+            }
+            else
+            {
+                CategoriaList = new List<CategoriaDto>();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Manejo de errores en caso de fallo
+            Console.WriteLine($"Error al consultar categorías: {ex.Message}");
+            CategoriaList = new List<CategoriaDto>();
         }
     }
-
 
     public void Limpiar()
     {
