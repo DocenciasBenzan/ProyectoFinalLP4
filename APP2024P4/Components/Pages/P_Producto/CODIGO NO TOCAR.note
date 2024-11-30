@@ -1,4 +1,4 @@
-ï»¿@rendermode InteractiveServer
+@rendermode InteractiveServer
 @attribute [StreamRendering]
 @page "/productos"
 
@@ -26,9 +26,9 @@
                         }
                     </div>
                     <div class="mb-3">
-                        <label for="categoria" class="form-label">CategorÃ­a</label>
+                        <label for="categoria" class="form-label">Categoría</label>
                         <select @bind="@MiProducto.CategoriaId" id="categoria" class="form-select">
-                            <option disabled selected>Seleccione una categorÃ­a</option>
+                            <option disabled selected>Seleccione una categoría</option>
                             @if (Categorias != null)
                             {
                                 @foreach (var categoria in Categorias)
@@ -66,7 +66,7 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Nombre</th>
-                                    <th scope="col">CategorÃ­a</th>
+                                    <th scope="col">Categoría</th>
                                     <th scope="col">Precio</th>
                                     <th scope="col">Imagen</th>
                                     <th scope="col">Acciones</th>
@@ -177,7 +177,7 @@
     }
     #endregion Eventos
 
-    #region MÃ©todos
+    #region Métodos
     async Task ConsultarCategorias()
     {
         var result = await categoriaService.GetAll();
@@ -216,5 +216,5 @@
             Limpiar();
         }
     }
-    #endregion MÃ©todos
+    #endregion Métodos
 }

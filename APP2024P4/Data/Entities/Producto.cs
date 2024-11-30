@@ -15,6 +15,20 @@ public class Producto
     [Column(TypeName = "decimal(18,6)")]
     public decimal Precio { get; set; } = 0;
 
+    // Propiedad adicional para facilitar la visualización de la imagen como una URL base64
+    [NotMapped]
+    public string ImagenUrl
+    {
+        get
+        {
+            if (Img != null && Img.Length > 0)
+            {
+                return $"data:image/png;base64,{Convert.ToBase64String(Img)}";
+            }
+            return string.Empty;
+        }
+    }
+
     #region Metodos
     public static Producto Create(string nombre, byte[]? img = null, int? categoriaId = null, decimal precio = 0)
         => new()
@@ -33,7 +47,7 @@ public class Producto
         }
         if (Img != img)
         {
-           Img = img; save = true;
+            Img = img; save = true;
         }
         if (CategoriaId != categoriaId)
         {

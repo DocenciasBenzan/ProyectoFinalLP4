@@ -2,6 +2,9 @@
 
 public record ProductoDto(int Id, string Nombre, byte[]? Img, int? CategoriaId, string Categoria, decimal Precio)
 {
+
+    // Nueva propiedad para obtener la imagen en formato base64
+    public string ImagenUrl => Img != null && Img.Length > 0 ? $"data:image/png;base64,{Convert.ToBase64String(Img)}" : string.Empty;
     public string PrecioText => $"RD$ {Precio.ToString("N2")}";
     public ProductoRequest ToRequest()
     => new()
