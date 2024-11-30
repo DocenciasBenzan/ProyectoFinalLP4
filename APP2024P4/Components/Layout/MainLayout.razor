@@ -1,56 +1,64 @@
 ﻿@inherits LayoutComponentBase
 @using Components.Pages.P_Producto
- <img src="https://images.unsplash.com/photo-1501082183835-b7b33db89c3f?q=80&w=2320&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" width="100%" height="200" alt="..."> 
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@inject NavigationManager Navigation
+
+<img src="https://images.unsplash.com/photo-1501082183835-b7b33db89c3f?q=80&w=2320&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" width="100%" height="200" alt="...">
+
 <div class="page">
-
-
     <main>
         <nav class="@Black">
             <div class="container-xl">
                 <!-- Logo -->
                 <a class="navbar-brand" href="">
-                   <h1>Grocery Store</h1>
+                    <h1>Grocery Store</h1>
                 </a>
                 <!-- Collapse -->
                 <div class="collapse navbar-collapse">
                     <!-- Nav -->
                     <div class="navbar-nav mx-lg-auto">
-                        <a class="nav-item nav-link active" href="" aria-current="page">Home</a>
-                        <a class="nav-item nav-link" href="productos">Productos</a>
-                        <a class="nav-item nav-link" href="categorias">Categorias</a>
-
-
-                        <a class="nav-item nav-link" href="#">Especiales</a>
-                        <a class="nav-item nav-link" href="#">Carrito</a>
+                        <a class="nav-item nav-link @(IsActivePage(""))" href="" aria-current="page">Home</a>
+                        <a class="nav-item nav-link @(IsActivePage("productos"))" href="productos">Productos</a>
+                        <a class="nav-item nav-link @(IsActivePage("categorias"))" href="categorias">Categorias</a>
+                        <a class="nav-item nav-link @(IsActivePage("especiales"))" href="#">Especiales</a>
+                        <a class="nav-item nav-link @(IsActivePage("carrito"))" href="#">Carrito</a>
                     </div>
-                     <form class="d-flex align-items-lg-center mt-3 mt-lg-0" role="search">
-                    <input class="form-control align-items-lg-center mt-3 mt-lg-0" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-
+                    <!-- Search Form -->
+                    <form class="d-flex align-items-lg-center mt-3 mt-lg-0" role="search">
+                        <input class="form-control align-items-lg-center mt-3 mt-lg-0" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
                     <!-- Right navigation -->
                     <div class="navbar-nav ms-lg-4">
-                        <a class="nav-item nav-link" href="Account/Login">Sign in</a>
+                        <AuthorizeView>
+                            <NotAuthorized>
+                                <a class="nav-item nav-link" href="Account/Login">Sign in</a>
+                            </NotAuthorized>
+                        </AuthorizeView>
                     </div>
                     <!-- Action -->
-                    <div class="d-flex align-items-lg-center mt-3 mt-lg-0">
-                        <a href="Account/Register" class="btn btn-sm btn-primary w-full w-lg-auto">
-                            Register
-                        </a>
-                    </div>
-
+                    <AuthorizeView>
+                        <Authorized>
+                            <div class="d-flex align-items-lg-center mt-3 mt-lg-0">
+                                <a href="#" class=" p-3 avatar bg-danger rounded-circle text-white">
+                                    RG
+                                </a>
+                            </div>
+                        </Authorized>
+                        <NotAuthorized>
+                            <div class="d-flex align-items-lg-center mt-3 mt-lg-0">
+                                <a href="Account/Register" class="btn btn-sm btn-primary w-full w-lg-auto">
+                                    Register
+                                </a>
+                            </div>
+                        </NotAuthorized>
+                    </AuthorizeView>
                 </div>
             </div>
-                <AuthorizeView>
-                <a href="#" style="margin-right:150px" class=" p-3 avatar bg-danger rounded-circle text-white">
-                    RG
-                </a>
-                </AuthorizeView>
         </nav>
         <article>
-            @Body
+         @Body
         </article>
-
     </main>
 </div>
 
@@ -62,4 +70,11 @@
 
 @code {
     string Black = "navbar navbar-expand-lg navbar-dark bg-dark px-0 py-3 shadow mb-5 bg-body-tertiary";
+
+    private string IsActivePage(string page)
+    {
+        var currentUri = Navigation.Uri;
+        return currentUri.EndsWith(page, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+    }
+ 
 }
