@@ -10,7 +10,7 @@
 @if (ShowForm)
 {
     <div class="card">
-        <h5 class="card-header">@Accion Cliente</h5>
+        <h5 class="card-header">@Accion Clientes</h5>
         <div class="card-body">
             <div class="input-group mb-3">
                 <span class="input-group-text">Nombre</span>
@@ -145,18 +145,21 @@ else
         ShowForm = false;
         MiCliente = new();
     }
-    
+
     public async Task Aceptar()
     {
-        Result result = Accion switch
-        {
-            Constants.Acciones.Registrar => await ClienteService.Create(MiCliente),
-            Constants.Acciones.Modificar => await ClienteService.Update(MiCliente),
-            Constants.Acciones.Eliminar => await ClienteService.Delete(MiCliente.ClienteId),
-            _ => Result.Failure("Acción no soportada")
-        };
+        
+        
+            Result r =
 
-        if (result.Succesd)
+            Accion == Constants.Acciones.Registrar ? await ClienteService.Create(MiCliente):
+            Accion == Constants.Acciones.Modificar ? await ClienteService.Update(MiCliente) :
+            Accion == Constants.Acciones.Eliminar  ? await ClienteService.Delete(MiCliente.ClienteId) :
+            Result.Failure("Acción no soportada");
+    
+        
+
+        if (r.Succesd)
         {
             await ConsultarClientes();
             Cancelar();
