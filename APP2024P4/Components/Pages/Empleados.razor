@@ -1,147 +1,182 @@
 ﻿@page "/empleados"
-@attribute [StreamRendering]
+@inject IEmpleadoServicio empleadoService
+@inject NavigationManager Navigation
 @rendermode InteractiveServer
-@inject IEmpleadoServicio EmpleadoServ
 
-<PageTitle>Empleados</PageTitle>
+<h3>Gestión de Empleados</h3>
 
-<h1 class="text-center mb-4">Gestión de Empleados</h1>
 
-<div class="container mt-4">
-	<!-- Botón para agregar un nuevo empleado -->
-	<div class="d-flex justify-content-end mb-3">
-		<button class="btn btn-primary d-flex align-items-center" @onclick="()=>{MostrarAgregar =!MostrarAgregar;}">
-			@if (MostrarAgregar)
-			{
-				<i class="bi bi-dash-circle">Cancelar</i>
-			}
-			else
-			{
-				<i class="bi bi-plus-circle me-2">Nuevo Empleado</i>
-			}
-		</button>
-	</div>
 
-	<!-- Tabla de empleados -->
-	@if (TodosEmpleados == null)
-	{
-		<p class="text-center"><em>Cargando...</em></p>
-	}
-	else if (!TodosEmpleados.Any())
-	{
-		<p class="text-center"><em>No hay empleados registrados.</em></p>
-	}
-	else
-	{
-		<div class="table-responsive">
-			<table class="table table-bordered table-striped table-hover align-middle">
-				<thead class="table-dark">
-					<tr>
-						<th>Nombre</th>
-						<th>Horario de Entrada</th>
-						<th>Horario de Salida</th>
-						<th class="text-center">Acciones</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var em in TodosEmpleados)
-					{
-						<tr>
-							<td>@em.Nombre</td>
-							<td>@em.InicioTrabajo.ToString("hh:mm tt")</td>
-							<td>@em.FinTrabajo.ToString("hh:mm tt")</td>
-							<td class="text-center">
-								<button class="btn btn-warning btn-sm mx-2" title="Ver">
-									<i class="bi bi-eye"></i>
-								</button>
-								<button class="btn btn-danger btn-sm" @onclick="() => EliminarEmpleado(em.Id)" title="Eliminar">
-									<i class="bi bi-trash"></i>
-								</button>
-							</td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		</div>
-	}
-</div>
-
-@if (MostrarAgregar)
+@if (MostrarForm)
 {
-
-	<EditForm Model="nuevoEmpleado" OnValidSubmit="AgregarEmpleado">
+	<!-- Formulario para agregar/editar empleados -->
+	<EditForm Model="empleadoActual" OnValidSubmit="GuardarEmpleado">
 		<DataAnnotationsValidator />
 		<ValidationSummary></ValidationSummary>
 		<div class="mb-3">
 			<label for="nombre" class="form-label">Nombre</label>
-			<InputText @bind-Value="nuevoEmpleado.Nombre" class="form-control" placeholder="Ejemplo: Juan" />
+			<InputText @bind-Value="empleadoActual.Nombre" class="form-control" placeholder="Ejemplo: Juan" />
 		</div>
 		<div class="mb-3">
 			<label for="apellido" class="form-label">Apellido</label>
-			<InputText @bind-Value="nuevoEmpleado.Apellido" class="form-control" placeholder="Ejemplo: Pérez" />
+			<InputText @bind-Value="empleadoActual.Apellido" class="form-control" placeholder="Ejemplo: Pérez" />
 		</div>
 		<div class="mb-3">
 			<label for="telefono" class="form-label">Teléfono</label>
-			<InputText @bind-Value="nuevoEmpleado.Telefono" class="form-control" placeholder="Ejemplo: 123-456-7890" />
+			<InputText @bind-Value="empleadoActual.Telefono" class="form-control" placeholder="Ejemplo: 123-456-7890" />
 		</div>
 		<div class="mb-3">
 			<label for="correo" class="form-label">Correo Electronico</label>
-			<InputText @bind-Value="nuevoEmpleado.CorreoElectronico" class="form-control" placeholder="Ejemplo: JuanPeres54@gmail.com" />
+			<InputText @bind-Value="empleadoActual.CorreoElectronico" class="form-control" placeholder="Ejemplo: JuanPeres54@gmail.com" />
 		</div>
 		<div class="mb-3">
 			<label for="horarioEntrada" class="form-label">Horario de Entrada</label>
-			<input @bind-value="nuevoEmpleado.InicioTrabajo" class="form-control" type="time" />
+			<input @bind-value="empleadoActual.InicioTrabajo" class="form-control" type="time" />
 		</div>
 		<div class="mb-3">
 			<label for="horarioSalida" class="form-label">Horario de Salida</label>
-			<input @bind-value="nuevoEmpleado.FinTrabajo" class="form-control" type="time" />
+			<input @bind-value="empleadoActual.FinTrabajo" class="form-control" type="time" />
 
 		</div>
-		<button type="submit" class="btn btn-success w-100">Guardar Empleado</button>
+		<div class="d-flex gap-2 mt-3">
+			<button type="submit" class="btn btn-success col-9"> @(empleadoActual.Id == 0 ? "Crear" : "Editar")</button>
+			<span class="btn btn-outline-dark col-3" @onclick="CancelarEdicion">
+				<i class="bi bi-x-circle"></i>
+				Cancelar
+			</span>
+		</div>
 	</EditForm>
 
 }
-@code {
-
-	private List<EmpleadoResponse> TodosEmpleados = new();
-	private EmpleadoRequest nuevoEmpleado = new();
-	public bool MostrarAgregar { get; set; }
-
-	protected override async void OnInitialized()
+else
+{
+	<span class="btn btn-outline-dark" @onclick="()=>{MostrarForm = true;}">
+		<i class="bi bi-file-plus"></i>
+		Agregar Empleado
+	</span>
+	@if (empleados != null && empleados.Any())
 	{
-		base.OnInitialized();
-		nuevoEmpleado.FinTrabajo = nuevoEmpleado.InicioTrabajo.AddHours(8);
-		await CargarEmpleados();
+
+		<!-- Tabla para listar empleados -->
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Nombre</th>
+					<th>Correo</th>
+					<th>Teléfono</th>
+					<th>Acciones</th>
+				</tr>
+			</thead>
+			<tbody>
+				@if (empleados != null)
+				{
+					@foreach (var empleado in empleados)
+					{
+						<tr>
+							<td>@empleado.Id</td>
+							<td>@empleado.Nombre</td>
+							<td>@empleado.CorreoElectronico</td>
+							<td>@empleado.Telefono</td>
+							<td>
+								<button @onclick="() => EditarEmpleado(empleado)" class="btn btn-warning">Editar</button>
+								<button @onclick="() => EliminarEmpleado(empleado.Id)" class="btn btn-danger">Eliminar</button>
+							</td>
+						</tr>
+					}
+				}
+				else
+				{
+					<tr>
+						<td colspan="5">Cargando empleados...</td>
+					</tr>
+				}
+			</tbody>
+		</table>
 	}
+	else
+	{
+		<p>Sin empleados registrados</p>
+		<span class="btn btn-outline-info" @onclick="()=>{MostrarForm = true;}">
+			<i class="bi bi-file-plus"></i>
+			Agregar Empleado
+		</span>
+	}
+}
+@code {
+	private List<EmpleadoResponse> empleados;
+	private EmpleadoRequest empleadoActual = new();
+	public bool MostrarForm { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		await CargarEmpleados();
+
+	}
+
 	private async Task CargarEmpleados()
 	{
-		var r = await EmpleadoServ.ObtenerEmpleados();
-		if (r.Succeeded)
+		var result = await empleadoService.ObtenerEmpleados();
+		if (result.Succeeded)
 		{
-			TodosEmpleados = r?.Data?.ToList() ?? new();
+			empleados = result?.Data?.ToList() ?? new();
+		}
+	}
+
+	private async Task GuardarEmpleado()
+	{
+		if (empleadoActual.Id == 0)
+		{
+			var result = await empleadoService.AgregarEmpleado(empleadoActual);
+			if (result.Succeeded)
+			{
+				await CargarEmpleados();
+				MostrarForm = false;
+				empleadoActual = new();
+			}
 		}
 		else
 		{
-			Console.WriteLine($"Error al obtener los empleados {r.Message}");
-		}
-		StateHasChanged();
-	}
-	private async Task AgregarEmpleado()
-	{
-		if (nuevoEmpleado != null)
-		{
-			await EmpleadoServ.AgregarEmpleado(nuevoEmpleado);
-			await CargarEmpleados();
-			MostrarAgregar = false;
-			// Resetear formulario
-			nuevoEmpleado = new EmpleadoRequest();
+			var result = await empleadoService.ActualizarEmpleado(empleadoActual);
+			if (result.Succeeded)
+			{
+				await CargarEmpleados();
+				empleadoActual = new();
+				MostrarForm = false;
+
+			}
 		}
 	}
 
-	private async Task EliminarEmpleado(int empleadoId)
+	private void EditarEmpleado(EmpleadoResponse empleado)
 	{
-		await EmpleadoServ.EliminarEmpleado(empleadoId);
-		await CargarEmpleados();
-		StateHasChanged();
+
+		empleadoActual = new EmpleadoRequest
+			{
+				Id = empleado.Id,
+				Nombre = empleado.Nombre,
+				Apellido = empleado.Apellido,
+				CorreoElectronico = empleado.CorreoElectronico,
+				Telefono = empleado.Telefono,
+				InicioTrabajo = empleado.InicioTrabajo,
+				FinTrabajo = empleado.FinTrabajo
+			};
+		MostrarForm = true;
+	}
+
+	private async Task EliminarEmpleado(int id)
+	{
+		var result = await empleadoService.EliminarEmpleado(id);
+		if (result.Succeeded)
+		{
+			await CargarEmpleados();
+		}
+	}
+
+	private void CancelarEdicion()
+	{
+		empleadoActual = new();
+		MostrarForm = false;
+
 	}
 }
