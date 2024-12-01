@@ -10,8 +10,8 @@ public record CategoriaDatos(int Id, string Nombre)
     };
 }
 
-public class CategoriaRequest
+public class CategoriaRequest 
 {
     public int Id { get; set; } = 0;
-    public string Nombre { get; set; } = "";
+    public string Nombre { get; set; } = null!;
 }

@@ -1,122 +1,303 @@
 ﻿@rendermode InteractiveServer
 @attribute [StreamRendering]
 @page "/productos"
+@using APP2024P4.Data.Datos
+@using APP2024P4.Data.Entities
 @* @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize] *@
+@*  Lo  voy a poner aqui, luego lo ubicar. Que codigo diosmiio *@
+@*                  AGREGAR PRODUCTO *@
 
 @if (ShowForm)
 {
     @* Formularion de accion*@
-    <a @onclick="btnCancelarClick" class="btn btn-outline-primary " type="button">Atras</a>
     <div class="card">
         <h5 class="card-header">@Accion Producto</h5>
         <div class="card-body">
-            <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="nombre" placeholder="Nombre">
-            </div>
-            <div class="mb-3">
-                <label for="marca" class="form-label">Marca</label>
-                <select class="form-select" aria-label="Default select example">
-                    <option selected>Selecciona la marca</option>
-                    <option value="1">Samsung</option>
-                    <option value="2">Apple</option>
-                    <option value="3">Huawei</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="modelo" class="form-label">Modelo</label>
-                <select class="form-select" aria-label="Default select example">
-                    <option selected>Selecciona el modelo</option>
-                    <option value="1">S22 Plus</option>
-                    <option value="2">13 Pro Max</option>
-                    <option value="3">70 Ultra</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="precio" class="form-label">Precio</label>
-                <input type="text" class="form-control" id="precio" placeholder="0">
-            </div>
-            <div class="mb-3">
-                <label for="descripcion" class="form-label">Descripción</label>
-                <textarea class="form-control" id="descripcion" rows="3" disabled="@DisableInputs"></textarea>
-            </div>
-            <span class="btn btn-primary">Aceptar</span>
-            <span class="btn btn-danger" @onclick="btnCancelarClick">Cancelar</span>
+            <form class="row g-3">
+                <div class="col-md-6">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input @bind-value="MiProducto.Nombre" type="text" class="form-control" id="nombre" placeholder="Nombre" disabled="@DisableInputs">
+                </div>
+                <div class="col-md-6">
+                    <label for="categoria" class="form-label">Categoría</label>
+                    <select @bind="@MiProducto.CategoriaId" id="categoria" class="form-select">
+                        <option disabled selected>Seleccione una categoría</option>
+                        @if (Categorias != null)
+                        {
+                            @foreach (var categoria in Categorias)
+                            {
+                                <option value="@categoria.Id">@categoria.Nombre</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="marca" class="form-label">Marca</label>
+                    <select id="marca" class="form-select" @onchange="OnMarcaChange">
+                        <option selected value="">Selecciona la marca</option>
+                        @if (Marcas != null)
+                        {
+                            @foreach (var marca in Marcas)
+                            {
+                                <option value="@marca.Id">@marca.Nombre</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="modelo" class="form-label">Modelo</label>
+                    <select @bind="@MiProducto.ModeloId" id="modelo" class="form-select">
+                        <option selected value="">Selecciona el modelo</option>
+                        @if (ModelosFiltrados != null)
+                        {
+                            @foreach (var modelo in ModelosFiltrados)
+                            {
+                                <option value="@modelo.Id">@modelo.Nombre</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="fechaLanzamiento" class="form-label">Fecha de Lanzamiento</label>
+                    <InputDate id="fechaLanzamiento" class="form-control" @bind-Value="MiProducto.FechaL"
+                    min="1980-01-01" max="2025-12-31" />
+                </div>
+                <div class="col-md-6">
+                    <label for="color" class="form-label">Color</label>
+                    <input type="text" class="form-control" id="color" placeholder="Color">
+                </div>
+                <div class="col-md-6">
+                    <label for="cantidad" class="form-label">Cantidad</label>
+                    <InputNumber id="cantidad" class="form-control" @bind-Value="MiProducto.Cantidad" required />
+
+                </div>
+                <div class="col-md-6">
+                    <label for="precio" class="form-label">Precio (RD$)</label>
+                    <input @bind="MiProducto.Precio" type="text" class="form-control" id="precio" placeholder="0" disabled="@DisableInputs">
+                </div>
+                <div class="mb-3">
+                    <label for="descripcion" class="form-label">Descripción</label>
+                    <textarea @bind="MiProducto.Descripcion" class="form-control" id="descripcion" rows="3" disabled="@DisableInputs"></textarea>
+                </div>
+                <AgregarProducto></AgregarProducto>
+                <div class="mt-2">
+                    @if (Accion != Constants.Acciones.Ver)
+                    {
+                        <span class="btn btn-primary me-2" @onclick="Aceptar">Aceptar</span>
+                    }
+                    <span class="btn btn-danger" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
+                </div>
+            </form>
         </div>
     </div>
 }
 else
 {
-    @* Formularion de los registros*@
-    <a href="/admin" class="btn btn-outline-primary " type="button">⬅️ Volver</a>
-    <div class="card mb-3 mt-3">
-        <div class="card-header">
-            <span class="btn btn-success" @onclick="btnAgregarClick">Agregar Dispositivo</span>
+    @if (ProductoList != null)
+    {
+        @* Formularion de los registros*@
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        <a href="/admin" class="btn btn-outline-primary " type="button">⬅️ Volver</a>
+        <div class="card mb-3 mt-3">
+            <div class="card-header">
+                <span class="btn btn-success" @onclick="btnAgregarClick">
+                    <i class="bi bi-plus-circle"></i> Agregar Dispositivo
+                </span>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Modelo</th>
+                            <th scope="col">Categoría</th>
+                            <th scope="col">Precio</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ProductoList.Count > 0)
+                        {
+                            @foreach (var p in ProductoList)
+                            {
+                                <tr>
+                                    <th scope="row">@p.Id</th>
+                                    <td>@p.Nombre</td>
+                                    <td>@p.Modelo</td>
+                                    <td>@p.Categoria</td>
+                                    <td>@p.PrecioText</td>
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                            <span @onclick="()=>btnEditarClick(p)" class="btn btn-secondary rounded me-2">
+                                                <i class="bi bi-pencil"></i> Editar
+                                            </span>
+                                            <span @onclick="()=>btnEliminarClick(p)" class="btn btn-danger rounded me-2">
+                                                <i class="bi bi-trash"></i> Eliminar
+                                            </span>
+                                            <span @onclick="()=>btnVerClick(p)" class="btn btn-primary rounded">
+                                                <i class="bi bi-eye"></i> Ver
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="card-body">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Modelo</th>
-                        <th scope="col">Categoría</th>
-                        <th scope="col">Precio</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Samsung Galaxy</td>
-                        <td>S22 Plus</td>
-                        <td>Teléfono</td>
-                        <td>RD$23000</td>
-                        <td>
-                            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                                <span @onclick="btnEditarClick" class="btn btn-outline-warning">Editar</span>
-                                <span @onclick="btnEliminarClick" class="btn btn-outline-danger">Eliminar</span>
-                                <span @onclick="btnVerClick" class="btn btn-outline-primary">Ver</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    }
+    else
+    {
+        <p>Cargando...</p>
+    }
 }
 @code {
-    string Accion = "Registrar";
-    bool ShowForm = false, DisableInputs = false;
+    #region Propiedades del componente Index.Razor
+    public List<CategoriaDatos> Categorias { get; set; } = new();
+    public List<MarcaDatos> Marcas { get; set; } = new();
+    public List<ModeloDatos> Modelos { get; set; } = new();
+    private List<ModeloDatos> ModelosFiltrados { get; set; } = new List<ModeloDatos>();
+    public string Accion { get; set; } = "Registrar";
+    public ProductoRequest MiProducto { get; set; } = new();
 
+    public List<ProductoDatos>? ProductoList { get; set; } = new();
+    bool ShowForm = false, DisableInputs = false;
+    #endregion
+    #region Metodos del ciclo de vida de la aplicacion (para este componente)
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await ConsultarCategorias();
+            await ConsultarMarcas();
+            await ConsultarModelos();
+            await Consultar();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error durante la inicialización: {ex.Message}");
+        }
+    }
+    #endregion Metodos del ciclo de vida de la aplicacion (para este componente)
+
+    #region Eventos
     public void btnAgregarClick()
     {
-        Accion = "Registrar";
+        Accion = Constants.Acciones.Registrar;
         ShowForm = true;
         StateHasChanged();
         DisableInputs = false;
     }
-    public void btnEditarClick()
+    public void btnEditarClick(ProductoDatos dto)
     {
-        Accion = "Editar";
+        Accion = Constants.Acciones.Editar;
         ShowForm = true;
         DisableInputs = false;
+        MiProducto = dto.ToRequest();
     }
-    public void btnEliminarClick()
+    public void btnEliminarClick(ProductoDatos dto)
     {
-        Accion = "Eliminar";
+        Accion = Constants.Acciones.Eliminar;
         ShowForm = true;
         DisableInputs = true;
+        MiProducto = dto.ToRequest();
     }
-    public void btnVerClick()
+    public void btnVerClick(ProductoDatos dto)
     {
-        Accion = "Ver";
+        Accion = Constants.Acciones.Ver;
         ShowForm = true;
         DisableInputs = true;
+        MiProducto = dto.ToRequest();
     }
     public void btnCancelarClick()
     {
-        ShowForm = false;
+        Limpiar();
     }
+    #endregion Eventos
+
+    #region Métodos
+    async Task ConsultarCategorias()
+    {
+        var result = await categoriaService.GetAll();
+        if (result.Succesd)
+        {
+            Categorias =
+            result.Data?.ToList()
+            ??
+            new List<CategoriaDatos>();
+        }
+    }
+    async Task ConsultarMarcas()
+    {
+        var result = await marcaService.GetAll();
+        if (result.Succesd)
+        {
+            Marcas =
+            result.Data?.ToList()
+            ??
+            new List<MarcaDatos>();
+        }
+    }
+    async Task ConsultarModelos()
+    {
+        var result = await modeloService.GetAll();
+        if (result.Succesd)
+        {
+            Modelos =
+            result.Data?.ToList()
+            ??
+            new List<ModeloDatos>();
+        }
+    }
+    async Task Consultar()
+    {
+        var result = await service.Get();
+        if (result.Succesd)
+        {
+            ProductoList =
+            result.Data?.ToList()
+            ??
+            new List<ProductoDatos>();
+        }
+    }
+    public void Limpiar()
+    {
+        ShowForm = false;
+        MiProducto = new();
+    }
+    private async Task OnMarcaChange(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var marcaId))
+        {
+            // Filtra modelos según la marca seleccionada
+            ModelosFiltrados = Modelos.Where(m => m.MarcaId == marcaId).ToList();
+        }
+        else
+        {
+            ModelosFiltrados = new List<ModeloDatos>(); // Limpia si no hay marca seleccionada
+        }
+    }
+    public async Task Aceptar()
+    {
+        Result r =
+        Accion == Constants.Acciones.Registrar ? await service.Create(MiProducto) :
+        Accion == Constants.Acciones.Editar ? await service.Update(MiProducto) :
+        Accion == Constants.Acciones.Eliminar ? await service.Delete(MiProducto.Id) :
+        Accion == Constants.Acciones.Ver ? Result.Success("") :
+        Result.Failure("Accion no soportada");
+        if (r.Succesd)
+        {
+            await Consultar();
+            Limpiar();
+        }
+    }
+    #endregion Métodos
+
+    private DateTime? fechaLanzamiento { get; set; }
+    private int? cantidad { get; set; } = 1;
 }

@@ -1,94 +1,194 @@
 ﻿@rendermode InteractiveServer
 @attribute [StreamRendering]
 @page "/modelos"
+@using APP2024P4.Data.Datos
 @* @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize] *@
 
 @if (ShowForm)
 {
     @* Formularion de accion*@
-    <a @onclick="btnCancelarClick" class="btn btn-outline-primary " type="button">Atras</a>
     <div class="card">
         <h5 class="card-header">@Accion Modelo</h5>
         <div class="card-body">
-            <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="nombre" placeholder="Nombre">
-            </div>
-            <div class="mb-3">
-                <label for="marca" class="form-label">Marca</label>
-                <select class="form-select" aria-label="Default select example">
-                    <option selected>Selecciona la marca</option>
-                    <option value="1">Samsung</option>
-                    <option value="2">Apple</option>
-                    <option value="3">Huawei</option>
-                </select>
-            </div>
-            <span class="btn btn-primary">Aceptar</span>
-            <span class="btn btn-danger" @onclick="btnCancelarClick">Cancelar</span>
+            <form class="row g-3">
+                <div class="col-md-6">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input @bind-value="MiModelo.Nombre" type="text" class="form-control" id="nombre" placeholder="Nombre" disabled="@DisableInputs">
+                </div>
+                <div class="col-md-6">
+                    <label for="marca" class="form-label">Marca</label>
+                    <select @bind="@MiModelo.MarcaId" id="marca" class="form-select">
+                        <option disabled selected>Seleccione una marca</option>
+                        @if (Marcas != null)
+                        {
+                            @foreach (var marca in Marcas)
+                            {
+                                <option value="@marca.Id">@marca.Nombre</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div>
+                    @if (Accion != Constants.Acciones.Ver)
+                    {
+                        <span class="btn btn-primary me-2" @onclick="Aceptar">Aceptar</span>
+                    }
+                    <span class="btn btn-danger" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
+                </div>
+            </form>
         </div>
     </div>
 }
 else
 {
-    @* Formularion de los registros*@
-    <a href="/admin" class="btn btn-outline-primary " type="button">⬅️ Volver</a>
-    <div class="card mb-3 mt-3">
-        <div class="card-header">
-            <span class="btn btn-success" @onclick="btnAgregarClick">Agregar Modelo</span>
+    @if (ModeloList != null)
+    {
+        @* Formularion de los registros*@
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        <a href="/admin" class="btn btn-outline-primary" type="button">⬅️ Volver</a>
+        <div class="card mb-3 mt-3">
+            <div class="card-header">
+                <span class="btn btn-success" @onclick="btnAgregarClick">
+                    <i class="bi bi-plus-circle"></i> Agregar Modelo
+                </span>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Marca</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ModeloList.Count > 0)
+                        {
+                            @foreach (var m in ModeloList)
+                            {
+                                <tr>
+                                    <th scope="row">@m.Id</th>
+                                    <td>@m.Nombre</td>
+                                    <td>@m.MarcaId</td>
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                            <span @onclick="()=>btnEditarClick(m)" class="btn btn-secondary rounded me-2">
+                                                <i class="bi bi-pencil"></i> Editar
+                                            </span>
+                                            <span @onclick="()=>btnEliminarClick(m)" class="btn btn-danger rounded">
+                                                <i class="bi bi-trash"></i> Eliminar
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="card-body">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Nombre</th>
-                        <th scope="col">Modelo</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>S22 Ultra</td>
-                        <td>Sangsum</td>
-                        <td>
-                            <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                                <span @onclick="btnEditarClick" class="btn btn-outline-warning">Editar</span>
-                                <span @onclick="btnEliminarClick" class="btn btn-outline-danger">Eliminar</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    }
+    else
+    {
+        <p>Cargando...</p>
+    }
 }
 @code {
-    string Accion = "Registrar";
-    bool ShowForm = false, DisableInputs = false;
+    #region Propiedades del componente Index.Razor
+    public List<MarcaDatos> Marcas { get; set; } = new();
+    public string Accion { get; set; } = "Registrar";
+    public ModeloRequest MiModelo { get; set; } = new();
 
+    public List<ModeloDatos>? ModeloList { get; set; } = new();
+    bool ShowForm = false, DisableInputs = false;
+    #endregion Propiedades del componente Index.Razor
+
+    #region Metodos del ciclo de vida de la aplicacion (para este componente)
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await ConsultarMarcas();
+            await Consultar();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error durante la inicialización: {ex.Message}");
+        }
+    }
+    #endregion Metodos del ciclo de vida de la aplicacion (para este componente)
+
+    #region Eventos
     public void btnAgregarClick()
     {
-        Accion = "Registrar";
+        Accion = Constants.Acciones.Registrar;
         ShowForm = true;
         StateHasChanged();
         DisableInputs = false;
     }
-    public void btnEditarClick()
+    public void btnEditarClick(ModeloDatos dto)
     {
-        Accion = "Editar";
+        Accion = Constants.Acciones.Editar;
         ShowForm = true;
         DisableInputs = false;
+        MiModelo = dto.ToRequest();
     }
-    public void btnEliminarClick()
+    public void btnEliminarClick(ModeloDatos dto)
     {
-        Accion = "Eliminar";
+        Accion = Constants.Acciones.Eliminar;
         ShowForm = true;
         DisableInputs = true;
+        MiModelo = dto.ToRequest();
     }
     public void btnCancelarClick()
     {
-        ShowForm = false;
+        Limpiar();
     }
+    #endregion Eventos
+
+    #region Métodos
+    async Task ConsultarMarcas()
+    {
+        var result = await marcaService.GetAll();
+        if (result.Succesd)
+        {
+            Marcas =
+            result.Data?.ToList()
+            ??
+            new List<MarcaDatos>();
+        }
+    }
+    async Task Consultar()
+    {
+        var result = await modeloService.GetAll();
+        if (result.Succesd)
+        {
+            ModeloList =
+            result.Data?.ToList()
+            ??
+            new List<ModeloDatos>();
+        }
+    }
+    public void Limpiar()
+    {
+        ShowForm = false;
+        MiModelo = new();
+    }
+    public async Task Aceptar()
+    {
+        Result r =
+        Accion == Constants.Acciones.Registrar ? await modeloService.Create(MiModelo) :
+        Accion == Constants.Acciones.Editar ? await modeloService.Update(MiModelo) :
+        Accion == Constants.Acciones.Eliminar ? await modeloService.Delete(MiModelo.Id) :
+        Result.Success("");
+        Result.Failure("Accion no soportada");
+        if (r.Succesd)
+        {
+            await Consultar();
+            Limpiar();
+        }
+    }
+    #endregion Métodos
 }

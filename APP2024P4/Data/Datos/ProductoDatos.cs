@@ -1,6 +1,6 @@
 ﻿namespace APP2024P4.Data.Datos
 {
-    public record ProductoDato(int Id, string Nombre, int CategoriaId, string Categoria, DateTime FechaL, string? Color, int Cantidad, int ModeloId, string Modelo, decimal Precio, string? Descripcion, string Imagen)
+    public record ProductoDatos(int Id, string Nombre, int CategoriaId, string Categoria, DateTime FechaL, string? Color, int Cantidad, int ModeloId, string Modelo, decimal Precio, string? Descripcion, string Imagen)
     {
         public string PrecioText => $"RD$ {Precio.ToString("N2")}";
         public ProductoRequest ToRequest()

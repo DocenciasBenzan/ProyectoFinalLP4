@@ -67,36 +67,36 @@ public partial class ProductoService : IProductoService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
-    public async Task<Result<ProductoDato>> GetById(int Id)
+    public async Task<Result<ProductoDatos>> GetById(int Id)
     {
         try
         {
             var entity = await dbContext.Productos.Where(p => p.Id == Id)
-                .Select(p => new ProductoDato(p.Id, p.Nombre, p.CategoriaId, p.Categoria!.NombreC ?? "No definida", p.FechaL, p.Color, p.Cantidad , p.ModeloId , p.Modelo!.NombreM ?? "No definida", p.Precio, p.Descripcion, p.Imagen))
+                .Select(p => new ProductoDatos(p.Id, p.Nombre, p.CategoriaId, p.Categoria!.NombreC ?? "No definida", p.FechaL, p.Color, p.Cantidad , p.ModeloId , p.Modelo!.NombreM ?? "No definida", p.Precio, p.Descripcion, p.Imagen))
                 .FirstOrDefaultAsync();
             if (entity == null)
-                return Result<ProductoDato>.Failure($"El producto '{Id}' no existe!");
+                return Result<ProductoDatos>.Failure($"El producto '{Id}' no existe!");
 
-            return Result<ProductoDato>.Success(entity);
+            return Result<ProductoDatos>.Success(entity);
         }
         catch (Exception Ex)
         {
-            return Result<ProductoDato>.Failure($"☠️ Error: {Ex.Message}");
+            return Result<ProductoDatos>.Failure($"☠️ Error: {Ex.Message}");
         }
     }
-    public async Task<ResultList<ProductoDato>> Get(string filtro = "")
+    public async Task<ResultList<ProductoDatos>> Get(string filtro = "")
     {
         try
         {
             var entities = await dbContext.Productos
                 .Where(p => p.Nombre.ToLower().Contains(filtro.ToLower()))
-                .Select(p => new ProductoDato(p.Id, p.Nombre, p.CategoriaId, p.Categoria!.NombreC ?? "No definida", p.FechaL, p.Color, p.Cantidad, p.ModeloId, p.Modelo!.NombreM ?? "No definida", p.Precio, p.Descripcion, p.Imagen))
+                .Select(p => new ProductoDatos(p.Id, p.Nombre, p.CategoriaId, p.Categoria!.NombreC ?? "No definida", p.FechaL, p.Color, p.Cantidad, p.ModeloId, p.Modelo!.NombreM ?? "No definida", p.Precio, p.Descripcion, p.Imagen))
                 .ToListAsync();
-            return ResultList<ProductoDato>.Success(entities);
+            return ResultList<ProductoDatos>.Success(entities);
         }
         catch (Exception Ex)
         {
-            return ResultList<ProductoDato>.Failure($"☠️ Error: {Ex.Message}");
+            return ResultList<ProductoDatos>.Failure($"☠️ Error: {Ex.Message}");
         }
     }
 }

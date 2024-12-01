@@ -1,6 +1,7 @@
 ﻿using APP2024P4.Data.Datos;
 using APP2024P4.Data.Entities;
 using APP2024P4.Data;
+using APP2024P4;
 using Microsoft.EntityFrameworkCore;
 
 namespace APP2024P4.Services
@@ -15,33 +16,33 @@ namespace APP2024P4.Services
         }
 
         //CRUD
-        public async Task<Result> Create(CategoriaRequest categoria)
+        public async Task<Result> Create(CategoriaRequest request)
         {
             try
             {
-                var entity = Categoria.Create(categoria.Nombre);
+                var entity = Categoria.Create(request.Nombre);
                 dbContext.Categorias.Add(entity);
                 await dbContext.SaveChangesAsync();
-                return Result.Success("✅Categoria registrada con exito!");
+                return Result.Success("✅Categoría registrada con exito!");
             }
             catch (Exception Ex)
             {
                 return Result.Failure($"☠️ Error: {Ex.Message}");
             }
         }
-        public async Task<Result> Update(CategoriaRequest categoria)
+        public async Task<Result> Update(CategoriaRequest request)
         {
             try
             {
-                var entity = dbContext.Categorias.Where(c => c.Id == categoria.Id).FirstOrDefault();
+                var entity = dbContext.Categorias.Where(c => c.Id == request.Id).FirstOrDefault();
                 if (entity == null)
-                    return Result.Failure($"La Categoria'{categoria.Id}' no existe!");
-                if (entity.Update(categoria.Nombre))
+                    return Result.Failure($"La categoría '{request.Id}' no existe!");
+                if (entity.Update(request.Nombre))
                 {
                     await dbContext.SaveChangesAsync();
-                    return Result.Success("✅Categoria modificada con exito!");
+                    return Result.Success("✅Categoría modificada con exito!");
                 }
-                return Result.Success("🐫 No has realizado ningun cambio! animal");
+                return Result.Success("🐫 No has realizado ningun cambio!");
             }
             catch (Exception Ex)
             {
@@ -54,10 +55,10 @@ namespace APP2024P4.Services
             {
                 var entity = dbContext.Categorias.Where(c => c.Id == Id).FirstOrDefault();
                 if (entity == null)
-                    return Result.Failure($"la Categoria '{Id}' no existe!");
+                    return Result.Failure($"La categoría '{Id}' no existe!");
                 dbContext.Categorias.Remove(entity);
                 await dbContext.SaveChangesAsync();
-                return Result.Success("✅Categoria eliminada con exito!");
+                return Result.Success("✅Categoría eliminada con exito!");
             }
             catch (Exception Ex)
             {
