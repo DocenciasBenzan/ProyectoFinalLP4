@@ -14,6 +14,41 @@ namespace APP2024P4.Data.Entidades
         public string ColaboradorEmail { get; set; } = null!;
         public bool IsApproved { get; set; }
 
+        public static Colaborador Create(string userId, string creadorEmail, string colaboradorEmail, bool isApproved)
+     => new()
+     {
+         UserId = userId,
+         CreadorEmail = creadorEmail,
+         ColaboradorEmail = colaboradorEmail,
+         IsApproved = isApproved
+     };
+
+        public bool Update(string userId, string creadorEmail, string colaboradorEmail, bool isApproved)
+        {
+            var save = false;
+
+            if (UserId != userId)
+            {
+                this.UserId = userId;
+                save = true;
+            }
+            if (CreadorEmail != creadorEmail)
+            {
+                this.CreadorEmail = creadorEmail;
+                save = true;
+            }
+            if (ColaboradorEmail != colaboradorEmail)
+            {
+                this.ColaboradorEmail = colaboradorEmail;
+                save = true;
+            }
+            if (IsApproved != isApproved)
+            {
+                this.IsApproved = isApproved;
+                save = true;
+            }
+            return save;
+        }
         [ForeignKey(nameof(UserId))]
         public virtual ApplicationUser? User { get; set; }
     }

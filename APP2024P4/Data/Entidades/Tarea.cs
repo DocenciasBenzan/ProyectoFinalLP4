@@ -11,15 +11,23 @@ public class Tarea
     public int Id { get; set; }
     public string Titulo { get; set; } = null!;
     public string UserId { get; set; } = null!;
+    public string Estado { get; set; } = null!;
+    public string Prioridad { get; set; } = null!;
     public string? Descripcion { get; set; }
     public int? ColaboradorId { get; set; }
     public DateTime? FechaCreacion { get; set; }
     public DateTime? FechaLimite { get; set; }
+    public bool IsCompleted { get; set; }
 
     public static Tarea Create
         (
         string titulo,
         string userId,
+        string estado,
+        DateTime fechaCreacion,
+        DateTime fechaLimite,
+        bool isCompleted,
+        string prioridad,
         string? descripcion = null,
         int? colaboradorId = null
         )
@@ -27,6 +35,11 @@ public class Tarea
             {
                 Titulo = titulo,
                 UserId = userId,
+                Estado = estado,
+                FechaCreacion = fechaCreacion,
+                FechaLimite = fechaLimite,
+                IsCompleted = isCompleted,
+                Prioridad = prioridad,
                 Descripcion = descripcion,
                 ColaboradorId = colaboradorId
                 
@@ -35,6 +48,11 @@ public class Tarea
     public bool Update(
         string titulo,
         string userId,
+        string estado,
+        DateTime fechaCreacion,
+        DateTime fechaLimite,
+        bool isCompleted,
+        string prioridad,
         string? descripcion = null,
         int? colaboradorId = null
         )
@@ -48,6 +66,14 @@ public class Tarea
         {
             UserId = userId; save = true;
         } 
+        if (Estado != estado)
+        {
+            Estado = estado; save = true;
+        } 
+        if (Prioridad != prioridad)
+        {
+            Prioridad = prioridad; save = true;
+        } 
         if (Descripcion != descripcion)
         {
             Descripcion = descripcion; save = true;
@@ -56,8 +82,19 @@ public class Tarea
         {
             ColaboradorId = colaboradorId; save = true;
         }
+        if (FechaCreacion != fechaCreacion)
+        {
+            FechaCreacion = fechaCreacion; save = true;
+        }
+        if (FechaLimite != fechaLimite)
+        {
+            FechaLimite = fechaLimite; save = true;
+        }
+        if (IsCompleted != isCompleted)
+        {
+            IsCompleted = isCompleted; save = true;
+        }
         return save;
-
     }
     [ForeignKey(nameof(UserId))]
     public virtual ApplicationUser? User { get; set; }
