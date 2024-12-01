@@ -33,7 +33,9 @@ public class ListService : IListService
         var lista = await context.UserLists.FirstOrDefaultAsync(l => l.Id == listaId);
         if (lista != null)
         {
-            context.Movies.Add(movie);
+			movie.UserListId = listaId;
+			movie.UserList = lista;
+			context.Movies.Add(movie);
             await context.SaveChangesAsync();
         }
     }

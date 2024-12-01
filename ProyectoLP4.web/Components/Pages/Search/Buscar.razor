@@ -130,7 +130,7 @@
                 </div>
 
 
-                @if (TituloSeleccionado?.Id == movie.Id)
+                @if (TituloSeleccionado?.TMDbId == movie.TMDbId)
                 {
                     <div style="margin-top: 10px; padding: 10px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
                         <h4> @(!string.IsNullOrEmpty(TituloSeleccionado.Title) ? TituloSeleccionado.Title : TituloSeleccionado.Name)</h4>
