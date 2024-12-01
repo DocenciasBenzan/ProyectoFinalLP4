@@ -7,6 +7,7 @@ public class Notificacion
 {
     [Key]
     public int Id { get; set; }
+    public string UserId { get; set; } = null!;
     public string SenderEmail { get; set; } = null!;
     public string RenderEmail { get; set; } = null!;
     public int? TareaId { get; set; }
@@ -16,6 +17,7 @@ public class Notificacion
     public string Status { get; set; } = "Pending"; // "Accepted", "Rejected"
 
     public static Notificacion Create(
+        string userId,
         string senderEmail,
         string renderEmail,
         string message,
@@ -25,6 +27,7 @@ public class Notificacion
         )
            => new()
            {
+               UserId = userId,
                SenderEmail = senderEmail,
                RenderEmail = renderEmail,
                TareaId = tareaId,
@@ -33,6 +36,7 @@ public class Notificacion
                FechaCreacion = fechaCreacion,
            };
     public bool Update(
+        string userId,
         string senderEmail,
         string renderEmail,
         string message,
@@ -42,6 +46,12 @@ public class Notificacion
         )
     {
         var save = false;
+
+        if (this.UserId != userId)
+        {
+            this.UserId = userId;
+            save = true;
+        }   
         if (this.SenderEmail != senderEmail)
         {
             this.SenderEmail = senderEmail;
@@ -74,7 +84,9 @@ public class Notificacion
         }
         return save;
     }
-
+    [ForeignKey(nameof(UserId))]
+    public virtual ApplicationUser? User { get; set; }
     [ForeignKey(nameof(TareaId))]
     public virtual Tarea? Tareas { get; set; }
+
 }

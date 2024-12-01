@@ -14,7 +14,7 @@ namespace APP2024P4.Data.Entidades
         public string ColaboradorEmail { get; set; } = null!;
         public bool IsApproved { get; set; }
 
-        public static Colaborador Create(string userId, string creadorEmail, string colaboradorEmail, bool isApproved)
+        public static Colaborador Create(string creadorEmail, string colaboradorEmail, bool isApproved, string userId = null!)
      => new()
      {
          UserId = userId,
@@ -22,6 +22,14 @@ namespace APP2024P4.Data.Entidades
          ColaboradorEmail = colaboradorEmail,
          IsApproved = isApproved
      };
+        public Colaborador ToDto() => new()
+        {
+            Id = this.Id,
+            UserId = this.UserId,
+            CreadorEmail = this.CreadorEmail,
+            ColaboradorEmail = this.ColaboradorEmail,
+            IsApproved = this.IsApproved
+        };
 
         public bool Update(string userId, string creadorEmail, string colaboradorEmail, bool isApproved)
         {

@@ -7,6 +7,8 @@ public record TareaDto(
  string Descripcion = null!,
  string Estado = null!,
  string Prioridad = null!,
+ int? ColaboradorId = null,
+ string Colaboradores = null!,
  DateTime? FechaCreacion = null!,
  DateTime? FechaLimite = null!,
  bool IsCompleted = false
@@ -32,6 +34,7 @@ public class TareaRequest
     public int Id { get; set; } = 0;
     public string UserId { get; set; } = null!;
     public string Titulo { get; set; } = "";
+    public int? ColaboradorId { get; set; }
     public string Descripcion { get; set; } = "";
     public string Estado { get; set; } = "";
     public string Prioridad { get; set; } = "";
@@ -39,4 +42,12 @@ public class TareaRequest
     public DateTime? FechaLimite { get; set; }
     public bool IsCompleted { get; set; }
     
+}
+public class ColaboradorRequest
+{
+    public int Id { get; set; }
+    public string UserId { get; set; } = null!;
+    public string CreadorEmail { get; set; } = null!;
+    public string ColaboradorEmail { get; set; } = null!;
+    public bool IsApproved { get; set; }
 }

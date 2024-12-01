@@ -22,14 +22,14 @@ public class Tarea
     public static Tarea Create
         (
         string titulo,
-        string userId,
-        string estado,
-        DateTime fechaCreacion,
-        DateTime fechaLimite,
+        DateTime? fechaCreacion,
+        DateTime? fechaLimite,
         bool isCompleted,
+        string estado,
         string prioridad,
         string? descripcion = null,
-        int? colaboradorId = null
+        int? colaboradorId = null,
+        string userId = null!
         )
             => new()
             {
@@ -47,14 +47,14 @@ public class Tarea
 
     public bool Update(
         string titulo,
-        string userId,
-        string estado,
-        DateTime fechaCreacion,
-        DateTime fechaLimite,
+        DateTime? fechaCreacion,
+        DateTime? fechaLimite,
         bool isCompleted,
+        string estado,
         string prioridad,
         string? descripcion = null,
-        int? colaboradorId = null
+        int? colaboradorId = null,
+        string userId = null!
         )
     {
         var save = false;

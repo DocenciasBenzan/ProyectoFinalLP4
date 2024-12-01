@@ -1,7 +1,19 @@
 ﻿namespace APP2024P4.Data.Dtos
 {
-    public record NotificacionDto(int Id,string UserId, string SenderEmail, string RenderEmail, string Messege, int TareaId, bool Isread, DateTime CreatedAt)
+    public record NotificacionDto
+        (
+        int Id,
+        string UserId,
+        string SenderEmail,
+        string RenderEmail,
+        string Messege,
+        int? TareaId,
+        string Tarea,
+        bool Isread,
+        DateTime FechaCreacion
+        )
     {
+
         public NotifiacioRequest ToRequest()
         => new()
         {
@@ -12,7 +24,7 @@
             Message = Messege,
             TareaId = TareaId,
             Isread = Isread,
-            CreatedAt = CreatedAt,
+            FechaCreacion = FechaCreacion,
         };
     };
     public class NotifiacioRequest
@@ -21,9 +33,9 @@
         public string UserId { get; set; } = null!;
         public string SenderEmail { get; set; } = null!;
         public string RenderEmail { get; set; } = null!;
-        public int TareaId { get; set; }
+        public int? TareaId { get; set; }
         public string Message { get; set; } = null!;
         public bool Isread { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime FechaCreacion { get; set; }
     }
 }
