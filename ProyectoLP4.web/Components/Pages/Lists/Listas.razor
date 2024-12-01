@@ -65,7 +65,15 @@ else
                                 {
                                     <div class="col-md-4">
                                         <div class="card movie-card">
-                                            <img src="http://image.tmdb.org/t/p/w500/@movie.Poster_path" class="card-img-top img-fluid" alt="@movie.Title Poster">
+                                            @*  Indica que no hay imagens *@
+                                            @if (movie.Poster_path == "https://via.placeholder.com/100x150?text=No+Image")
+                                            {
+                                                <img src="@movie.Poster_path" class="card-img-top img-fluid" alt="@movie.Title Poster">
+                                            }
+                                            else
+                                            {
+                                                <img src="http://image.tmdb.org/t/p/w500/@movie.Poster_path" class="card-img-top img-fluid" alt="@movie.Title Poster">
+                                            }
                                             <div class="card-body">
                                                 <h5 class="card-title">@movie.Title</h5>
                                                 <p class="card-text">@movie.Overview </p>
@@ -122,7 +130,11 @@ else
     public async void CargarDatos()
     {
 
-        Lists = await ListService.GetListsAsync();
+        var r = await ListService.GetListsAsync();
+        if (r.Succeeded)
+        {
+            Lists = r.Data?.ToList() ?? new();
+        }
         StateHasChanged();
     }
 
@@ -133,8 +145,8 @@ else
         {
             await ListService.CrearListaAsync(NuevaLista);
             NuevaLista = string.Empty;
-            Lists = await ListService.GetListsAsync();
             StateHasChanged();
+            this.CargarDatos();
             this.btnCancelarCrearLista();
         }
     }

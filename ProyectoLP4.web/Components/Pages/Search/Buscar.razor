@@ -192,7 +192,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        UserLists = await ListService.GetListsAsync();
+        var r = await ListService.GetListsAsync();
+        if (r.Succeeded) {
+            UserLists = r?.Data?.ToList() ?? new();
+        }
+
     }
 
     private string GetPosterUrl(string posterPath)
@@ -239,11 +243,19 @@
 
     private async Task AgregarALista()
     {
+       
         if (CanAddToList)
         {
+            TituloSeleccionado.Poster_path = GetPosterUrl(TituloSeleccionado.Poster_path);
             await ListService.AddMovieToListAsync(SelectedListId.Value, TituloSeleccionado);
+            if (TituloSeleccionado.Poster_path == "https://via.placeholder.com/100x150?text=No+Image")
+            {
+                TituloSeleccionado.Poster_path = string.Empty;
+            }
+            // Esto no esta funcionando ( drop hide )
             SelectedListId = null; //Reinicia el dropdown
             Console.WriteLine($"'{TituloSeleccionado.Title}' agregado a la lista con exito.");
+            StateHasChanged();
         }
     }
 
