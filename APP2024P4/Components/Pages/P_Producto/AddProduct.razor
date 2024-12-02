@@ -1,4 +1,4 @@
-﻿<h3>Productos</h3>
+﻿<h3>Agregar Productos</h3>
 @if (ShowForm)
 {
     @* Formularion de accion *@
@@ -45,66 +45,74 @@
 }
 else
 {
+
     @if (ProductoList != null)
     {
-        @* Formulario de los registros *@
-        <div class="card mb-3 mt-3">
-            <div class="card-header">
-                <span class="btn btn-success" @onclick="btnAgregarClick">+</span>
+
+        <div class="table-responsive">
+            <div onclick="@btnAgregarClick" class="card-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-plus-square-fill" viewBox="0 0 16 16">
+                    <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0" />
+                </svg>
             </div>
-            <div class="card-body">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Nombre</th>
-                            <th scope="col">Categoría</th>
-                            <th scope="col">Precio</th>
-                            <th scope="col">Imagen</th>
-                            <th scope="col">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (ProductoList.Count > 0)
+            <table class="table table-hover table-nowrap">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Nombre</th>
+                        <th scope="col">Categorias</th>
+                        <th scope="col">Precio</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ProductoList.Count > 0)
+                    {
+                        @foreach (var P in ProductoList)
                         {
-                            @foreach (var p in ProductoList)
-                            {
-                                <tr>
-                                    <th scope="row">@p.Id</th>
-                                    <td>@p.Nombre</td>
-                                    <td>@p.Categoria</td>
-                                    <td>@p.PrecioText</td>
-                                    <td>
-                                        @if (p.Img != null && p.Img.Length > 0)
-                                        {
-                                            <img src="@p.ImagenUrl" alt="Imagen de Producto" style="max-width: 100px; height: auto;" />
-                                        }
-                                    </td>
-                                    <td>
-                                        <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                                            <span @onclick="()=>btnEditarClick(p)" class="btn btn-outline-warning">Editar</span>
-                                            <span @onclick="()=>btnEliminarClick(p)" class="btn btn-outline-danger">Eliminar</span>
-                                            <span @onclick="()=>btnVerClick(p)" class="btn btn-outline-primary">Ver</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
+
+                            <tr>
+                                <td data-label="Job Title" style="display:flex; flex-direction:row;">
+                                    @if (P.Img != null && P.Img.Length > 0)
+                                    {
+                                        <img alt="..." src="@P.ImagenUrl" class="avatar avatar-sm rounded-1 me-2" style="width:200px">
+                                    }
+                                    <p>@P.Nombre</p>
+                                </td>
+                                <td data-label="Email">
+                                    @P.Categoria
+                                </td>
+                                <td data-label="Phone">
+                                    @P.PrecioText
+                                </td>
+                                <td data-label="Lead Score">
+                                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                        <span @onclick="()=>btnEditarClick(P)" class="btn btn-outline-warning">Editar</span>
+                                        <span @onclick="()=>btnEliminarClick(P)" class="btn btn-outline-danger">Eliminar</span>
+                                        <span @onclick="()=>btnVerClick(P)" class="btn btn-outline-primary">Ver</span>
+                                    </div>
+                                </td>
+                            </tr>
                         }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
         </div>
     }
     else
     {
-        <div class="spinner-border text-danger" role="status">
+        <div class="spinner-grow text-danger" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow text-danger" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <div class="spinner-grow text-danger" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
     }
 }
 
-
-@code {
+@code{
     #region Propiedades del componente Index.Razor
     public List<CategoriaDto> Categorias { get; set; } = new();
     public string Accion { get; set; } = "Registrar";

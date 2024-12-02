@@ -1,0 +1,45 @@
+﻿@if(ProductoList != null)
+{
+    @if(ProductoList.Count > 0)
+    {
+        @foreach (var I in ProductoList)
+        {
+            <img src="@I.ImagenUrl" style="width:100%; height:250px" class="card-img-top" alt="...">
+
+        }
+    }
+}
+else
+{
+    <style>
+        h1 {
+            font-size: 40px;
+            text-align: center;
+            font-family: 'Times New Roman', Times, serif;
+        }
+    </style>
+    <h1>
+        GROCERY
+    </h1>
+
+    <br />
+    <h1>
+        STORE
+    </h1>
+}
+@code {
+    public List<ProductoDto>? ProductoList { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        await Consultar();
+    }
+    async Task Consultar()
+    {
+        var result = await service.Get();
+        if (result.Succesd)
+        {
+            ProductoList = result.Data?.ToList() ?? new List<ProductoDto>();
+        }
+    }
+
+}

@@ -35,8 +35,28 @@ main {
         overflow: hidden;
         text-overflow: ellipsis;
     }
+@media (max-width: 1200px) {
+    input,button{
+        display: none;
+    }
+}
+@media (max-width: 1000px) {
+    #elemnt{
+        display: none;
+    }
+    #NotHidden{
+        display: flex !important;
+        flex-direction: row;
+        justify-content: space-between;
 
-@media (max-width: 640.98px) {
+    }
+}
+@media (max-width: 768px) {
+    .page {
+        width: 100%;
+        flex-direction: row;
+    }
+  
     .top-row {
         justify-content: space-between;
     }
@@ -46,8 +66,9 @@ main {
     }
 }
 
-@media (min-width: 641px) {
+@media (max-width: 480px) {
     .page {
+        width: 100%;
         flex-direction: row;
     }
 
