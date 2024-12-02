@@ -1,0 +1,59 @@
+﻿@using ProyectoLP4.web.Models
+@rendermode InteractiveServer
+
+
+
+<div class="col">
+	<div class="card mb-3" style="max-width: 400px;" @onclick="() => ShowDetails = !ShowDetails" role="button" aria-expanded="@ShowDetails.ToString()" aria-label="Toggle details for @movie.Title or @movie.Name">
+		<div class="row g-0">
+			<div class="col-md-4">
+				<img src="@GetPosterUrl()" class="img-fluid rounded-start pt-2" alt="Poster of @(string.IsNullOrEmpty(movie.Title) ? movie.Name : movie.Title)" />
+			</div>
+			<div class="col-md-8">
+				<div class="card-body">
+					<h5 class="card-title d-flex justify-content-between align-items-center">
+						@(string.IsNullOrEmpty(movie.Title) ? movie.Name : movie.Title)
+						<span class="badge bg-secondary">@(movie.Release_date ?? "Unknown")</span>
+					</h5>
+					<p class="card-text"><small class="text-muted">Average Vote: @movie.Vote_average</small></p>
+					@if (ShowDetails)
+					{
+						<div class="col-md-8 d-flex flex-column justify-content-start">
+							<p class="card-text mt-2">@movie.Overview</p>
+							@if (!string.IsNullOrWhiteSpace(movie.Name))
+							{
+								<p class="card-text">
+									<strong>Series Name:</strong> @movie.Name<br />
+									<strong>First Air Date:</strong> @movie.First_air_date
+								</p>
+							}
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	[Parameter]
+	public Movie movie { get; set; } = null!;
+	public bool ShowDetails { get; set; }
+
+
+	private string GetPosterUrl()
+	{
+		if (string.IsNullOrWhiteSpace(movie.Poster_path))
+		{
+			return "https://via.placeholder.com/100x150?text=No+Image"; // Imagen de reemplazo por si no hay póster
+		}
+		else if (movie.Poster_path != "https://via.placeholder.com/100x150?text=No+Image")
+		{
+			return $"https://image.tmdb.org/t/p/w200{movie.Poster_path}"; // "w200" es para ajustar el tamaño de imagen
+		}
+		else
+		{
+			return movie.Poster_path;
+		}
+	}
+}

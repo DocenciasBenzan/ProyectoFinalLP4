@@ -105,73 +105,41 @@
 
 @if (Movies != null && Movies.Any())
 {
-    <ul>
-        @foreach (var movie in Movies)
-        {
-            <li style="margin-bottom: 20px; display: flex; flex-direction: column; align-items: flex-start;">
-                <div style="display: flex; align-items: center; background-color: #f8f9fa; border: 1px solid #e1e1e1; border-radius: 8px; padding: 10px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                    <img src="@GetPosterUrl(movie.Poster_path)" alt="@movie.Title"
-                         style="width: 100px; height: auto; margin-right: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); cursor: pointer;"
-                         @onclick="() => MostrarDetalles(movie)" />
-                    <div>
-                        <a @onclick="() => MostrarDetalles(movie)"
-                           style="font-size: 1.2em; color: #007bff; font-weight: bold; text-decoration: none; cursor: pointer;">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var movie in Movies)
+            {
+                <div class="card">
+                    <span class="btn btn-outline-dark" @onclick="()=>{MostrarDetalles(movie);}">
+                        <i class="bi bi-file-plus"></i>
+                    </span>
+                    @if (TituloSeleccionado?.TMDbId == movie.TMDbId)
+                    {
+                        <div class="mb-3">
+                            <label for="lista" class="form-label"> Agregar en:</label>
+                            <select id="lista" class="form-control" @bind="SelectedListId">
+                                <option disabled value="">-- Selecciona una lista --</option>
+                                @foreach (var list in UserLists)
+                                {
+                                    <option value="@list.Id">@list.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="btn btn-group">
+                            <span class="btn btn-success mt-2 col-9" @onclick="AgregarALista" disabled="@(!CanAddToList)">Agregar</span>
+                            <span class="btn btn-outline-dark mt-2" @onclick="CancelarAgregarALista">Cancelar</span>
+                        </div>
+                    }
+                    <CompMovie movie="movie"></CompMovie>
 
-                            @(!string.IsNullOrEmpty(movie.Title) ? movie.Title : movie.Name)
-
-                        </a>
-                        <p style="margin: 5px 0 0; font-size: 0.9em; color: #555;">
-
-                            @(!string.IsNullOrEmpty(movie.Release_date) ? movie.Release_date : movie.First_air_date)
-
-                        </p>
-                        <p style="color: forestgreen; font-size: 0.9em; font-family: Consolas;"> Calificación: @movie.Vote_average</p>
-                    </div>
                 </div>
+            }
 
+        </div>
 
-                @if (TituloSeleccionado?.TMDbId == movie.TMDbId)
-                {
-                    <div style="margin-top: 10px; padding: 10px; background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 5px; width: 100%;">
-                        <h4> @(!string.IsNullOrEmpty(TituloSeleccionado.Title) ? TituloSeleccionado.Title : TituloSeleccionado.Name)</h4>
-                        <p>@TituloSeleccionado.Overview</p>
-                        <p>@(!string.IsNullOrEmpty(TituloSeleccionado.Release_date) ? TituloSeleccionado.Release_date : TituloSeleccionado.First_air_date)</p>
-
-                        <h5>Agregar a una lista</h5>
-                        <select @bind="SelectedListId">
-                            <option value="">-- Selecciona una lista --</option>
-                            @foreach (var list in UserLists)
-                            {
-                                <option value="@list.Id">@list.Name</option>
-                            }
-                        </select>
-
-                        <span class="btn btn-success mt-2" @onclick="AgregarALista" disabled="@(!CanAddToList)">Agregar</span>
-                    </div>
-                }
-            </li>
-        }
-    </ul>
+    </div>
 }
 
-
-@* @if (TituloSeleccionado != null)
-{
-    <h4>@TituloSeleccionado.Title</h4>
-    <p>@TituloSeleccionado.Overview</p>
-
-    <h5>Agregar a una lista</h5>
-    <select @bind="SelectedListId">
-        <option value="">-- Selecciona una lista --</option>
-        @foreach (var list in UserLists)
-        {
-            <option value="@list.Id">@list.Name</option>
-        }
-    </select>
-
-    <span class="btn btn-success" @onclick="AgregarALista" disabled="@(!CanAddToList)">Agregar</span>
-}
- *@
 @if (Movies == null || !Movies.Any())
 {
     <p> No hay resultados </p>
@@ -193,7 +161,8 @@
     protected override async Task OnInitializedAsync()
     {
         var r = await ListService.GetListsAsync();
-        if (r.Succeeded) {
+        if (r.Succeeded)
+        {
             UserLists = r?.Data?.ToList() ?? new();
         }
 
@@ -243,10 +212,14 @@
 
     private async Task AgregarALista()
     {
-       
+
         if (CanAddToList)
         {
             TituloSeleccionado.Poster_path = GetPosterUrl(TituloSeleccionado.Poster_path);
+            TituloSeleccionado.Release_date = TituloSeleccionado.Release_date ?? "";
+            TituloSeleccionado.Name = TituloSeleccionado.Name ?? "";
+            TituloSeleccionado.Title = TituloSeleccionado.Title ?? "";
+
             await ListService.AddMovieToListAsync(SelectedListId.Value, TituloSeleccionado);
             if (TituloSeleccionado.Poster_path == "https://via.placeholder.com/100x150?text=No+Image")
             {
@@ -259,7 +232,11 @@
         }
     }
 
-
+    private void CancelarAgregarALista()
+    {
+        TituloSeleccionado = null;
+        StateHasChanged();
+    }
     private async Task BuscarPrueba()
     {
         Console.WriteLine($"Buscando: {query}");

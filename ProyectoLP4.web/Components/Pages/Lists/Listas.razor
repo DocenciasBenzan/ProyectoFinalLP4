@@ -63,24 +63,24 @@ else
                             <div class="row">
                                 @foreach (var movie in list.Movies)
                                 {
-                                    <div class="col-md-4">
-                                        <div class="card movie-card">
-                                            @*  Indica que no hay imagens *@
-                                            @if (movie.Poster_path == "https://via.placeholder.com/100x150?text=No+Image")
-                                            {
-                                                <img src="@movie.Poster_path" class="card-img-top img-fluid" alt="@movie.Title Poster">
-                                            }
-                                            else
-                                            {
-                                                <img src="http://image.tmdb.org/t/p/w500/@movie.Poster_path" class="card-img-top img-fluid" alt="@movie.Title Poster">
-                                            }
-                                            <div class="card-body">
-                                                <h5 class="card-title">@movie.Title</h5>
-                                                <p class="card-text">@movie.Overview </p>
-                                                <p><strong>Release Date:</strong> @movie.Release_date</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <CompMovie movie="movie"></CompMovie>
+                                    @* <div class="col-md-4">
+                <div class="card movie-card">
+                @if (movie.Poster_path == "https://via.placeholder.com/100x150?text=No+Image")
+                {
+                <img src="@movie.Poster_path" class="card-img-top img-fluid" alt="@movie.Title Poster">
+                }
+                else
+                {
+                <img src="http://image.tmdb.org/t/p/w500/@movie.Poster_path" class="card-img-top img-fluid" alt="@movie.Title Poster">
+                }
+                <div class="card-body">
+                <h5 class="card-title">@movie.Title</h5>
+                <p class="card-text">@movie.Overview </p>
+                <p><strong>Release Date:</strong> @movie.Release_date</p>
+                </div>
+                </div>
+                </div> *@
                                 }
                             </div>
                         }
