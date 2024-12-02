@@ -13,8 +13,6 @@
 <PageTitle>Log in</PageTitle>
 
 <style>
-    
-
     * {
         box-sizing: border-box;
         margin: 0;
@@ -127,12 +125,12 @@
         transition: 0.2s;
     }
 
-    .login__input:active,
-    .login__input:focus,
-    .login__input:hover {
-        outline: none;
-        border-bottom-color: #6A679E;
-    }
+        .login__input:active,
+        .login__input:focus,
+        .login__input:hover {
+            outline: none;
+            border-bottom-color: #6A679E;
+        }
 
     .login__submit {
         background: #fff;
@@ -152,12 +150,12 @@
         transition: 0.2s;
     }
 
-    .login__submit:active,
-    .login__submit:focus,
-    .login__submit:hover {
-        border-color: #6A679E;
-        outline: none;
-    }
+        .login__submit:active,
+        .login__submit:focus,
+        .login__submit:hover {
+            border-color: #6A679E;
+            outline: none;
+        }
 
     .button__icon {
         font-size: 24px;
@@ -165,6 +163,14 @@
         color: #7875B5;
     }
 
+    /* Estilo de mensaje de error */
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        margin-top: 20px;
+        border-radius: 5px;
+    }
 </style>
 
 <div class="container">
@@ -190,6 +196,12 @@
                     <i class="button__icon fas fa-chevron-right"></i>
                 </button>
             </form>
+
+            <!-- Mostrar mensaje de error si las credenciales son incorrectas -->
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <div class="alert-danger">@errorMessage</div>
+            }
         </div>
         <div class="screen__background">
             <span class="screen__background__shape screen__background__shape4"></span>
@@ -222,24 +234,16 @@
 
     public async Task LoginUser()
     {
-        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-        if (result.Succeeded)
+        // Validación manual de usuario y contraseña
+        if (Input.Email == "admin" && Input.Password == "1234")
         {
-            Logger.LogInformation("User logged in.");
+            // Si las credenciales son correctas, simular un inicio de sesión
+            Logger.LogInformation("Usuario logueado como admin.");
             RedirectManager.RedirectTo(ReturnUrl);
-        }
-        else if (result.RequiresTwoFactor)
-        {
-            RedirectManager.RedirectTo("Account/LoginWith2fa", new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
-        }
-        else if (result.IsLockedOut)
-        {
-            Logger.LogWarning("User account locked out.");
-            RedirectManager.RedirectTo("Account/Lockout");
         }
         else
         {
-            errorMessage = "Error: Invalid login attempt.";
+            errorMessage = "Error: Intento de inicio de sesión inválido.";
         }
     }
 
@@ -253,7 +257,7 @@
         [DataType(DataType.Password)]
         public string Password { get; set; } = "";
 
-        [Display(Name = "Remember me?")]
+        [Display(Name = "Recordarme")]
         public bool RememberMe { get; set; }
     }
 }
