@@ -38,7 +38,38 @@ else
                 @foreach (var list in Lists)
                 {
                     <li class="list-group-item d-flex justify-content-between align-items-center">
-                        @list.Name
+                        <strong>@list.Name</strong>
+
+                        <div class="justify-content-end">
+                            @* Botón para editar lista *@
+                            <span class="btn btn-outline-warning btn-sm me-2" @onclick="() => EditarLista(list.Id, list.Name)">
+                                <i class="bi bi-pencil"></i> Editar
+                            </span>
+
+                            @* Boton para eliminar listas *@
+                            <span class="btn btn-outline-danger btn-sm me-2" @onclick="() => EliminarLista(list.Id)">
+                                <i class="bi bi-pencil"></i> Eliminar
+                            </span>
+                        </div>
+
+                        @* Formulario para editar el nombre *@
+                        @if (EditingListId != 0 && EditingListId == list.Id)
+                        {
+                            <div class="card shadow-sm mt-3">
+                                <h5 class="card-header text-center bg-warning text-white">Editar Lista</h5>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="nuevoNombre" class="form-label">Nuevo nombre de la lista</label>
+                                        <input type="text" @bind="NuevoNombreLista" class="form-control" id="nuevoNombre" placeholder="Nuevo nombre" />
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span @onclick="GuardarNombreLista" class="btn btn-outline-success">Guardar</span>
+                                        <span @onclick="btnCancelarEditarLista" class="btn btn-outline-danger">Cancelar</span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
                         <span class="btn btn-outline-dark btn-sm" @onclick="()=>btnVerMovies(list.Id)">
                             @if (IdVerMoviesList == list.Id)
                             {
@@ -63,39 +94,24 @@ else
                             <div class="row">
                                 @foreach (var movie in list.Movies)
                                 {
-                                    <CompMovie movie="movie"></CompMovie>
-                                    @* <div class="col-md-4">
-                <div class="card movie-card">
-                @if (movie.Poster_path == "https://via.placeholder.com/100x150?text=No+Image")
-                {
-                <img src="@movie.Poster_path" class="card-img-top img-fluid" alt="@movie.Title Poster">
-                }
-                else
-                {
-                <img src="http://image.tmdb.org/t/p/w500/@movie.Poster_path" class="card-img-top img-fluid" alt="@movie.Title Poster">
-                }
-                <div class="card-body">
-                <h5 class="card-title">@movie.Title</h5>
-                <p class="card-text">@movie.Overview </p>
-                <p><strong>Release Date:</strong> @movie.Release_date</p>
-                </div>
-                </div>
-                </div> *@
+                                    <CompMovie movie="movie" OnMovieDeleted="CargarDatos"></CompMovie>
                                 }
                             </div>
                         }
                         else
                         {
                             <div class="card mt-3">
-                                <div class="card-header text-center">Sin Movies Agregadas</div>
+                                <div class="card-header text-center">Sin contenido agregado</div>
                                 <div class="card-body">
-                                    @*      agregar funcionalidad para redirigir a movies *@
-                                    <button class="btn btn-outline-info">Agregar MOVIE</button>
+                                    <div>
+                                        <NavLink class="nav-link" href="buscar">
+                                            <span class="btn btn-outline-info">Buscar titulos</span>
+                                        </NavLink>
+                                    </div>
                                 </div>
                             </div>
                         }
-                        <button class="btn btn-outline-danger col-2" @onclick="()=>btnVerMovies(list.Id)">Cerrar</button>
-
+                        <span class="btn btn-outline-danger col-2" @onclick="()=>btnVerMovies(list.Id)">Cerrar</span>
                     }
                 }
             </ul>
@@ -107,7 +123,7 @@ else
     <div class="card mt-3">
         <div class="card-header text-center">Sin Listas Creadas</div>
         <div class="card-body">
-            <button class="btn btn-outline-success" @onclick="btnShowAddList">Crear Lista</button>
+            <span class="btn btn-outline-success" @onclick="btnShowAddList">Crear Lista</span>
         </div>
     </div>
 }
@@ -122,6 +138,9 @@ else
     private string NuevaLista;
     private List<UserList> Lists;
 
+    private int EditingListId = 0;
+    private string NuevoNombreLista = string.Empty;
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -129,7 +148,6 @@ else
     }
     public async void CargarDatos()
     {
-
         var r = await ListService.GetListsAsync();
         if (r.Succeeded)
         {
@@ -137,7 +155,6 @@ else
         }
         StateHasChanged();
     }
-
 
     private async Task CrearLista()
     {
@@ -148,6 +165,47 @@ else
             StateHasChanged();
             this.CargarDatos();
             this.btnCancelarCrearLista();
+        }
+    }
+
+    private void EditarLista(int id, string nombreActual)
+    {
+        EditingListId = id;
+        NuevoNombreLista = nombreActual;
+    }
+    private async Task GuardarNombreLista()
+    {
+        if (!string.IsNullOrWhiteSpace(NuevoNombreLista))
+        {
+            var result = await ListService.UpdateListAsync(EditingListId, NuevoNombreLista);
+            if (result.Succeeded)
+            {
+                EditingListId = 0;
+                NuevoNombreLista = string.Empty;
+                CargarDatos();
+            }
+            else
+            {
+                Console.WriteLine(result.Message);
+            }
+        }
+    }
+    private void btnCancelarEditarLista()
+    {
+        EditingListId = 0;
+        NuevoNombreLista = string.Empty;
+    }
+
+    private async Task EliminarLista(int listaId)
+    {
+        var result = await ListService.DeleteListAsync(listaId);
+        if (result.Succeeded)
+        {
+            CargarDatos();
+        }
+        else
+        {
+            Console.WriteLine(result.Message);
         }
     }
 

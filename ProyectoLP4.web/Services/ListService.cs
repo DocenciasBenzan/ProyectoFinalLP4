@@ -87,47 +87,67 @@ public class ListService : IListService
         }
     }
 
+	public async Task<Result> UpdateListAsync(int listaId, string nuevoNombre)
+	{
+		try
+		{
+			var lista = await context.UserLists.FirstOrDefaultAsync(l => l.Id == listaId);
+			if (lista == null)
+			{
+				return Result.Failure("List not found.");
+			}
 
-    // public async Task<List<UserList>> GetListsAsync()
-    // {
+			lista.Name = nuevoNombre;
+			await context.SaveChangesAsync();
 
-    //     // Esto tendria que tener validacion :/
-    //     var r =  context.UserLists.ToList();
+			return Result.Success("List renamed successfully.");
+		}
+		catch (Exception ex)
+		{
+			return Result.Failure($"Error trying to rename the list: {ex.Message}");
+		}
+	}
 
-    //     if (r.Count == 0) {
-    //         return new List<UserList>();
-    //     }
+	public async Task<Result> DeleteListAsync(int listaId)
+	{
+		try
+		{
+			var lista = await context.UserLists.Include(l => l.Movies).FirstOrDefaultAsync(l => l.Id == listaId);
+			if (lista == null)
+			{
+				return Result.Failure("List not found or already deleted");
+			}
 
-    //     return await context.UserLists.Include(x => x.Movies).ToListAsync();
-    // }
+			context.Movies.RemoveRange(lista.Movies);
+			context.UserLists.Remove(lista);
+			await context.SaveChangesAsync();
 
-    // public Task CrearListaAsync(string nombre)
-    // {
-    //     // agregar peliculas
-    //     var list = new UserList { Name = nombre };
-    //     context.UserLists.Add(list);
-    //     return context.SaveChangesAsync();
-    // }
+			return Result.Success("List deleted successfully.");
+		}
+		catch (Exception ex)
+		{
+			return Result.Failure($"Error trying to delete list: {ex.Message}");
+		}
+	}
 
-    // public async Task AddMovieToListAsync(int listaId, Movie movie)
-    // {
+	public async Task<Result> DeleteMovieFromListAsync(int movieId)
+	{
+		try
+		{
+			var movie = await context.Movies.FirstOrDefaultAsync(m => m.Id == movieId);
+			if (movie == null)
+			{
+				return Result.Failure("Movie or tv show not found.");
+			}
 
-    //     var lista = await context.UserLists.FirstOrDefaultAsync(l => l.Id == listaId);
-    //     if (lista != null)
-    //     {
-    //movie.UserListId = listaId;
-    //movie.UserList = lista;
-    //context.Movies.Add(movie);
-    //         await context.SaveChangesAsync();
-    //     }
-    // }
+			context.Movies.Remove(movie);
+			await context.SaveChangesAsync();
 
-    // public async Task<UserList?> GetListByIdAsync(int listaId)
-    // {
-    //     var r = await context.UserLists.Include(x => x.Movies).FirstOrDefaultAsync(l => l.Id == listaId);
-    //     return r;
-    // }
-
-
-
+			return Result.Success("Movie or tv show removed succesfully.");
+		}
+		catch (Exception ex)
+		{
+			return Result.Failure($"Error trying to remove the movie or tv show: {ex.Message}");
+		}
+	}
 }
