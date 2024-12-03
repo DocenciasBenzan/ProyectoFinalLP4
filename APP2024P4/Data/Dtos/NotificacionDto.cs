@@ -7,7 +7,7 @@
         string SenderEmail,
         string RenderEmail,
         string Messege,
-        int? TareaId,
+        int TareaId,
         string Tarea,
         bool Isread,
         DateTime FechaCreacion
@@ -33,7 +33,7 @@
         public string UserId { get; set; } = null!;
         public string SenderEmail { get; set; } = null!;
         public string RenderEmail { get; set; } = null!;
-        public int? TareaId { get; set; }
+        public int TareaId { get; set; }
         public string Message { get; set; } = null!;
         public bool Isread { get; set; }
         public DateTime FechaCreacion { get; set; }

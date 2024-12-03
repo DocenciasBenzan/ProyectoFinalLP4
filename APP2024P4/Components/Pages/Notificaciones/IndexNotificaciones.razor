@@ -22,7 +22,7 @@
                     <div class="card-header ">Para: @p.RenderEmail </div>
                     <div class="card-body">
                         <h5 class="card-title">Invitacion a colaborar</h5>
-                        <span class="btn btn-primary" @onclick="() => btnAgregarClick(p.Id)">Aceptar</span>
+                        <span class="btn btn-primary" @onclick="() => btnAgregarClick(p.Id,p.TareaId)">Aceptar</span>
                         <span class="btn btn-primary" @onclick="() => btnEliminarClick(p.Id)">Rechazar</span>
                     </div>
                     <div class="card-footer">Enviado por @p.SenderEmail</div>
@@ -52,18 +52,19 @@
         await ConsultarNotificaciones();
     }
 
-    public async Task btnAgregarClick(int notificationId)
+    public async Task btnAgregarClick(int notificationId, int tareaId)
     {
         try
         {
             var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId)) return;
             // Responder a la invitación y agregar colaborador
-            var result = await NotificationService.RespondToInvitationAsync(notificationId, true,userId);
+            var result = await NotificationService.RespondToInvitationAsync(notificationId, true, userId, tareaId);
             if (result.Succesd)
             {
                 // Actualizar las notificaciones
-                await ConsultarNotificaciones();            }
+                await ConsultarNotificaciones();
+            }
         }
         catch (Exception ex)
         {
@@ -86,6 +87,8 @@
     public async Task btnEliminarClick(int notificationId)
     {
         await NotificationService.Delete(notificationId);
+        StateHasChanged();
+
     }
 
 }

@@ -8,7 +8,6 @@ public record TareaDto(
  string Estado = null!,
  string Prioridad = null!,
  int? ColaboradorId = null,
- string Colaboradores = null!,
  DateTime? FechaCreacion = null!,
  DateTime? FechaLimite = null!,
  bool IsCompleted = false
@@ -46,8 +45,10 @@ public class TareaRequest
 public class ColaboradorRequest
 {
     public int Id { get; set; }
+    public int TareaId { get; set; }
     public string UserId { get; set; } = null!;
     public string CreadorEmail { get; set; } = null!;
     public string ColaboradorEmail { get; set; } = null!;
     public bool IsApproved { get; set; }
 }
+

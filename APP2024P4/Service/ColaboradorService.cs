@@ -30,6 +30,7 @@ public partial class ColaboradorService : IColaboradorService
                 colaborador.CreadorEmail,
                 colaborador.ColaboradorEmail,
                 colaborador.IsApproved,
+                colaborador.TareaId,
                 colaborador.UserId
                 );
             _context.Colaboradores.Add(entity);
@@ -54,7 +55,8 @@ public partial class ColaboradorService : IColaboradorService
             if (entity.Update(
                 colaborador.UserId,
                 colaborador.CreadorEmail,
-                colaborador.CreadorEmail,
+                colaborador.TareaId,
+                colaborador.ColaboradorEmail,
                 colaborador.IsApproved
                 ))
             {
@@ -94,6 +96,7 @@ public partial class ColaboradorService : IColaboradorService
                 .Select(p => new ColaboradorDto(
                     p.Id,
                     p.UserId,
+                    p.TareaId,
                     p.CreadorEmail,
                     p.ColaboradorEmail,
                     p.IsApproved

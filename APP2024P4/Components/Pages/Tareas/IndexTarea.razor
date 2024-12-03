@@ -2,137 +2,134 @@
 @attribute [StreamRendering]
 @page "/tareas"
 
-@if (ShowForm)
-{
-    <div class="card">
-        <h5 class="card-header text-center">@Accion Tarea</h5>
-        <div class="card-body">
-            @if (@ShowSelect)
-            {
-                <div class="mb-3">
-                    <label class="form-label">Colaboradores</label>
-                    <input @bind="SelectedEmail" class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Type to search..." disabled="@DisableInputs">
-                    <datalist class="mb-3" id="datalistOptions">
-                        @foreach (var UserEmail in Emails)
-                        {
-                            <option value="@UserEmail">
-                                @UserEmail
-                            </option>
-                        }
-                    </datalist>
-                    <span @onclick="()=>SendInvitacion(tareaIdActual)" class="btn btn-outline-primary">Enviar Invitacion</span>
-
-                </div>
-            }
-            else
-            {
-                <div class="mb-3">
-                    <label for="nombre" class="form-label">Titulo</label>
-                    <input @bind-value="MiTarea.Titulo" type="text" class="form-control" id="nombre" placeholder="Nombre" disabled="@DisableInputs">
-                </div>
-                <div class="mb-3">
-                    <label for="descripcion" class="form-label">Descripción</label>
-                    <textarea @bind="MiTarea.Descripcion" class="form-control" id="descripcion" rows="3" disabled="@DisableInputs"></textarea>
-                </div>
-                <div class="mb-3">
-                    <label for="exampleFormControlTextarea1" class="form-label">Prioridad</label>
-                    <select class="form-select" aria-label="Default select example" @bind="@MiTarea.Prioridad" disabled="@DisableInputs" placeholder="Prioridad">
-                        <option selected disabled>Seleccione </option>
-                        @foreach (var Prioridad in Enum.GetValues(typeof(Prioridad)))
-                        {
-                            <option value="@Prioridad">
-                                @Prioridad.ToString()
-                            </option>
-                        }
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="exampleFormControlTextarea1" class="form-label">Estado</label>
-                    <select class="form-select" aria-label="Default select example" @bind="@MiTarea.Estado" disabled="@DisableInputs" placeholder="Estado">
-                        <option selected disabled>Seleccione</option>
-                        @foreach (var Estado in Enum.GetValues(typeof(Estado)))
-                        {
-                            <option value="@Estado">
-                                @Estado.ToString()
-                            </option>
-
-                        }
-                    </select>
-                </div>
-
-                <div class="mb-3 " disabled="@DisableInputs">
-                    <label for="exampleFormControlInput1" class="form-label">Fecha Limite</label>
-                    <div class="mb-3">
-                        <InputDate @bind-Value="MiTarea.FechaLimite" class="form-control" disabled="@DisableInputs" />
-                    </div>
-                    @if (Accion != Constants.Acciones.Ver)
+<div class="card">
+    <h5 class="card-header text-center">@Accion Tarea</h5>
+    <div class="card-body">
+        @if (@ShowSelect)
+        {
+            <div class="mb-3">
+                <label class="form-label">Colaboradores</label>
+                <input @bind="SelectedEmail" class="form-control" list="datalistOptions" id="exampleDataList" placeholder="Type to search..." disabled="@DisableInputs">
+                <datalist class="" id="datalistOptions">
+                    @foreach (var UserEmail in Emails)
                     {
-                        <span class="btn btn-primary" @onclick="Aceptar">Aceptar</span> 
+                        <option value="@UserEmail">
+                            @UserEmail
+                        </option>
                     }
-                    <span class="btn btn-danger" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
-                </div>
-            }
-        </div>
-    </div>
-}
-else
-{
-    <div class="card text-bg-dark mb-3" style="max-width: auto;">
-        <div class="card-header">
-            Tareas en procesos
-            <span class="btn btn-success" @onclick="btnAgregarClick">+</span>
-        </div>
-        <div class="card-body">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Titulo</th>
-                        <th scope="col">Descripcion</th>
-                        <th scope="col">Prioridad</th>
-                        <th scope="col">Estado</th>
-                        <th scope="col">Fecha de Creacion</th>
-                        <th scope="col">Fecha Limite</th>
-                        <th scope="col">Action</th>
-                        <th scope="col">AgregarColaborador</th>
-                        <th scope="col">Finalizar</th>
-
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (TareaList?.Count > 0)
+                </datalist>
+                    <span @onclick="()=>SendInvitacion(tareaIdActual)" class="btn btn-outline-primary m-3">Enviar Invitacion</span>
+            </div>
+        }
+        else
+        {
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Titulo</label>
+                <input @bind-value="MiTarea.Titulo" type="text" class="form-control" id="nombre" placeholder="Nombre" disabled="@DisableInputs">
+            </div>
+            <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción</label>
+                <textarea @bind="MiTarea.Descripcion" class="form-control" id="descripcion" rows="3" disabled="@DisableInputs"></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label">Prioridad</label>
+                <select class="form-select" aria-label="Default select example" @bind="@MiTarea.Prioridad" disabled="@DisableInputs" placeholder="Prioridad">
+                    <option selected disabled>Seleccione </option>
+                    @foreach (var Prioridad in Enum.GetValues(typeof(Prioridad)))
                     {
-                        @foreach (var p in TareaList)
-                        {
-                            <tr>
-                                <th scope="row">@p.Id</th>
-                                <td>@p.Titulo</td>
-                                <td>@p.Descripcion</td>
-                                <td>@p.Prioridad</td>
-                                <td>@p.Estado</td>
-                                <td>@p.FechaCreacion?.ToShortDateString()</td>
-                                <td>@p.FechaLimite?.ToShortDateString()</td>
-                                <td>
-                                    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
-                                        <span @onclick="()=>btnEditarClick(p)" class="btn btn-outline-warning">Editar</span>
-                                        <span @onclick="()=>btnEliminarClick(p)" class="btn btn-outline-danger">Eliminar</span>
-                                        <span @onclick="()=>btnVerClick(p)" class="btn btn-outline-primary">Ver</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span @onclick="()=>btnAgregarColaborador(tareaIdActual = p.Id)" class="btn btn-outline-danger">AgregarColaborador</span>
-                                </td>
-                                <td>
-                                    <span @onclick="()=>btnVerClick(p)" class="btn btn-outline-primary">TareaCompletada</span>
-                                </td>
-                            </tr>
-                        }
+                        <option value="@Prioridad">
+                            @Prioridad.ToString()
+                        </option>
                     }
-                </tbody>
-            </table>
-        </div>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlTextarea1" class="form-label">Estado</label>
+                <select class="form-select" aria-label="Default select example" @bind="@MiTarea.Estado" disabled="@DisableInputs" placeholder="Estado">
+                    <option selected disabled>Seleccione</option>
+                    @foreach (var Estado in Enum.GetValues(typeof(Estado)))
+                    {
+                        <option value="@Estado">
+                            @Estado.ToString()
+                        </option>
+
+                    }
+                </select>
+            </div>
+
+            <div class="mb-3 " disabled="@DisableInputs">
+                <label for="exampleFormControlInput1" class="form-label">Fecha Limite</label>
+                <div class="mb-3">
+                    <InputDate @bind-Value="MiTarea.FechaLimite" class="form-control" disabled="@DisableInputs" />
+                </div>
+                @if (Accion != Constants.Acciones.Ver)
+                {
+                    <span class="btn btn-primary" @onclick="Aceptar">Aceptar</span>
+                }
+                <span class="btn btn-danger" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
+            </div>
+        }
     </div>
-}
+</div>
+
+
+
+<div class="card text-bg-dark mb-3" style="max-width: auto;">
+    <div class="card-header">
+        Tareas en procesos
+        <span class="btn btn-success" @onclick="btnAgregarClick">+</span>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Titulo</th>
+                    <th scope="col">Descripcion</th>
+                    <th scope="col">Prioridad</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Fecha de Creacion</th>
+                    <th scope="col">Fecha Limite</th>
+                    <th scope="col">Action</th>
+                    <th scope="col">AgregarColaborador</th>
+                    <th scope="col">Finalizar</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @if (TareaList?.Count > 0)
+                {
+                    @foreach (var p in TareaList)
+                    {
+                        <tr>
+                            <th scope="row">@p.Id</th>
+                            <td>@p.Titulo</td>
+                            <td>@p.Descripcion</td>
+                            <td>@p.Prioridad</td>
+                            <td>@p.Estado</td>
+                            <td>@p.FechaCreacion?.ToShortDateString()</td>
+                            <td>@p.FechaLimite?.ToShortDateString()</td>
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                    <span @onclick="()=>btnEditarClick(p)" class="btn btn-outline-warning">Editar</span>
+                                    <span @onclick="()=>btnEliminarClick(p)" class="btn btn-outline-danger">Eliminar</span>
+                                    <span @onclick="()=>btnVerClick(p)" class="btn btn-outline-primary">Ver</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span @onclick="()=>btnAgregarColaborador(tareaIdActual = p.Id)" class="btn btn-outline-danger">AgregarColaborador</span>
+                            </td>
+                            <td>
+                                <span @onclick="()=>btnVerClick(p)" class="btn btn-outline-primary">TareaCompletada</span>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
 @code {
 
     private ClaimsPrincipal? currentUser;
@@ -230,7 +227,7 @@ else
                 MiNotificacion.FechaCreacion = DateTime.Now;
                 await NotificationService.SendNotificationAsync(MiNotificacion, userId, tareaId, SelectedEmail);
                 Limpiar();
-                return Result.Success("");     
+                return Result.Success("");
             }
         }
         return Result.Success("");
@@ -240,10 +237,10 @@ else
     {
         if (currentUser is not { Identity.IsAuthenticated: true }) return;
 
-        var userId = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value; 
+        var userId = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId)) return;
 
-        var result = await service.GetById(userId); 
+        var result = await service.GetById(userId);
 
         if (result.Succesd)
         {
@@ -254,7 +251,7 @@ else
         }
         else
         {
-            TareaList = new(); 
+            TareaList = new();
             Console.WriteLine(result.Message);
         }
     }
@@ -281,10 +278,10 @@ else
 
     public async Task Aceptar()
     {
-        var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value; 
+        var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId)) return;
         Result r =
-        Accion == Constants.Acciones.Registrar ? await service.Create(MiTarea,userId) :
+        Accion == Constants.Acciones.Registrar ? await service.Create(MiTarea, userId) :
         Accion == Constants.Acciones.Modificar ? await service.Update(MiTarea) :
         Accion == Constants.Acciones.Eliminar ? await service.Delete(MiTarea.Id) :
         Accion == Constants.Acciones.AgregarColabor ? Result.Success("") :

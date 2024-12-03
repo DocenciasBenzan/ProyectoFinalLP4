@@ -14,6 +14,7 @@ public interface ITareaSevice
     Task<ResultList<TareaDto>> Get(string filtro = "");
     Task<ResultList<TareaDto>> GetById(string UserId);
     Task<Result> Update(TareaRequest tarea);
+    Task<ResultList<TareaDto>> ObtenerTareasPorColaborador(string email);
 
 
 }
@@ -113,7 +114,6 @@ public partial class TareaService : ITareaSevice
                     p.Estado,
                     p.Prioridad,
                     p.ColaboradorId,
-                    p.Colaboradores!.CreadorEmail ?? "Sin colaborador todavia",
                     p.FechaCreacion,
                     p.FechaLimite,
                     p.IsCompleted
@@ -143,7 +143,6 @@ public partial class TareaService : ITareaSevice
                     p.Estado,
                     p.Prioridad,
                     p.ColaboradorId,
-                    p.Colaboradores!.CreadorEmail ?? "Sin colaborador todavia",
                     p.FechaCreacion,
                     p.FechaLimite,
                     p.IsCompleted
@@ -154,6 +153,38 @@ public partial class TareaService : ITareaSevice
         catch (Exception Ex)
         {
             return ResultList<TareaDto>.Failure($"Error: {Ex.Message}");
+        }
+    }
+    public async Task<ResultList<TareaDto>> ObtenerTareasPorColaborador(string email)
+    {
+        try
+        {
+            var tareas = await dbContext.Tareas
+                .Where(t => t.Colaboradores != null && (
+                    t.Colaboradores.CreadorEmail == email ||
+                    t.Colaboradores.ColaboradorEmail == email))
+                .Select(t => new TareaDto(
+                    t.Id,
+                    t.UserId,
+                    t.Titulo,
+                    t.Descripcion!,
+                    t.Estado,
+                    t.Prioridad,
+                    t.ColaboradorId,
+                    t.FechaCreacion,
+                    t.FechaLimite,
+                    t.IsCompleted
+                ))
+                .ToListAsync();
+
+            if (!tareas.Any())
+                return ResultList<TareaDto>.Failure("No se encontraron tareas asociadas a este colaborador.");
+
+            return ResultList<TareaDto>.Success(tareas);
+        }
+        catch (Exception ex)
+        {
+            return ResultList<TareaDto>.Failure($"☠️ Error: {ex.Message}");
         }
     }
 }

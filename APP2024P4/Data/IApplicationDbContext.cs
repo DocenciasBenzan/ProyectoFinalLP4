@@ -9,4 +9,5 @@ public interface IApplicationDbContext
     DbSet<Notificacion> Notificaciones { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
+
 }

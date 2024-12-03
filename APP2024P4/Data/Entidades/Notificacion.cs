@@ -10,7 +10,8 @@ public class Notificacion
     public string UserId { get; set; } = null!;
     public string SenderEmail { get; set; } = null!;
     public string RenderEmail { get; set; } = null!;
-    public int? TareaId { get; set; }
+    [ForeignKey(nameof(Tarea.Id))]
+    public int TareaId { get; set; }
     public string Message { get; set; } = null!;
     public bool Isread { get; set; }
     public DateTime FechaCreacion { get; set; }
@@ -23,7 +24,7 @@ public class Notificacion
         string message,
         bool isread,
         DateTime fechaCreacion,
-        int? tareaId = null
+        int tareaId 
         )
            => new()
            {
@@ -42,7 +43,7 @@ public class Notificacion
         string message,
         bool isread,
         DateTime fechaCreacion,
-        int? tareaId = null
+        int tareaId 
         )
     {
         var save = false;
@@ -86,7 +87,6 @@ public class Notificacion
     }
     [ForeignKey(nameof(UserId))]
     public virtual ApplicationUser? User { get; set; }
-    [ForeignKey(nameof(TareaId))]
     public virtual Tarea? Tareas { get; set; }
 
 }

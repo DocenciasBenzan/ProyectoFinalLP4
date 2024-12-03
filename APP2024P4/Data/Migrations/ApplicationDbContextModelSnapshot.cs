@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace APP2024P4.Migrations
+namespace APP2024P4.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -150,7 +150,7 @@ namespace APP2024P4.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TareaId")
+                    b.Property<int>("TareaId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
@@ -207,7 +207,9 @@ namespace APP2024P4.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ColaboradorId");
+                    b.HasIndex("ColaboradorId")
+                        .IsUnique()
+                        .HasFilter("[ColaboradorId] IS NOT NULL");
 
                     b.HasIndex("UserId");
 
@@ -362,7 +364,9 @@ namespace APP2024P4.Migrations
                 {
                     b.HasOne("APP2024P4.Data.Entidades.Tarea", "Tareas")
                         .WithMany()
-                        .HasForeignKey("TareaId");
+                        .HasForeignKey("TareaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("APP2024P4.Data.ApplicationUser", "User")
                         .WithMany()
@@ -378,8 +382,8 @@ namespace APP2024P4.Migrations
             modelBuilder.Entity("APP2024P4.Data.Entidades.Tarea", b =>
                 {
                     b.HasOne("APP2024P4.Data.Entidades.Colaborador", "Colaboradores")
-                        .WithMany()
-                        .HasForeignKey("ColaboradorId");
+                        .WithOne("Tareas")
+                        .HasForeignKey("APP2024P4.Data.Entidades.Tarea", "ColaboradorId");
 
                     b.HasOne("APP2024P4.Data.ApplicationUser", "User")
                         .WithMany()
@@ -441,6 +445,11 @@ namespace APP2024P4.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("APP2024P4.Data.Entidades.Colaborador", b =>
+                {
+                    b.Navigation("Tareas");
                 });
 #pragma warning restore 612, 618
         }

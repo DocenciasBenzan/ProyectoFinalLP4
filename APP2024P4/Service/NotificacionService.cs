@@ -4,14 +4,12 @@ using Microsoft.AspNetCore.Identity;
 using TaskMaster;
 using APP2024P4.Data.Entidades;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
-using System.Threading;
 namespace APP2024P4.Service;
 public interface INotificationService
 {
-    Task<Result> SendNotificationAsync(NotifiacioRequest notificacion,string userId, int tareaId,string renderEmail);
+    Task<Result> SendNotificationAsync(NotifiacioRequest notificacion, string userId, int tareaId, string renderEmail);
     Task<ResultList<NotificacionDto>> GetNotificacionByEmail(string renderEmail);
-    Task<Result> RespondToInvitationAsync(int notificationId, bool isAccepted, string userId);
+    Task<Result> RespondToInvitationAsync(int notificationId, bool isAccepted, string userId, int tareaId);
     Task<Result> Delete(int Id);
 }
 public partial class NotificationService : INotificationService
@@ -92,7 +90,7 @@ public partial class NotificationService : INotificationService
             return ResultList<NotificacionDto>.Failure($"☠️ Error: {Ex.Message}");
         }
     }
-    public async Task<Result> RespondToInvitationAsync(int notificationId, bool isAccepted ,string userId)
+    public async Task<Result> RespondToInvitationAsync(int notificationId, bool isAccepted, string userId, int tareaId)
     {
         try
         {
@@ -108,10 +106,13 @@ public partial class NotificationService : INotificationService
                 // Agregar al colaborador
                 var colaboradorRequest = new ColaboradorRequest
                 {
+
                     CreadorEmail = notification.SenderEmail,
                     ColaboradorEmail = notification.RenderEmail,
                     IsApproved = true,
-                    UserId = userId
+                    UserId = userId,
+                    TareaId = notification.TareaId,
+
                 };
                 var addResult = await _colaboradorService.Addcolaborador(colaboradorRequest);
                 if (!addResult.Succesd)

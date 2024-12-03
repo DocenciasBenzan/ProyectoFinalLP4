@@ -1,42 +1,82 @@
-﻿@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IColaboradorService ColaboradoresSevice
-@rendermode InteractiveServer
-@attribute [StreamRendering]
+﻿@inject AuthenticationStateProvider ProveedorEstadoAutenticacion
+@inject ITareaSevice ServicioTareas
+
 @page "/colaboradores"
 @using APP2024P4.Data.Dtos
 @using APP2024P4.Service
 @using System.Security.Claims
 
-
+<div class="card text-bg-dark mb-3">
+    <div class="card-header">
+        Tareas del Colaborador
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Título</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Prioridad</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Fecha de Creación</th>
+                    <th scope="col">Fecha Límite</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (ListaTareas.Any())
+                {
+                    @foreach (var tarea in ListaTareas)
+                    {
+                        <tr>
+                            <th scope="row">@tarea.Id</th>
+                            <td>@tarea.Titulo</td>
+                            <td>@tarea.Descripcion</td>
+                            <td>@tarea.Prioridad</td>
+                            <td>@tarea.Estado</td>
+                            <td>@tarea.FechaCreacion?.ToShortDateString()</td>
+                            <td>@tarea.FechaLimite?.ToShortDateString()</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" class="text-center">No se encontraron tareas.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
 @code {
-    public ColaboradorRequest Micolaborador { get; set; } = new();
-    public List<ColaboradorDto>? ColaboradorList { get; set; } 
-    public TareaRequest MiTarea { get; set; } = new();
-    public List<TareaDto>? TareaList { get; set; }
-    private string CurrentUserEmail = null!;
+    private string CorreoUsuarioActual = string.Empty;
+    private List<TareaDto> ListaTareas = new();
 
     protected override async Task OnInitializedAsync()
     {
+        var estadoAutenticacion = await ProveedorEstadoAutenticacion.GetAuthenticationStateAsync();
+        var usuario = estadoAutenticacion.User;
 
-        await Consultar();
-    }
-    async Task Consultar()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        if (user.Identity!.IsAuthenticated)
+        if (usuario.Identity?.IsAuthenticated == true)
         {
-            CurrentUserEmail = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value!;
+            CorreoUsuarioActual = usuario.FindFirst(c => c.Type == ClaimTypes.Email)?.Value ?? string.Empty;
+            await ConsultarTareasColaborador();
         }
-        var result = await ColaboradoresSevice.GetByEmail(CurrentUserEmail);
-        if (result.Succesd)
+    }
+
+    private async Task ConsultarTareasColaborador()
+    {
+        var resultado = await ServicioTareas.ObtenerTareasPorColaborador(CorreoUsuarioActual);
+
+        if (resultado.Succesd)
         {
-            ColaboradorList =
-            result.Data?.ToList()
-            ??
-        new List<ColaboradorDto>();
+            ListaTareas = resultado.Data?.ToList() ?? new List<TareaDto>();
+        }
+        else
+        {
+            ListaTareas = new List<TareaDto>();
         }
     }
 }

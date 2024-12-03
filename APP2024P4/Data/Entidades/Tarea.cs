@@ -100,5 +100,4 @@ public class Tarea
     public virtual ApplicationUser? User { get; set; }
     [ForeignKey(nameof(ColaboradorId))]
     public virtual Colaborador? Colaboradores { get; set; }
-
 }

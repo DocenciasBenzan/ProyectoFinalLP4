@@ -14,10 +14,11 @@ namespace APP2024P4.Data.Entidades
         public string CreadorEmail { get; set; } = null!;
         public string ColaboradorEmail { get; set; } = null!;
         public bool IsApproved { get; set; }
-        public static Colaborador Create(string creadorEmail, string colaboradorEmail, bool isApproved, string userId = null!)
+        public static Colaborador Create(string creadorEmail, string colaboradorEmail, bool isApproved,int tareaId, string userId = null!)
      => new()
      {
          UserId = userId,
+         TareaId = tareaId,
          CreadorEmail = creadorEmail,
          ColaboradorEmail = colaboradorEmail,
          IsApproved = isApproved
@@ -25,13 +26,14 @@ namespace APP2024P4.Data.Entidades
         public Colaborador ToDto() => new()
         {
             Id = this.Id,
+            TareaId = this.TareaId,
             UserId = this.UserId,
             CreadorEmail = this.CreadorEmail,
             ColaboradorEmail = this.ColaboradorEmail,
             IsApproved = this.IsApproved
         };
 
-        public bool Update(string userId, string creadorEmail, string colaboradorEmail, bool isApproved)
+        public bool Update(string userId, string creadorEmail, int tareaId, string colaboradorEmail, bool isApproved)
         {
             var save = false;
 
@@ -39,6 +41,12 @@ namespace APP2024P4.Data.Entidades
             {
                 this.UserId = userId;
                 save = true;
+            }
+            if (UserId != userId)
+            {
+                this.UserId = userId;
+                save = true;
+
             }
             if (CreadorEmail != creadorEmail)
             {
@@ -59,5 +67,6 @@ namespace APP2024P4.Data.Entidades
         }
         [ForeignKey(nameof(UserId))]
         public virtual ApplicationUser? User { get; set; }
+        public virtual Tarea? Tareas { get; set; }
     }
 }

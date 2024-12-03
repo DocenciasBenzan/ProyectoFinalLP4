@@ -1,5 +1,4 @@
 ﻿using APP2024P4.Data;
-using APP2024P4.Data.Entidades;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskMaster;

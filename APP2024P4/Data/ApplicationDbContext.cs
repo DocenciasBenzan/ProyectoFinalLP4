@@ -14,5 +14,6 @@ namespace APP2024P4.Data
         {
             return base.SaveChangesAsync(cancellationToken);
         }
+
     }
 }
