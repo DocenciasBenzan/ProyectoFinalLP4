@@ -1,7 +1,7 @@
 ﻿@page "/colaboradores"
 @attribute [Authorize]
 
-<div class="card text-bg-dark mb-3">
+<div class="card mb-3">
     <div class="card-header">
         Tareas del Colaborador
     </div>
@@ -33,9 +33,8 @@
                             <td>@tarea.Estado</td>
                             <td>@tarea.FechaCreacion?.ToShortDateString()</td>
                             <td>@tarea.FechaLimite?.ToShortDateString()</td>
-                            <td>@tarea.</td>
-                            <td>@tarea.</td>
-                            <></>
+                            <td>@tarea.Colaboradores</td>
+                            <td>@tarea.CreadorEmail</td>
                         </tr>
                     }
                 }
@@ -47,6 +46,7 @@
 @code {
     private string CorreoUsuarioActual = string.Empty;
     private List<TareaDto> ListaTareas = new();
+    private List<ColaboradorDto> ListColaboradores = new();
 
     protected override async Task OnInitializedAsync()
     {
