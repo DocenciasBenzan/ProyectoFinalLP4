@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using APP2024P4.Data.Request;
+using APP2024P4.Data.Response;
 
 namespace APP2024P4.Data.Entities;
 
@@ -17,6 +18,20 @@ public class Vehiculo
 	[ForeignKey(nameof(ClientId))]
 	public virtual Cliente Cliente { get; set; }
 
+	#region Metodos
+	public VehiculoResponse ToResponse()
+	{
+		return new VehiculoResponse
+		{
+			Id = this.Id,
+			Placa = this.Placa,
+			Marca = this.Marca,
+			Modelo = this.Modelo,
+			Color = this.Color,
+			Tipo = this.Tipo,
+			Cliente = this.Cliente.ToResponse() 
+		};
+	}
 	public bool Actualizar(VehiculoRequest r)
 	{
 		var cambios = false;
@@ -28,4 +43,6 @@ public class Vehiculo
 		if (this.ClientId != r.ClienteId) { ClientId = r.ClienteId; cambios = true; }
 		return cambios;
 	}
+
+	#endregion
 }

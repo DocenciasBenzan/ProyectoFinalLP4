@@ -42,10 +42,30 @@ public class EmpleadoRequest
 }
 public class ServicioRequest
 {
+	public int Id { get; set; }
+	[Required(AllowEmptyStrings = false, ErrorMessage = "Ingresa un Nombre")]
 	public string Nombre { get; set; } = null!;
+	[Required(AllowEmptyStrings = false, ErrorMessage = "Ingresa una Descripcion")]
+
 	public string Descripcion { get; set; } = null!;
+	[Range(	1, double.MaxValue, ErrorMessage = "Ingresa una duracion correcta ( >  )")]
 	public decimal DuracionEstimada { get; set; }
+	[Range(1, double.MaxValue, ErrorMessage = "Ingresa un precio ( > 1 )")]
+
 	public decimal Precio { get; set; }
+
+	public Servicio ToServicio()
+	{
+		return new Servicio()
+		{
+			Id = this.Id,
+			Nombre = this.Nombre,
+			Descripcion = this.Descripcion,
+			DuracionEstimada = this.DuracionEstimada,
+			Precio = this.Precio
+		};
+	}
+
 }
 public class VehiculoRequest
 {
@@ -87,14 +107,31 @@ public class VehiculoRequest
 }
 public class ClienteRequest
 {
+	public int Id { get; set; }
+	[Required(AllowEmptyStrings = false, ErrorMessage = "Debes introducir un nombre")]
 	public string Nombre { get; set; } = null!;
+	[Required(AllowEmptyStrings = false, ErrorMessage = "Debes introducir un Telefono")]
+
 	public string Telefono { get; set; } = null!;
 	public string? CorreoElectronico { get; set; }
 	public string? Direcion { get; set; }
+
+	public Cliente ToCliente()
+	{
+		return new()
+		{
+			Nombre = this.Nombre,
+			Telefono = this.Telefono,
+			CorreoElectronico = this.CorreoElectronico,
+			Direcion = this.Direcion
+		};
+
+	}
 }
 
 public class ReservaRequest
 {
+	public int Id { get; set; }
 	public DateTime Inicio { get; set; }
 	public DateTime Fin { get; set; }
 	public int ClienteId { get; set; }
@@ -103,4 +140,21 @@ public class ReservaRequest
 	public int EmpleadoId { get; set; }
 	public string Estado { get; set; } = null!; // pendiente, completada, cancelada
 	public string? NotasAdicionales { get; set; }
+
+
+	public Reserva ToReserva()
+	{
+		return new()
+		{
+			Id = this.Id,
+			Inicio = this.Inicio,
+			Fin = this.Fin,
+			ClienteId = this.ClienteId,
+			VehiculoId = this.VehiculoId,
+			ServicioId = this.ServicioId,
+			EmpleadoId = this.EmpleadoId,
+			Estado = this.Estado,
+			NotasAdicionales = this.NotasAdicionales
+		};
+	}
 }

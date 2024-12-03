@@ -1,0 +1,165 @@
+﻿@page "/servicios"
+@inject IServicioService ServicioService
+@rendermode InteractiveServer
+
+<h3>Gestión de Servicios</h3>
+
+@if (MostrarForm)
+{
+	<!-- Formulario para Agregar/Actualizar Servicio -->
+	<div class="card mb-4">
+		<div class="card-header">
+			<h5 class="card-title">@((servicio.Id == 0) ? "Agregar Servicio" : "Actualizar Servicio")</h5>
+		</div>
+		<div class="card-body">
+			<EditForm Model="@servicio" OnValidSubmit="GuardarServicio" FormName="FormularioServicios">
+				<DataAnnotationsValidator />
+				<ValidationSummary />
+
+				<div class="mb-3">
+					<label for="nombre" class="form-label">Nombre</label>
+					<InputText id="nombre" class="form-control" @bind-Value="servicio.Nombre" />
+				</div>
+
+				<div class="mb-3">
+					<label for="descripcion" class="form-label">Descripción</label>
+					<InputText id="descripcion" class="form-control" @bind-Value="servicio.Descripcion" />
+				</div>
+
+				<div class="mb-3">
+					<label for="duracionEstimada" class="form-label">Duración Estimada (en horas)</label>
+					<InputNumber id="duracionEstimada" class="form-control" @bind-Value="servicio.DuracionEstimada" />
+				</div>
+
+				<div class="mb-3">
+					<label for="precio" class="form-label">Precio</label>
+					<InputNumber id="precio" class="form-control" @bind-Value="servicio.Precio" />
+				</div>
+				<div class="btn-group w-100">
+					<button type="submit" class="btn btn-primary col-9">@((servicio.Id == 0) ? "Agregar Servicio" : "Actualizar Servicio")</button>
+					<span class="btn btn-outline-info col-3" @onclick="Limpiar">Cancelar</span>
+				</div>
+			</EditForm>
+		</div>
+	</div>
+}
+else
+{
+	<div class="mb-4">
+		<span class="btn btn-outline-primary" @onclick="btnAgregarCliente">
+			<i class="bi bi-file-plus"></i> Agregar Servicio
+		</span>
+	</div>
+	@if (servicios.Any())
+	{
+		<!-- Tabla de Servicios -->
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Lista de Servicios</h5>
+			</div>
+			<div class="card-body">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Nombre</th>
+							<th>Descripción</th>
+							<th>Duración Estimada (hrs)</th>
+							<th>Precio</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in servicios)
+						{
+							<tr>
+								<td>@item.Id</td>
+								<td>@item.Nombre</td>
+								<td>@item.Descripcion</td>
+								<td>@item.DuracionEstimada</td>
+								<td>@item.Precio</td>
+								<td>
+									<button class="btn btn-warning btn-sm" @onclick="() => EditarServicio(item.ToRequest())">Editar</button>
+									<button class="btn btn-danger btn-sm" @onclick="() => EliminarServicio(item.Id)">Eliminar</button>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	}
+	else
+	{
+		<p>Sin servicios registrados</p>
+	}
+}
+@code {
+	private ServicioRequest servicio = new ServicioRequest();
+	private List<ServicioResponse> servicios = new List<ServicioResponse>();
+	public bool MostrarForm { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		await CargarServicios();
+	}
+
+	private async Task CargarServicios()
+	{
+		var result = await ServicioService.ObtenerServicios();
+		if (result.Succeeded)
+		{
+			servicios = result?.Data?.ToList() ?? new();
+			StateHasChanged();
+		}
+	}
+
+	private async Task GuardarServicio()
+	{
+		Result result;
+		if (servicio.Id == 0) // Agregar
+		{
+			result = await ServicioService.AgregarServicio(servicio);
+		}
+		else // Actualizar
+		{
+			result = await ServicioService.ActualizarServicio(servicio);
+		}
+
+		if (result.Succeeded)
+		{
+			this.Limpiar();
+			await CargarServicios();
+		}
+
+	}
+
+	private async Task EditarServicio(ServicioRequest request)
+	{
+		MostrarForm = true;
+		servicio = request;
+	}
+
+	private async Task EliminarServicio(int id)
+	{
+		var result = await ServicioService.EliminarServicio(id);
+		if (result.Succeeded)
+		{
+			await CargarServicios();
+		}
+
+	}
+	private async Task btnAgregarCliente()
+	{
+		servicio = new();
+		MostrarForm = true;
+		StateHasChanged();
+
+	}
+	private void Limpiar()
+	{
+		MostrarForm = false;
+		servicio = new ServicioRequest();
+		StateHasChanged();
+	}
+}
