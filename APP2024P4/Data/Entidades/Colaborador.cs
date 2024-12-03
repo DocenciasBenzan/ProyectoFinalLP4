@@ -9,11 +9,11 @@ namespace APP2024P4.Data.Entidades
         [Key]
         public int Id { get; set; }
         public string UserId { get; set; } = null!;
-        public virtual ICollection<Tarea>? Tareas { get; set; }
+        [ForeignKey(nameof(Tarea.Id))]
+        public int TareaId { get; set; }
         public string CreadorEmail { get; set; } = null!;
         public string ColaboradorEmail { get; set; } = null!;
         public bool IsApproved { get; set; }
-
         public static Colaborador Create(string creadorEmail, string colaboradorEmail, bool isApproved, string userId = null!)
      => new()
      {

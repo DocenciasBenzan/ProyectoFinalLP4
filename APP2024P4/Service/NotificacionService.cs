@@ -5,11 +5,14 @@ using TaskMaster;
 using APP2024P4.Data.Entidades;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using System.Threading;
 namespace APP2024P4.Service;
 public interface INotificationService
 {
-    Task<Result> SendNotificationAsync(NotifiacioRequest notificacion);
+    Task<Result> SendNotificationAsync(NotifiacioRequest notificacion,string userId, int tareaId,string renderEmail);
     Task<ResultList<NotificacionDto>> GetNotificacionByEmail(string renderEmail);
+    Task<Result> RespondToInvitationAsync(int notificationId, bool isAccepted, string userId);
+    Task<Result> Delete(int Id);
 }
 public partial class NotificationService : INotificationService
 {
@@ -25,10 +28,23 @@ public partial class NotificationService : INotificationService
         _userManager = userManager;
         _colaboradorService = colaboradorService;
     }
-    public async Task<Result> SendNotificationAsync(NotifiacioRequest notificacion)
+    public async Task<Result> SendNotificationAsync(NotifiacioRequest notificacion, string userId, int tareaId, string renderEmail)
     {
         try
         {
+            // Verificar si ya existe una notificación para el usuario con la misma tareaId 
+            var existingNotification = await _context.Notificaciones
+                            .FirstOrDefaultAsync(n => n.UserId == userId && n.TareaId == tareaId && n.RenderEmail == renderEmail);
+
+            if (existingNotification != null)
+            {
+                existingNotification.Message = notificacion.Message;
+                existingNotification.Isread = notificacion.Isread;
+                existingNotification.FechaCreacion = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+                return Result.Success("✅ Notificación actualizada con éxito.");
+            }
             var entity = Notificacion.Create(
                 notificacion.UserId,
                 notificacion.SenderEmail,
@@ -37,12 +53,13 @@ public partial class NotificationService : INotificationService
                 notificacion.Isread,
                 notificacion.FechaCreacion,
                 notificacion.TareaId
+            );
+            entity.UserId = userId;
 
-                );
             _context.Notificaciones.Add(entity);
             await _context.SaveChangesAsync();
 
-            return Result.Success("✅Notificaion registrado con éxito!");
+            return Result.Success("✅ Notificación registrada con éxito!");
         }
         catch (Exception Ex)
         {
@@ -53,17 +70,17 @@ public partial class NotificationService : INotificationService
     {
         try
         {
-            var entity = await _context.Notificaciones.Where(p => p.RenderEmail == renderEmail)
-                .Select(p => new NotificacionDto(
-                    p.Id,
-                    p.UserId,
-                    p.SenderEmail,
-                    p.RenderEmail,
-                    p.Message,
-                    p.TareaId,
-                    p.Tareas!.Titulo ?? "No definido",
-                    p.Isread,
-                    p.FechaCreacion))
+            var entity = await _context.Notificaciones.Where(n => n.RenderEmail == renderEmail)
+                .Select(n => new NotificacionDto(
+                    n.Id,
+                    n.UserId,
+                    n.SenderEmail,
+                    n.RenderEmail,
+                    n.Message,
+                    n.TareaId,
+                    n.Tareas!.Titulo ?? "No definido",
+                    n.Isread,
+                    n.FechaCreacion))
                 .ToListAsync();
             if (entity == null)
                 return ResultList<NotificacionDto>.Failure($"El producto no existe!");
@@ -112,6 +129,22 @@ public partial class NotificationService : INotificationService
         catch (Exception ex)
         {
             return Result.Failure($"☠️ Error: {ex.Message}");
+        }
+    }
+    public async Task<Result> Delete(int Id)
+    {
+        try
+        {
+            var entity = _context.Notificaciones.Where(p => p.Id == Id).FirstOrDefault();
+            if (entity == null)
+                return Result.Failure($"La Notificacion '{Id}' no existe!");
+            _context.Notificaciones.Remove(entity);
+            await _context.SaveChangesAsync();
+            return Result.Success("Notificacion eliminada con exito!");
+        }
+        catch (Exception Ex)
+        {
+            return Result.Failure($"Error: {Ex.Message}");
         }
     }
 

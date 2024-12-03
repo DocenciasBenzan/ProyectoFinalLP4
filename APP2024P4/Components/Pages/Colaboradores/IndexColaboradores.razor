@@ -1,0 +1,42 @@
+﻿@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IColaboradorService ColaboradoresSevice
+@rendermode InteractiveServer
+@attribute [StreamRendering]
+@page "/colaboradores"
+@using APP2024P4.Data.Dtos
+@using APP2024P4.Service
+@using System.Security.Claims
+
+
+
+@code {
+    public ColaboradorRequest Micolaborador { get; set; } = new();
+    public List<ColaboradorDto>? ColaboradorList { get; set; } 
+    public TareaRequest MiTarea { get; set; } = new();
+    public List<TareaDto>? TareaList { get; set; }
+    private string CurrentUserEmail = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await Consultar();
+    }
+    async Task Consultar()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity!.IsAuthenticated)
+        {
+            CurrentUserEmail = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value!;
+        }
+        var result = await ColaboradoresSevice.GetByEmail(CurrentUserEmail);
+        if (result.Succesd)
+        {
+            ColaboradorList =
+            result.Data?.ToList()
+            ??
+        new List<ColaboradorDto>();
+        }
+    }
+}
