@@ -22,6 +22,7 @@ public partial class ColaboradorService : IColaboradorService
     {
         this._context = _context;
     }
+
     public async Task<Result> Addcolaborador(ColaboradorRequest colaborador)
     {
         try
@@ -44,11 +45,11 @@ public partial class ColaboradorService : IColaboradorService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
     public async Task<Result> Update(ColaboradorRequest colaborador)
     {
         try
         {
-
             var entity = _context.Colaboradores.Where(p => p.Id == colaborador.Id).FirstOrDefault();
             if (entity == null)
                 return Result.Failure($"El producto '{colaborador.Id}' no existe!");
@@ -70,6 +71,7 @@ public partial class ColaboradorService : IColaboradorService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
     public async Task<Result> Delete(int Id)
     {
         try
@@ -86,6 +88,7 @@ public partial class ColaboradorService : IColaboradorService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
     public async Task<ResultList<ColaboradorDto>> GetByEmail(string creadorEmail)
     {
         try
@@ -93,13 +96,13 @@ public partial class ColaboradorService : IColaboradorService
 
             var entity = await _context.Colaboradores.Where(p => p.CreadorEmail == creadorEmail)
 
-                .Select(p => new ColaboradorDto(
-                    p.Id,
-                    p.UserId,
-                    p.TareaId,
-                    p.CreadorEmail,
-                    p.ColaboradorEmail,
-                    p.IsApproved
+                .Select(c => new ColaboradorDto(
+                    c.Id,
+                    c.UserId,
+                    c.TareaId,
+                    c.CreadorEmail,
+                    c.ColaboradorEmail,
+                    c.IsApproved
                     ))
                 .ToListAsync();
             if (entity == null)

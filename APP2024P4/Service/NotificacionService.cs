@@ -32,8 +32,7 @@ public partial class NotificationService : INotificationService
         {
             // Verificar si ya existe una notificación para el usuario con la misma tareaId 
             var existingNotification = await _context.Notificaciones
-                            .FirstOrDefaultAsync(n => n.UserId == userId && n.TareaId == tareaId && n.RenderEmail == renderEmail);
-
+            .FirstOrDefaultAsync(n => n.UserId == userId && n.TareaId == tareaId && n.RenderEmail == renderEmail);
             if (existingNotification != null)
             {
                 existingNotification.Message = notificacion.Message;
@@ -99,6 +98,7 @@ public partial class NotificationService : INotificationService
             {
                 return Result.Failure("Notificación no encontrada.");
             }
+
             if (isAccepted)
             {
                 notification.Status = "Accepted";
@@ -106,24 +106,24 @@ public partial class NotificationService : INotificationService
                 // Agregar al colaborador
                 var colaboradorRequest = new ColaboradorRequest
                 {
-
                     CreadorEmail = notification.SenderEmail,
                     ColaboradorEmail = notification.RenderEmail,
                     IsApproved = true,
                     UserId = userId,
                     TareaId = notification.TareaId,
-
                 };
+
                 var addResult = await _colaboradorService.Addcolaborador(colaboradorRequest);
                 if (!addResult.Succesd)
                 {
-                    Result.Success(addResult.Message);
+                    return Result.Failure(addResult.Message);
                 }
             }
             else
             {
                 notification.Status = "Rejected";
             }
+
             await _context.SaveChangesAsync();
             return Result.Success("Respuesta a la invitación procesada con éxito.");
         }

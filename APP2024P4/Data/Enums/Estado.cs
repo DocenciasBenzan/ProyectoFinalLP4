@@ -2,7 +2,7 @@
 {
     public enum Estado
     {
-        Pendiente,En_Progreso,Completada
+        Pendiente,Progreso,Completada
     }
 }
 

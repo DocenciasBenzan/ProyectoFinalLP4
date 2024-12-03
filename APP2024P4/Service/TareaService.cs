@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using TaskMaster;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace APP2024P4.Service;
 
 public interface ITareaSevice
@@ -45,8 +46,7 @@ public partial class TareaService : ITareaSevice
                 tarea.IsCompleted,
                 tarea.Estado,
                 tarea.Prioridad,
-                tarea.Descripcion,
-                tarea.ColaboradorId
+                tarea.Descripcion
                 );
             entity.UserId = userId;
             dbContext.Tareas.Add(entity);
@@ -71,8 +71,7 @@ public partial class TareaService : ITareaSevice
                 tarea.IsCompleted,
                 tarea.Estado,
                 tarea.Prioridad,
-                tarea.Descripcion,
-                tarea.ColaboradorId
+                tarea.Descripcion
                 ))
             {
                 await dbContext.SaveChangesAsync();
@@ -106,17 +105,18 @@ public partial class TareaService : ITareaSevice
         try
         {
             var entity = await dbContext.Tareas.Where(p => p.UserId == UserId)
-                .Select(p => new TareaDto(
-                    p.Id,
-                    p.UserId,
-                    p.Titulo,
-                    p.Descripcion!,
-                    p.Estado,
-                    p.Prioridad,
-                    p.ColaboradorId,
-                    p.FechaCreacion,
-                    p.FechaLimite,
-                    p.IsCompleted
+                .Select(t => new TareaDto(
+                    t.Id,
+                    t.UserId,
+                    t.Titulo,
+                    t.Descripcion!,
+                    t.Estado,
+                    t.Prioridad,
+                    t.FechaCreacion,
+                    t.FechaLimite,
+                    t.IsCompleted,
+                    string.Empty, 
+                    new List<string>()
                     ))
                 .ToListAsync();
             if (entity == null)
@@ -135,17 +135,18 @@ public partial class TareaService : ITareaSevice
         {
             var entities = await dbContext.Tareas
                 .Where(p => p.Titulo.ToLower().Contains(filtro.ToLower()))
-                .Select(p => new TareaDto(
-                    p.Id,
-                    p.UserId,
-                    p.Titulo,
-                    p.Descripcion!,
-                    p.Estado,
-                    p.Prioridad,
-                    p.ColaboradorId,
-                    p.FechaCreacion,
-                    p.FechaLimite,
-                    p.IsCompleted
+                .Select(t => new TareaDto(
+                    t.Id,
+                    t.UserId,
+                    t.Titulo,
+                    t.Descripcion!,
+                    t.Estado,
+                    t.Prioridad,
+                    t.FechaCreacion,
+                    t.FechaLimite,
+                    t.IsCompleted,
+                    string.Empty,
+                    new List<string>()
                     ))
                 .ToListAsync();
             return ResultList<TareaDto>.Success(entities);
@@ -160,22 +161,22 @@ public partial class TareaService : ITareaSevice
         try
         {
             var tareas = await dbContext.Tareas
-                .Where(t => t.Colaboradores != null && (
-                    t.Colaboradores.CreadorEmail == email ||
-                    t.Colaboradores.ColaboradorEmail == email))
-                .Select(t => new TareaDto(
-                    t.Id,
-                    t.UserId,
-                    t.Titulo,
-                    t.Descripcion!,
-                    t.Estado,
-                    t.Prioridad,
-                    t.ColaboradorId,
-                    t.FechaCreacion,
-                    t.FechaLimite,
-                    t.IsCompleted
-                ))
-                .ToListAsync();
+     .Include(t => t.Colaboradores) // Asegúrate de cargar los colaboradores
+     .Where(t => t.Colaboradores!.Any(c => c.CreadorEmail == email || c.ColaboradorEmail == email))
+     .Select(t => new TareaDto(
+         t.Id,
+         t.UserId,
+         t.Titulo,
+         t.Descripcion!,
+         t.Estado,
+         t.Prioridad,
+         t.FechaCreacion,
+         t.FechaLimite,
+         t.IsCompleted,
+          string.Empty,
+          new List<string>()
+     ))
+     .ToListAsync();
 
             if (!tareas.Any())
                 return ResultList<TareaDto>.Failure("No se encontraron tareas asociadas a este colaborador.");

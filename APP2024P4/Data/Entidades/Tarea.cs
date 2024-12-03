@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace APP2024P4.Data.Entidades;
 
 [Table("Tareas")]
@@ -14,7 +12,6 @@ public class Tarea
     public string Estado { get; set; } = null!;
     public string Prioridad { get; set; } = null!;
     public string? Descripcion { get; set; }
-    public int? ColaboradorId { get; set; }
     public DateTime? FechaCreacion { get; set; }
     public DateTime? FechaLimite { get; set; }
     public bool IsCompleted { get; set; }
@@ -28,7 +25,6 @@ public class Tarea
         string estado,
         string prioridad,
         string? descripcion = null,
-        int? colaboradorId = null,
         string userId = null!
         )
             => new()
@@ -41,8 +37,6 @@ public class Tarea
                 IsCompleted = isCompleted,
                 Prioridad = prioridad,
                 Descripcion = descripcion,
-                ColaboradorId = colaboradorId
-                
             };
 
     public bool Update(
@@ -53,7 +47,6 @@ public class Tarea
         string estado,
         string prioridad,
         string? descripcion = null,
-        int? colaboradorId = null,
         string userId = null!
         )
     {
@@ -78,10 +71,6 @@ public class Tarea
         {
             Descripcion = descripcion; save = true;
         }  
-        if (ColaboradorId != colaboradorId)
-        {
-            ColaboradorId = colaboradorId; save = true;
-        }
         if (FechaCreacion != fechaCreacion)
         {
             FechaCreacion = fechaCreacion; save = true;
@@ -97,7 +86,6 @@ public class Tarea
         return save;
     }
     [ForeignKey(nameof(UserId))]
-    public virtual ApplicationUser? User { get; set; }
-    [ForeignKey(nameof(ColaboradorId))]
-    public virtual Colaborador? Colaboradores { get; set; }
+    public virtual ApplicationUser? User { get; set; }    
+    public virtual ICollection<Colaborador>? Colaboradores { get; set; }
 }
