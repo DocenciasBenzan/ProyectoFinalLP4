@@ -2,6 +2,113 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<!-- Incluir el CDN de Bootstrap para usar sus clases -->
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 
-Welcome to your new app.
+<!-- Contenedor principal -->
+<div class="container-fluid">
+    <!-- Barra de navegación con el logo enlazado -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="">
+            <img src="/bootstrap/Black and White Bold Typographic Car Wash Logo.jpg" width="100" height="auto" alt="Logo" />
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Servicios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Precios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contacto</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Sección de bienvenida con imagen de fondo -->
+    <div class="jumbotron text-center" style="background-image: url('https://www.canva.com/design/DAGXJ-IWmns/FcGbBRDdu-bL6edd1d4diw/edit?utm_content=DAGXJ-IWmns&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton); background-size: cover; color: white;">
+        <h1 class="display-4">¡Bienvenido a nuestro Car Wash!</h1>
+        <p class="lead">¡Tu auto nunca estuvo tan limpio y brillante!</p>
+        <hr class="my-4">
+        <p>Reserva ahora y disfruta de un servicio rápido y de calidad.</p>
+        <a class="btn btn-primary btn-lg" href="#" role="button">Ver Servicios</a>
+    </div>
+
+    <!-- Sección de servicios -->
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRQM9eY7lDiHWJyXGAHlhgU_UfA0IIUDdK6Q&s" class="card-img-top" alt="Lavado Exterior">
+                <div class="card-body">
+                    <h5 class="card-title">Lavado Exterior</h5>
+                    <p class="card-text">Deja que tu auto brille por fuera con nuestros productos de calidad.</p>
+                    <a href="#" class="btn btn-primary">Ver más</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <img src="data:image/jpeg;base64,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" class="card-img-top" alt="Lavado Interior">
+                <div class="card-body">
+                    <h5 class="card-title">Lavado Interior</h5>
+                    <p class="card-text">La limpieza perfecta para el interior de tu vehículo.</p>
+                    <a href="#" class="btn btn-primary">Ver más</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <img src="https://blog.way.com/wp-content/uploads/2022/02/Waxing-on-car.jpg" class="card-img-top" alt="Pulido y Cera">
+                <div class="card-body">
+                    <h5 class="card-title">Pulido y Cera</h5>
+                    <p class="card-text">Dale un acabado brillante y protector con nuestro servicio de pulido y cera.</p>
+                    <a href="#" class="btn btn-primary">Ver más</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de testimonios -->
+    <div class="container my-5">
+        <h2 class="text-center">Lo que dicen nuestros clientes</h2>
+        <div id="testimonialCarousel" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <blockquote class="blockquote text-center">
+                        <p class="mb-0">"El mejor servicio de lavado de autos. Mi coche nunca ha quedado tan limpio. ¡Altamente recomendado!"</p>
+
+                        <footer class="blockquote-footer">Juan Pérez</footer>
+                    </blockquote>
+                </div>
+                <div class="carousel-item">
+                    <blockquote class="blockquote text-center">
+                        <p class="mb-0">"Rápidos, eficientes y de calidad. Mi auto se ve increíble después de cada lavado."</p>
+
+                        <footer class="blockquote-footer">Ana García</footer>
+                    </blockquote>
+                </div>
+            </div>
+            <a class="carousel-control-prev" href="#testimonialCarousel" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#testimonialCarousel" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Incluir el CDN de Bootstrap JS y JQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
