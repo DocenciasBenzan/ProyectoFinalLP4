@@ -71,7 +71,7 @@ namespace APP2024P4.Services
             {
                 var entities = await dbContext.Categorias
                     .Where(c => c.NombreC.ToLower().Contains(filtro.ToLower()))
-                    .Select(c => new CategoriaDatos(c.Id, c.NombreC))
+                    .Select(c => c.ToDatos())
                     .ToListAsync();
                 return ResultList<CategoriaDatos>.Success(entities);
             }

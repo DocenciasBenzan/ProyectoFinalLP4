@@ -19,7 +19,7 @@ namespace APP2024P4.Services
         {
             try
             {
-                var entity = Modelo.Create(modelo.Nombre);
+                var entity = Modelo.Create(modelo);
                 dbContext.Modelos.Add(entity);
                 await dbContext.SaveChangesAsync();
                 return Result.Success("✅Modelo registrada con exito!");
@@ -36,7 +36,7 @@ namespace APP2024P4.Services
                 var entity = dbContext.Modelos.Where(m => m.Id == modelo.Id).FirstOrDefault();
                 if (entity == null)
                     return Result.Failure($"El Modelo'{modelo.Id}' no existe!");
-                if (entity.Update(modelo.Nombre))
+                if (entity.Update(modelo))
                 {
                     await dbContext.SaveChangesAsync();
                     return Result.Success("✅Modelo modificada con exito!");
@@ -70,7 +70,7 @@ namespace APP2024P4.Services
             {
                 var entities = await dbContext.Modelos
                     .Where(m => m.NombreM.ToLower().Contains(filtro.ToLower()))
-                    .Select(m => new ModeloDatos(m.Id, m.NombreM, m.MarcaId))
+                    .Select(m => m.ToDatos())
                     .ToListAsync();
                 return ResultList<ModeloDatos>.Success(entities);
             }

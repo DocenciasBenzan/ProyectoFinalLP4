@@ -70,7 +70,7 @@ namespace APP2024P4.Services
             {
                 var entities = await dbContext.Marcas
                     .Where(m => m.NombreMc.ToLower().Contains(filtro.ToLower()))
-                    .Select(m => new MarcaDatos(m.Id, m.NombreMc))
+                    .Select(m => m.ToDatos())
                     .ToListAsync();
                 return ResultList<MarcaDatos>.Success(entities);
             }

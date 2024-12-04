@@ -22,7 +22,7 @@ public partial class ProductoService : IProductoService
     {
         try
         {
-            var entity = Producto.Create(producto.Nombre, producto.CategoriaId, producto.FechaL, producto.Color, producto.Cantidad, producto.Descripcion, producto.ModeloId, producto.Precio, producto.Imagen);
+            var entity = Producto.Create(producto);
             dbContext.Productos.Add(entity);
             await dbContext.SaveChangesAsync();
             return Result.Success("✅Producto registrado con exito!");
@@ -39,7 +39,7 @@ public partial class ProductoService : IProductoService
             var entity = dbContext.Productos.Where(p => p.Id == producto.Id).FirstOrDefault();
             if (entity == null)
                 return Result.Failure($"El producto '{producto.Id}' no existe!");
-            if (entity.Update(producto.Nombre, producto.CategoriaId, producto.FechaL, producto.Color, producto.Cantidad, producto.Descripcion, producto.ModeloId, producto.Precio, producto.Imagen))
+            if (entity.Update(producto))
             {
                 await dbContext.SaveChangesAsync();
                 return Result.Success("✅Producto modificado con exito!");
@@ -72,7 +72,7 @@ public partial class ProductoService : IProductoService
         try
         {
             var entity = await dbContext.Productos.Where(p => p.Id == Id)
-                .Select(p => new ProductoDatos(p.Id, p.Nombre, p.CategoriaId, p.Categoria!.NombreC ?? "No definida", p.FechaL, p.Color, p.Cantidad , p.ModeloId , p.Modelo!.NombreM ?? "No definida", p.Precio, p.Descripcion, p.Imagen))
+                .Select(p => p.ToDatos())
                 .FirstOrDefaultAsync();
             if (entity == null)
                 return Result<ProductoDatos>.Failure($"El producto '{Id}' no existe!");
@@ -90,7 +90,7 @@ public partial class ProductoService : IProductoService
         {
             var entities = await dbContext.Productos
                 .Where(p => p.Nombre.ToLower().Contains(filtro.ToLower()))
-                .Select(p => new ProductoDatos(p.Id, p.Nombre, p.CategoriaId, p.Categoria!.NombreC ?? "No definida", p.FechaL, p.Color, p.Cantidad, p.ModeloId, p.Modelo!.NombreM ?? "No definida", p.Precio, p.Descripcion, p.Imagen))
+                .Select(p => p.ToDatos())
                 .ToListAsync();
             return ResultList<ProductoDatos>.Success(entities);
         }
