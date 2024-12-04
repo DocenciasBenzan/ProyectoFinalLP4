@@ -1,260 +1,328 @@
 ﻿@page "/vehiculos"
 @inject IVehiculoServicio VehiculoServicio
+@inject IClienteService ClienteServicio
 @rendermode InteractiveServer
 
 <h3 class="text-center my-4">Gestión de Vehículos</h3>
-
-@if (mostrarFormulario)
+@if (!string.IsNullOrWhiteSpace(errorMessage))
 {
-    <!-- Formulario para agregar/editar vehículo -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
-            <h5>@(vehiculoFormulario.Id == 0 ? "Agregar Nuevo Vehículo" : "Editar Vehículo")</h5>
-        </div>
-        <div class="card-body">
-            <EditForm Model="vehiculoFormulario" OnValidSubmit="GuardarVehiculo">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="placa" class="form-label">Placa</label>
-                        <InputText id="placa" class="form-control" @bind-Value="vehiculoFormulario.Placa" />
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="marca" class="form-label">Marca</label>
-                        <input list="options" id="marca" name="marca" @bind-value="vehiculoFormulario.Marca" class="form-control" placeholder="Escribe o selecciona">
-                        <datalist id="options">
-                            @foreach (var marca in Marcas)
-                            {
-                                <option value="@marca"></option>
-                            }
-                        </datalist>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="modelo" class="form-label">Modelo</label>
-                        <input list="modeloOptions" id="modelo" name="modelo" @bind-value="vehiculoFormulario.Modelo" class="form-control" placeholder="Escribe o selecciona">
-                        <datalist id="modeloOptions">
-                            @foreach (var modelo in Modelos)
-                            {
-                                <option value="@modelo"></option>
-                            }
-                        </datalist>
-                    </div>
-                </div>
+	<p class="alert">@errorMessage</p>
+}
+@if (Clientes.Any())
+{
+	<div class="mb-3">
+		<label for="Client" class="form-laberl">Cliente</label>
+		<InputSelect class="form-control" id="brand"
+					 Value="@ClienteActual.Id"
+					 ValueExpression="@(()=>ClienteActual.Id)"
+					 ValueChanged="@((int x)=>CargarVehiculos(x))">
+			<option disabled value="0" selected>Selecciona un cliente</option>
+			@foreach (var cliente in Clientes)
+			{
+				<option value="@cliente.Id">@cliente.Nombre</option>
+			}
 
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="color" class="form-label">Color</label>
-                        <input list="colorOptions" id="color" name="color" @bind-value="vehiculoFormulario.Color" class="form-control" placeholder="Escribe o selecciona">
-                        <datalist id="colorOptions">
-                            @foreach (var color in Colores)
-                            {
-                                <option value="@color"></option>
-                            }
-                        </datalist>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="tipo" class="form-label">Tipo</label>
-                        <input list="tipoOptions" id="tipo" name="tipo" @bind-value="vehiculoFormulario.Tipo" class="form-control" placeholder="Escribe o selecciona">
-                        <datalist id="tipoOptions">
-                            @foreach (var tipo in Tipos)
-                            {
-                                <option value="@tipo"></option>
-                            }
-                        </datalist>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-primary col-5">
-                        @(vehiculoFormulario.Id == 0 ? "Guardar" : "Actualizar")
-                    </button>
-                    <button type="button" class="btn btn-danger col-5 ms-2" @onclick="CancelarFormulario">
-                        <i class="bi bi-x-circle"></i> Cancelar
-                    </button>
-                </div>
-            </EditForm>
-        </div>
-    </div>
+		</InputSelect>
+	</div>
 }
 else
 {
-    <div class="mb-4">
-        <span class="btn btn-outline-primary" @onclick="()=>{mostrarFormulario = true;}">
-            <i class="bi bi-file-plus"></i> Agregar Vehículo
-        </span>
-    </div>
+	<div class="card">
+		<p class="alert"> Sin CLientes registrados</p>
+	</div>
+}
+@if (vehiculoFormulario.ClienteId != 0)
+{
+	@if (mostrarFormulario)
+	{
+		<!-- Formulario para agregar/editar vehículo -->
+		<div class="card shadow-sm mb-4">
+			<div class="card-header bg-primary text-white">
+				<h5>@(vehiculoFormulario.Id == 0 ? "Agregar Nuevo Vehículo" : "Editar Vehículo")</h5>
+			</div>
+			<div class="card-body">
+				<EditForm Model="vehiculoFormulario" OnValidSubmit="GuardarVehiculo">
+					<DataAnnotationsValidator />
+					<ValidationSummary />
+					<div class="row">
+						<div class="col-md-4 mb-3">
+							<label for="placa" class="form-label">Placa</label>
+							<InputText id="placa" class="form-control" @bind-Value="vehiculoFormulario.Placa" />
+						</div>
+						<div class="col-md-4 mb-3">
+							<label for="marca" class="form-label">Marca</label>
+							<input list="options" id="marca" name="marca" @bind-value="vehiculoFormulario.Marca" class="form-control" placeholder="Escribe o selecciona">
+							<datalist id="options">
+								@foreach (var marca in Marcas)
+								{
+									<option value="@marca"></option>
+								}
+							</datalist>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label for="modelo" class="form-label">Modelo</label>
+							<input list="modeloOptions" id="modelo" name="modelo" @bind-value="vehiculoFormulario.Modelo" class="form-control" placeholder="Escribe o selecciona">
+							<datalist id="modeloOptions">
+								@foreach (var modelo in Modelos)
+								{
+									<option value="@modelo"></option>
+								}
+							</datalist>
+						</div>
+					</div>
 
-    @if (vehiculos != null && vehiculos.Any())
-    {
-        <!-- Tabla para listar vehículos -->
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Placa</th>
-                        <th>Marca</th>
-                        <th>Modelo</th>
-                        <th>Color</th>
-                        <th>Tipo</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var vehiculo in vehiculos)
-                    {
-                        <tr>
-                            <td>@vehiculo.Placa</td>
-                            <td>@vehiculo.Marca</td>
-                            <td>@vehiculo.Modelo</td>
-                            <td>@vehiculo.Color</td>
-                            <td>@vehiculo.Tipo</td>
-                            <td>
-                                <button class="btn btn-primary btn-sm" @onclick="() => EditarVehiculo(vehiculo.Id)">
-                                    <i class="bi bi-pencil"></i> Editar
-                                </button>
-                                <button class="btn btn-danger btn-sm ms-2" @onclick="() => EliminarVehiculo(vehiculo.Id)">
-                                    <i class="bi bi-trash"></i> Eliminar
-                                </button>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-    else
-    {
-        <p class="text-center">No se encontraron vehículos.</p>
-        <span class="btn btn-outline-info" @onclick="()=>{mostrarFormulario = true;}">
-            <i class="bi bi-file-plus"></i> Agregar Vehículo
-        </span>
-    }
+					<div class="row">
+						<div class="col-md-4 mb-3">
+							<label for="color" class="form-label">Color</label>
+							<input list="colorOptions" id="color" name="color" @bind-value="vehiculoFormulario.Color" class="form-control" placeholder="Escribe o selecciona">
+							<datalist id="colorOptions">
+								@foreach (var color in Colores)
+								{
+									<option value="@color"></option>
+								}
+							</datalist>
+						</div>
+						<div class="col-md-4 mb-3">
+							<label for="tipo" class="form-label">Tipo</label>
+							<input list="tipoOptions" id="tipo" name="tipo" @bind-value="vehiculoFormulario.Tipo" class="form-control" placeholder="Escribe o selecciona">
+							<datalist id="tipoOptions">
+								@foreach (var tipo in Tipos)
+								{
+									<option value="@tipo"></option>
+								}
+							</datalist>
+						</div>
+					</div>
+
+					<div class="d-flex justify-content-between">
+						<button type="submit" class="btn btn-primary col-5">
+							@(vehiculoFormulario.Id == 0 ? "Guardar" : "Actualizar")
+						</button>
+						<button type="button" class="btn btn-danger col-5 ms-2" @onclick="CancelarFormulario">
+							<i class="bi bi-x-circle"></i> Cancelar
+						</button>
+					</div>
+				</EditForm>
+			</div>
+		</div>
+	}
+	else
+	{
+		<div class="mb-4">
+			<span class="btn btn-outline-primary" @onclick="()=>{mostrarFormulario = true;}">
+				<i class="bi bi-file-plus"></i> Agregar Vehículo
+			</span>
+		</div>
+
+
+		@* Muestra los vehiculos *@
+		@if (vehiculos != null && vehiculos.Any())
+		{
+			<div class="d-flex">
+				@foreach (var vehiculo in vehiculos)
+				{
+					<div class="card m-2">
+						<div class="card-body d-flex flex-column">
+							<span class="d-flex justify-content-end text-danger">
+								<i class="bi bi-trash danger" @onclick="() => EliminarVehiculo(vehiculo.Id)"></i>
+							</span>
+							<p class="card-text ">
+								<strong class="text-black-50">Marca:</strong> @vehiculo.Marca<br>
+								<strong class="text-black-50">Modelo:</strong> @vehiculo.Modelo<br>
+								<strong class="text-black-50">Placa:</strong> @vehiculo.Placa<br>
+								<strong class="text-black-50">Color:</strong> @vehiculo.Color
+							</p>
+							<span class="d-flex justify-content-end" @onclick="() => EditarVehiculo(vehiculo.Id)">
+								<i class="bi bi-pencil"></i>
+							</span>
+						</div>
+					</div>
+
+				}
+			</div>
+		}
+		else
+		{
+			<p class="text-center">No se encontraron vehículos.</p>
+		}
+	}
 }
 
+
 @code {
-    private List<VehiculoResponse> vehiculos;
-    private VehiculoRequest vehiculoFormulario = new();
-    private bool mostrarFormulario = false;
-    private bool loading = true;
-    private string errorMessage = "";
-    List<string> Colores = new List<string>();
-    List<string> Modelos = new List<string>();
-    List<string> Marcas = new List<string>();
-    List<string> Tipos = new List<string>();
+	public int ClienteSeleccionado { get; set; }
+	public ClienteResponse ClienteActual { get; set; } = new();
+	private List<VehiculoResponse> vehiculos;
+	private List<ClienteResponse> Clientes;
+	private VehiculoRequest vehiculoFormulario = new();
+	private bool mostrarFormulario = false;
+	private bool loading = true;
+	private string errorMessage = "";
+	List<string> Colores = new List<string>();
+	List<string> Modelos = new List<string>();
+	List<string> Marcas = new List<string>();
+	List<string> Tipos = new List<string>();
 
-    protected override async Task OnInitializedAsync()
-    {
-        await CargarVehiculos();
-        Tipos = VehiculoServicio.ObtenerTiposAutos();
-        Modelos = VehiculoServicio.ObtenerModelosAutos();
-        Colores = VehiculoServicio.ObtenerColores();
-        Marcas = VehiculoServicio.ObtenerMarcasAutos();
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		await CargarClientes();
+		if (Clientes.Any())
+		{
+			//ClienteActual = Clientes[0];
+			StateHasChanged();
 
-    private async Task CargarVehiculos()
-    {
-        loading = true;
-        errorMessage = "";
-        try
-        {
-            var result = VehiculoServicio.ObtenerVehiculos(1); // Cambia el ClientId según corresponda
-            if (result.Succeeded)
-            {
-                vehiculos = result?.Data?.ToList() ?? new();
-            }
-            else
-            {
-                errorMessage = result.Message;
-            }
-        }
-        catch (Exception ex)
-        {
-            errorMessage = $"Error al cargar los vehículos: {ex.Message}";
-        }
-        finally
-        {
-            loading = false;
-        }
-        StateHasChanged();
-    }
+		}
+		Tipos = VehiculoServicio.ObtenerTiposAutos();
+		Modelos = VehiculoServicio.ObtenerModelosAutos();
+		Colores = VehiculoServicio.ObtenerColores();
+		Marcas = VehiculoServicio.ObtenerMarcasAutos();
+		StateHasChanged();
+	}
+	private async Task CargarClientes()
+	{
+		loading = true;
+		errorMessage = "";
+		try
+		{
+			var result = await ClienteServicio.ObtenerClientes();
+			if (result.Succeeded)
+			{
+				Clientes = result?.Data?.ToList() ?? new();
+			}
+			else
+			{
+				errorMessage = result.Message;
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = $"Error al cargar los CLientes: {ex.Message}";
+		}
+		finally
+		{
+			loading = false;
+			StateHasChanged();
 
-    private void MostrarFormularioAgregar()
-    {
-        vehiculoFormulario = new VehiculoRequest();
-        mostrarFormulario = true;
-        StateHasChanged();
-    }
+		}
+	}
+	private async Task CargarVehiculos(int ClienteId = 0)
+	{
+		errorMessage = "";
+		//ClienteSeleccionado = ClienteId;
+		ClienteActual.Id = ClienteId;
+		mostrarFormulario = false;
 
-    private async Task GuardarVehiculo()
-    {
-        vehiculoFormulario.ClienteId = 1; // Sustituir por cliente id
+		Console.WriteLine($" --------- Cargando vehiculos de : {ClienteId}");
+		@if (ClienteActual.Id == 0)
+		{
+			errorMessage = "Debes seleccionar un Cliente";
+			return;
+		}
 
-        if (vehiculoFormulario.Id == 0) // Nuevo vehículo
-        {
-            var result = await VehiculoServicio.AgregarVehiculo(vehiculoFormulario);
-            if (result.Succeeded)
-            {
-                await CargarVehiculos();
-            }
-            else
-            {
-                errorMessage = result.Message;
-            }
-        }
-        else // Actualizar vehículo
-        {
-            var result = await VehiculoServicio.ActualizarVehiculo(vehiculoFormulario);
-            if (result.Succeeded)
-            {
-                await CargarVehiculos();
-            }
-            else
-            {
-                errorMessage = result.Message;
-            }
-        }
-        CancelarFormulario();
-        StateHasChanged();
-    }
+		vehiculoFormulario.ClienteId = ClienteActual.Id;
+		loading = true;
+		errorMessage = "";
+		try
+		{
+			var result = VehiculoServicio.ObtenerVehiculos(ClienteActual.Id);
+			if (result.Succeeded)
+			{
+				vehiculos = result?.Data?.ToList() ?? new();
+			}
+			else
+			{
+				errorMessage = result.Message;
+			}
+		}
+		catch (Exception ex)
+		{
+			errorMessage = $"Error al cargar los vehículos: {ex.Message}";
+		}
+		finally
+		{
+			loading = false;
+		}
+		StateHasChanged();
+	}
 
-    private void EditarVehiculo(int id)
-    {
-        var vehiculo = vehiculos.FirstOrDefault(v => v.Id == id);
-        if (vehiculo != null)
-        {
-            vehiculoFormulario = new VehiculoRequest
-                {
-                    Id = vehiculo.Id,
-                    Placa = vehiculo.Placa,
-                    Marca = vehiculo.Marca,
-                    Modelo = vehiculo.Modelo,
-                    Color = vehiculo.Color,
-                    Tipo = vehiculo.Tipo,
-                    ClienteId = vehiculo.ClienteId
-                };
-            mostrarFormulario = true;
-        }
-        StateHasChanged();
-    }
+	private void MostrarFormularioAgregar()
+	{
+		vehiculoFormulario = new VehiculoRequest() { ClienteId = ClienteActual.Id };
+		mostrarFormulario = true;
+		StateHasChanged();
+	}
 
-    private async Task EliminarVehiculo(int id)
-    {
-        var result = await VehiculoServicio.EliminarVehiculo(id);
-        if (result.Succeeded)
-        {
-            await CargarVehiculos();
-        }
-        else
-        {
-            errorMessage = result.Message;
-        }
-        StateHasChanged();
-    }
+	private async Task GuardarVehiculo()
+	{
+		vehiculoFormulario.ClienteId = ClienteActual.Id;
 
-    private void CancelarFormulario()
-    {
-        mostrarFormulario = false;
-        vehiculoFormulario = new VehiculoRequest();
-    }
+		if (vehiculoFormulario.Id == 0) // Nuevo vehículo
+		{
+			var result = await VehiculoServicio.AgregarVehiculo(vehiculoFormulario);
+			if (result.Succeeded)
+			{
+				await CargarVehiculos(ClienteActual.Id);
+			}
+			else
+			{
+				errorMessage = result.Message;
+			}
+		}
+		else // Actualizar vehículo
+		{
+			var result = await VehiculoServicio.ActualizarVehiculo(vehiculoFormulario);
+			if (result.Succeeded)
+			{
+				await CargarVehiculos(ClienteActual.Id);
+			}
+			else
+			{
+				errorMessage = result.Message;
+			}
+		}
+		mostrarFormulario = false;
+
+		//CancelarFormulario();
+		StateHasChanged();
+	}
+
+	private void EditarVehiculo(int id)
+	{
+		var vehiculo = vehiculos.FirstOrDefault(v => v.Id == id);
+		if (vehiculo != null)
+		{
+			vehiculoFormulario = new VehiculoRequest
+				{
+					Id = vehiculo.Id,
+					Placa = vehiculo.Placa,
+					Marca = vehiculo.Marca,
+					Modelo = vehiculo.Modelo,
+					Color = vehiculo.Color,
+					Tipo = vehiculo.Tipo,
+					ClienteId = vehiculo.ClienteId
+				};
+			mostrarFormulario = true;
+		}
+		StateHasChanged();
+	}
+
+	private async Task EliminarVehiculo(int id)
+	{
+		var result = await VehiculoServicio.EliminarVehiculo(id);
+		if (result.Succeeded)
+		{
+			await CargarVehiculos(ClienteActual.Id);
+		}
+		else
+		{
+			errorMessage = result.Message;
+		}
+		StateHasChanged();
+	}
+
+	private void CancelarFormulario()
+	{
+		mostrarFormulario = false;
+		vehiculoFormulario = new VehiculoRequest() { ClienteId = ClienteActual.Id };
+	}
 }

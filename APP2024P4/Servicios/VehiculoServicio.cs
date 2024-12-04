@@ -34,6 +34,7 @@ public class VehiculoServicio(IApplicationDbContext context) : IVehiculoServicio
 				ClienteId = x.Id,
 				Cliente = x.Cliente.ToResponse()
 			}).OrderBy(x => x.Modelo).ToList();
+			Console.WriteLine($"Desde el servicio de vehiculos:: {r.Count} apeticion de::: {ClientId} ::: ");
 			if (r is not null)
 			{
 				return ResultList<VehiculoResponse>.Success(r);

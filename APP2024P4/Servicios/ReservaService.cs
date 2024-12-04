@@ -9,20 +9,33 @@ namespace APP2024P4.Servicios;
 public interface IReservaService
 {
 	Task<Result> ActualizarReservaAsync(ReservaRequest request);
-	Task<Result> CrearReservaAsync(ReservaRequest request);
+	Task<Result> CrearReserva(ReservaRequest request);
 	Task<Result> EliminarReservaAsync(int id);
-	Task<Result<ReservaResponse>> ObtenerReservaPorIdAsync(int id);
-	Task<ResultList<ReservaResponse>> ObtenerTodasLasReservasAsync();
+	Task<ResultList<ReservaResponse>> ObtenerTodasLasReservas();
 }
 
 public class ReservaService(ApplicationDbContext context) : IReservaService
 {
-	public async Task<ResultList<ReservaResponse>> ObtenerTodasLasReservasAsync()
+	public async Task<ResultList<ReservaResponse>> ObtenerTodasLasReservas()
 	{
 		try
 		{
-			var reservas = await context.Reservas.AsNoTracking().Select(x=>x.ToResponse()).ToListAsync();
-			return ResultList<ReservaResponse>.Success(reservas);
+			var r = await context.Reservas.AsNoTracking()
+			.Include(x => x.Cliente)
+			.Include(x => x.Servicio)
+			.Include(x => x.Vehiculo)
+			.Include(x => x.Empleado)
+			.ToListAsync();
+			if (r != null)
+			{
+				var reservas = r.Select(x => x.ToResponse()).ToList();
+				return ResultList<ReservaResponse>.Success(reservas);
+			}
+			else
+			{
+				return ResultList<ReservaResponse>.Failure("Sin reservas encontrada");
+
+			}
 		}
 		catch (Exception ex)
 		{
@@ -30,27 +43,7 @@ public class ReservaService(ApplicationDbContext context) : IReservaService
 		}
 	}
 
-	public async Task<Result<ReservaResponse>> ObtenerReservaPorIdAsync(int id)
-	{
-		try
-		{
-			var reserva = await context.Reservas.FindAsync(id);
-			if (reserva != null)
-			{
-				return Result<ReservaResponse>.Success(reserva.ToResponse());
-			}
-			else
-			{
-				return Result<ReservaResponse>.Failure("Reserva no encontrada");
-			}
-		}
-		catch (Exception ex)
-		{
-			return Result<ReservaResponse>.Failure($"Error al obtener reserva: {ex.Message}");
-		}
-	}
-
-	public async Task<Result> CrearReservaAsync(ReservaRequest request)
+	public async Task<Result> CrearReserva(ReservaRequest request)
 	{
 		try
 		{

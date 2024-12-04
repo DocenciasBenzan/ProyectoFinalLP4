@@ -2,6 +2,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using APP2024P4.Data.Entities;
+using APP2024P4.Data.Response;
 
 namespace APP2024P4.Data.Request;
 
@@ -48,7 +49,7 @@ public class ServicioRequest
 	[Required(AllowEmptyStrings = false, ErrorMessage = "Ingresa una Descripcion")]
 
 	public string Descripcion { get; set; } = null!;
-	[Range(	1, double.MaxValue, ErrorMessage = "Ingresa una duracion correcta ( >  )")]
+	[Range(1, double.MaxValue, ErrorMessage = "Ingresa una duracion correcta ( >  )")]
 	public decimal DuracionEstimada { get; set; }
 	[Range(1, double.MaxValue, ErrorMessage = "Ingresa un precio ( > 1 )")]
 
@@ -91,6 +92,8 @@ public class VehiculoRequest
 	public string Tipo { get; set; } = null!;
 	public int ClienteId { get; set; }
 
+	public ClienteRequest Cliente { get; set; }
+
 	public Vehiculo ToVehiculo()
 	{
 		return new Vehiculo()
@@ -129,24 +132,81 @@ public class ClienteRequest
 	}
 }
 
+//public class ReservaRequest
+//{
+//	public int Id { get; set; }
+//	public DateTime Inicio { get; set; }
+//	public DateTime Fin { get; set; }
+//	public int ClienteId { get; set; }
+//	public int VehiculoId { get; set; }
+//	public int ServicioId { get; set; }
+//	public int EmpleadoId { get; set; }
+//	public string Estado { get; set; } = null!; // pendiente, completada, cancelada
+//	public string? NotasAdicionales { get; set; }
+
+//	public ClienteRequest Cliente { get; set; } = null!;
+//	public VehiculoRequest Vehiculo { get; set; } = null!;
+//	public ServicioRequest Servicio { get; set; } = null!;
+//	public EmpleadoRequest Empleado { get; set; } = null!;
+
+//	public Reserva ToReserva()
+//	{
+//		return new()
+//		{
+//			Inicio = this.Inicio,
+//			Fin = this.Fin,
+//			ClienteId = this.ClienteId,
+//			VehiculoId = this.VehiculoId,
+//			ServicioId = this.ServicioId,
+//			EmpleadoId = this.EmpleadoId,
+//			Estado = this.Estado,
+//			NotasAdicionales = this.NotasAdicionales
+//		};
+//	}
+//}
+
 public class ReservaRequest
 {
 	public int Id { get; set; }
-	public DateTime Inicio { get; set; }
-	public DateTime Fin { get; set; }
-	public int ClienteId { get; set; }
-	public int VehiculoId { get; set; }
-	public int ServicioId { get; set; }
-	public int EmpleadoId { get; set; }
-	public string Estado { get; set; } = null!; // pendiente, completada, cancelada
-	public string? NotasAdicionales { get; set; }
 
+	[Required(ErrorMessage = "La fecha de inicio es obligatoria.")]
+	[DataType(DataType.DateTime, ErrorMessage = "La fecha de inicio debe ser una fecha y hora válida.")]
+	public DateTime Inicio { get; set; }
+
+
+	[Required(ErrorMessage = "Debe seleccionar un cliente.")]
+	[Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un cliente válido.")]
+	public int ClienteId { get; set; }
+
+	[Required(ErrorMessage = "Debe seleccionar un vehículo.")]
+	[Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un vehículo válido.")]
+	public int VehiculoId { get; set; }
+
+	[Required(ErrorMessage = "Debe seleccionar un servicio.")]
+	[Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un servicio válido.")]
+	public int ServicioId { get; set; }
+
+	[Required(ErrorMessage = "Debe seleccionar un empleado.")]
+	[Range(1, int.MaxValue, ErrorMessage = "Debe seleccionar un empleado válido.")]
+	public int EmpleadoId { get; set; }
+
+	[Required(ErrorMessage = "El estado es obligatorio.")]
+	[StringLength(50, ErrorMessage = "El estado no puede superar los 50 caracteres.")]
+	public string Estado { get; set; } = null!; // pendiente, completada, cancelada
+
+	[StringLength(500, ErrorMessage = "Las notas adicionales no pueden superar los 500 caracteres.")]
+	public string? NotasAdicionales { get; set; }
+	public DateTime Fin{ get; set; }
+
+	public ClienteRequest Cliente { get; set; } = null!;
+	public VehiculoRequest Vehiculo { get; set; } = null!;
+	public ServicioRequest Servicio { get; set; } = null!;
+	public EmpleadoRequest Empleado { get; set; } = null!;
 
 	public Reserva ToReserva()
 	{
 		return new()
 		{
-			Id = this.Id,
 			Inicio = this.Inicio,
 			Fin = this.Fin,
 			ClienteId = this.ClienteId,
@@ -157,4 +217,5 @@ public class ReservaRequest
 			NotasAdicionales = this.NotasAdicionales
 		};
 	}
+
 }

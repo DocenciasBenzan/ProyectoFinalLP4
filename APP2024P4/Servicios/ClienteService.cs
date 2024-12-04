@@ -19,7 +19,8 @@ public class ClienteService(IApplicationDbContext context) : IClienteService
 	{
 		try
 		{
-			var r = context.Clientes.AsNoTracking().Where(x => x.Nombre.Contains(filtro)).Select(x => x.ToResponse()).ToList();
+			var r = context.Clientes.AsNoTracking().Select(x => x.ToResponse()).ToList();
+			Console.WriteLine($"Clientes encontrados: {r.Count}");
 			if (r != null)
 			{
 				return ResultList<ClienteResponse>.Success(r);

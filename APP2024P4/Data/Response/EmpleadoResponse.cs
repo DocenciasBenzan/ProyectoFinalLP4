@@ -48,6 +48,20 @@ public class VehiculoResponse
 	public string Tipo { get; set; } = null!;
 	public int ClienteId { get; set; }
 	public ClienteResponse Cliente { get; set; } = null!;
+
+	public VehiculoRequest ToRequest(){
+		return new()
+		{
+			Id = this.Id,
+			Placa = this.Placa,
+			Marca = this.Marca,
+			Modelo = this.Modelo,
+			Color = this.Color,
+			Tipo = this.Tipo,
+			ClienteId = this.ClienteId,
+			Cliente = this.Cliente.ToRequest()
+		};
+	}
 }
 public class ClienteResponse
 {
@@ -86,4 +100,21 @@ public class ReservaResponse
 	public VehiculoResponse Vehiculo { get; set; } = null!;
 	public ServicioResponse Servicio { get; set; } = null!;
 	public EmpleadoResponse Empleado { get; set; } = null!;
+
+	public ReservaRequest ToRequest(){
+		return new ReservaRequest()
+		{
+			Id = this.Id,
+			Inicio = this.Inicio,
+			Fin = this.Fin,
+			ClienteId = this.ClienteId,
+			VehiculoId = this.VehiculoId,
+			ServicioId = this.ServicioId,
+			EmpleadoId = this.EmpleadoId,
+			Estado = this.Estado,
+			NotasAdicionales = this.NotasAdicionales,
+			Cliente = this.Cliente.ToRequest(),
+			Vehiculo = this.Vehiculo.ToRequest()
+		};
+	}
 }
