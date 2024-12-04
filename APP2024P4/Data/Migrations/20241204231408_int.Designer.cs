@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APP2024P4.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241201190026_AgregandoNuevasCaracteristicas_Tarea")]
-    partial class AgregandoNuevasCaracteristicas_Tarea
+    [Migration("20241204231408_int")]
+    partial class @int
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -109,15 +109,58 @@ namespace APP2024P4.Data.Migrations
                     b.Property<bool>("IsApproved")
                         .HasColumnType("bit");
 
+                    b.Property<int>("TareaId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TareaId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Colaboradores");
+                });
+
+            modelBuilder.Entity("APP2024P4.Data.Entidades.Comentario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreadorEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaActualizacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TareaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TareaId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comentarios");
                 });
 
             modelBuilder.Entity("APP2024P4.Data.Entidades.Notificacion", b =>
@@ -150,12 +193,18 @@ namespace APP2024P4.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TareaId")
+                    b.Property<int>("TareaId")
                         .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("TareaId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Notificaciones");
                 });
@@ -167,9 +216,6 @@ namespace APP2024P4.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ColaboradorId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
@@ -200,8 +246,6 @@ namespace APP2024P4.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ColaboradorId");
 
                     b.HasIndex("UserId");
 
@@ -343,11 +387,38 @@ namespace APP2024P4.Data.Migrations
 
             modelBuilder.Entity("APP2024P4.Data.Entidades.Colaborador", b =>
                 {
+                    b.HasOne("APP2024P4.Data.Entidades.Tarea", "Tareas")
+                        .WithMany("Colaboradores")
+                        .HasForeignKey("TareaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("APP2024P4.Data.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Tareas");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("APP2024P4.Data.Entidades.Comentario", b =>
+                {
+                    b.HasOne("APP2024P4.Data.Entidades.Tarea", "Tareas")
+                        .WithMany("Comentarios")
+                        .HasForeignKey("TareaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("APP2024P4.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tareas");
 
                     b.Navigation("User");
                 });
@@ -355,17 +426,10 @@ namespace APP2024P4.Data.Migrations
             modelBuilder.Entity("APP2024P4.Data.Entidades.Notificacion", b =>
                 {
                     b.HasOne("APP2024P4.Data.Entidades.Tarea", "Tareas")
-                        .WithMany()
-                        .HasForeignKey("TareaId");
-
-                    b.Navigation("Tareas");
-                });
-
-            modelBuilder.Entity("APP2024P4.Data.Entidades.Tarea", b =>
-                {
-                    b.HasOne("APP2024P4.Data.Entidades.Colaborador", "Colaboradores")
-                        .WithMany("Tareas")
-                        .HasForeignKey("ColaboradorId");
+                        .WithMany("Notificaciones")
+                        .HasForeignKey("TareaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("APP2024P4.Data.ApplicationUser", "User")
                         .WithMany()
@@ -373,7 +437,18 @@ namespace APP2024P4.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Colaboradores");
+                    b.Navigation("Tareas");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("APP2024P4.Data.Entidades.Tarea", b =>
+                {
+                    b.HasOne("APP2024P4.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -429,9 +504,13 @@ namespace APP2024P4.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("APP2024P4.Data.Entidades.Colaborador", b =>
+            modelBuilder.Entity("APP2024P4.Data.Entidades.Tarea", b =>
                 {
-                    b.Navigation("Tareas");
+                    b.Navigation("Colaboradores");
+
+                    b.Navigation("Comentarios");
+
+                    b.Navigation("Notificaciones");
                 });
 #pragma warning restore 612, 618
         }

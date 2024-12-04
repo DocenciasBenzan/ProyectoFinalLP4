@@ -122,6 +122,44 @@ namespace APP2024P4.Data.Migrations
                     b.ToTable("Colaboradores");
                 });
 
+            modelBuilder.Entity("APP2024P4.Data.Entidades.Comentario", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CreadorEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("FechaActualizacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TareaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TareaId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comentarios");
+                });
+
             modelBuilder.Entity("APP2024P4.Data.Entidades.Notificacion", b =>
                 {
                     b.Property<int>("Id")
@@ -175,10 +213,6 @@ namespace APP2024P4.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CreadorEmail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Descripcion")
                         .HasColumnType("nvarchar(max)");
@@ -353,7 +387,26 @@ namespace APP2024P4.Data.Migrations
                     b.HasOne("APP2024P4.Data.Entidades.Tarea", "Tareas")
                         .WithMany("Colaboradores")
                         .HasForeignKey("TareaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("APP2024P4.Data.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tareas");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("APP2024P4.Data.Entidades.Comentario", b =>
+                {
+                    b.HasOne("APP2024P4.Data.Entidades.Tarea", "Tareas")
+                        .WithMany("Comentarios")
+                        .HasForeignKey("TareaId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("APP2024P4.Data.ApplicationUser", "User")
@@ -370,9 +423,9 @@ namespace APP2024P4.Data.Migrations
             modelBuilder.Entity("APP2024P4.Data.Entidades.Notificacion", b =>
                 {
                     b.HasOne("APP2024P4.Data.Entidades.Tarea", "Tareas")
-                        .WithMany()
+                        .WithMany("Notificaciones")
                         .HasForeignKey("TareaId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("APP2024P4.Data.ApplicationUser", "User")
@@ -451,6 +504,10 @@ namespace APP2024P4.Data.Migrations
             modelBuilder.Entity("APP2024P4.Data.Entidades.Tarea", b =>
                 {
                     b.Navigation("Colaboradores");
+
+                    b.Navigation("Comentarios");
+
+                    b.Navigation("Notificaciones");
                 });
 #pragma warning restore 612, 618
         }

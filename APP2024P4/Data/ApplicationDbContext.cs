@@ -15,6 +15,47 @@ namespace APP2024P4.Data
         {
             return base.SaveChangesAsync(cancellationToken);
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Colaborador>()
+                .HasOne(c => c.Tareas)
+                .WithMany(t => t.Colaboradores)
+                .HasForeignKey(c => c.TareaId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<Colaborador>()
+                .HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Comentario>()
+                .HasOne(c => c.Tareas)
+                .WithMany(t => t.Comentarios)
+                .HasForeignKey(c => c.TareaId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<Comentario>()
+                .HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade); 
+
+            modelBuilder.Entity<Notificacion>()
+                .HasOne(n => n.Tareas)
+                .WithMany(t => t.Notificaciones)
+                .HasForeignKey(n => n.TareaId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Notificacion>()
+                .HasOne(n => n.User)
+                .WithMany()
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        
+        }
 
     }
 }

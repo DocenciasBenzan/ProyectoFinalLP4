@@ -11,7 +11,6 @@ public class Comentario
     public string Contenido { get; set; } = null!;
     public string UserId { get; set; } = null!;
     public string CreadorEmail { get; set; } = null!;
-    [ForeignKey(nameof(Tarea.Id))]
     public int TareaId { get; set; }
     public DateTime FechaCreacion { get; set; }
     public DateTime FechaActualizacion { get; set; }
@@ -78,6 +77,7 @@ public class Comentario
 
     [ForeignKey(nameof(UserId))]
     public virtual ApplicationUser? User { get; set; }
+    [ForeignKey(nameof(TareaId))]
     public virtual Tarea? Tareas { get; set; }
 
 

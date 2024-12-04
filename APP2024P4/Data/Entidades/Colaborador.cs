@@ -9,7 +9,6 @@ namespace APP2024P4.Data.Entidades
         [Key]
         public int Id { get; set; }
         public string UserId { get; set; } = null!;
-        [ForeignKey(nameof(Tarea.Id))]
         public int TareaId { get; set; }
         public string CreadorEmail { get; set; } = null!;
         public string ColaboradorEmail { get; set; } = null!;
@@ -65,8 +64,11 @@ namespace APP2024P4.Data.Entidades
             }
             return save;
         }
+
         [ForeignKey(nameof(UserId))]
         public virtual ApplicationUser? User { get; set; }
+
+        [ForeignKey(nameof(TareaId))]
         public virtual Tarea? Tareas { get; set; }
     }
 }
