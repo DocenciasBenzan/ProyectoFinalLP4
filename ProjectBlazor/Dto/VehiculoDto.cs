@@ -2,15 +2,15 @@
 
 public record class VehiculoDto(int VehiculoId, string Marca, string? Modelo, string? Matricula, string? NumeroPlaca, string? Tipo, string? Year, string? Estatus, decimal Precio = 0)
 {
-	//public int VehiculoId { get; set; }
-	//public string Marca { get; set; }
-	//public string Modelo { get; set; }
-	//public string Matricula { get; set; }
-	//public string NumeroPlaca { get; set; }
-	//public string Tipo { get; set; }
-	//public string Estatus { get; set; }
-	//public decimal Precio { get; set; }
-	
+    //public int VehiculoId { get; set; }
+    //public string Marca { get; set; }
+    //public string Modelo { get; set; }
+    //public string Matricula { get; set; }
+    //public string NumeroPlaca { get; set; }
+    //public string Tipo { get; set; }
+    //public string Estatus { get; set; }
+    //public decimal Precio { get; set; }
+    //public string PrecioText => $"RD$ {Precio.ToString("N2")}";
     public VehiculoRequest ToRequest()
 		=> new()
 		{

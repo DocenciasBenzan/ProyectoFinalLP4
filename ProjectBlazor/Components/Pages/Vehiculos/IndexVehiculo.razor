@@ -1,6 +1,6 @@
 ﻿@rendermode InteractiveServer
 
-@using ProjectBlazor.Dto
+
 @page "/Vehiculos"
 
 
@@ -38,9 +38,15 @@
 				<span class="input-group-text" id="inputGroup-sizing-Default">Año</span>
 				<input @bind-value="MiVehiculo.Year" type="text" class="form-control" id="tipo"  disabled="@DisableInputs">
 			</div>
+
 			<div class="input-group mb-3">
 				<apan class="input-group-text" id="inputGroup-sizing-Default">Estatus</apan>
-				<input @bind-value="MiVehiculo.Estatus " type="text" class="form-control" id="Estatus" disabled="@DisableInputs">
+				<select disabled="@DisableInputs" @bind="MiVehiculo.Estatus" class="form-select" aria-label="Default select example">
+					<option selected>Seleccione el estado del vehiculo</option>
+					<option value="Disponible">Disponible</option>
+					<option value="Rentado">Rentado</option>
+					<option value="Mantenimiento">Mantenimiento</option>
+				</select>
 			</div>
 			<div class="input-group mb-3">
 				<span class="input-group-text" id="inputGroup-sizing-Default">Precio (RD$)</span>
@@ -55,7 +61,10 @@
 		</div>
 	</div>
 
+	<label @bind="Contador"></label>
+
 }
+@*Formulario para renta*@
 @if (ShowFormRenta == true)
 {
 
@@ -109,9 +118,26 @@
 	</div>
 
 	<div>
-		<div class="card-body">
+		<div class="form-control">
+
 			<h5 class="card-header">Datos de Renta</h5>
-			<input type="date" class="form-control" >
+
+			<div class="card-body">
+				<label class="form-control">Fecha de Renta</label>
+				<input type="date" @bind="FechaRenta">
+				<input type="time">
+			</div>
+			<div class="card-body">
+				<label class="form-control">Fecha de Entrega</label>
+				<input type="date" @bind="FechaEntrega">
+				<input type="time">
+			</div>
+			<div class="card-body">
+				<p>
+					Dias seleccionados: @DiasdeRenta
+				</p>
+			</div>
+
 		</div>
 	</div>
 }
@@ -124,28 +150,78 @@ else
 
 		@if (VehiculoList.Count > 0)
 		{
+
+
 			<div class="container flex-column ">
 				<span class="btn btn-primary align-content-end mb-3" @onclick="btnAgregarClick">+</span>
 				@foreach (var v in VehiculoList)
 				{
-					@*Tarjeta de vehiculo*@
-					<div class="card m-3 text-black border border-primary mb-3 d-inline-flex" style="width: 18rem;">
-						<div class="card-header bg-primary">
-							<h5 class="card-title textcol-m-6 m-3">@v.Marca @v.Modelo</h5>
-						</div>
-						<div class="card- body m-3">
-							<p class="card-text">@v.NumeroPlaca</p>
-							<p class="card-text">@v.Year</p>
-							<p class="card-text">@v.Estatus</p>
-							<div class="btn-group" role="group" aria-label="Basic mixed styles example">
-								<span @onclick="()=>btnEditarClick(v)" class="btn btn-outline-warning">Editar</span>
-								<span @onclick="()=>btnEliminarClick(v)" class="btn btn-outline-danger">Eliminar</span>
-								<span @onclick="()=>btnVerClick(v)" class="btn btn-outline-primary">Ver</span>
-							</div>
-							<span @onclick="()=>btnRentarClick(v)" class="btn btn-primary">Rentar</span>
 
+					@*Tarjeta de vehiculo*@
+					@if(v.Estatus == "Disponible")
+					{
+						<div class="card m-3 text-black border border-primary mb-3 d-inline-flex" style="width: 18rem;">
+							<div class="card-header bg-primary">
+								<h5 class="card-title textcol-m-6 m-3">@v.Marca @v.Modelo</h5>
+							</div>
+							<div class="card- body m-3">
+								<p class="card-text">@v.NumeroPlaca</p>
+								<p class="card-text">@v.Year</p>
+								<p class="card-text">@v.Estatus</p>
+								<div class="btn-group" role="group" aria-label="Basic mixed styles example">
+									<span @onclick="()=>btnEditarClick(v)" class="btn btn-outline-warning">Editar</span>
+									<span @onclick="()=>btnEliminarClick(v)" class="btn btn-outline-danger">Eliminar</span>
+									<span @onclick="()=>btnVerClick(v)" class="btn btn-outline-primary">Ver</span>
+								</div>
+								<span @onclick="()=>btnRentarClick(v)" class="btn btn-primary">Rentar</span>
+
+							</div>
 						</div>
-					</div>
+					}
+					@if (v.Estatus == "Rentado")
+					{
+						@*Tarjeta de vehiculo*@
+
+						<div class="card m-3 text-black border border-warning mb-3 d-inline-flex" style="width: 18rem;">
+							<div class="card-header bg-warning">
+								<h5 class="card-title textcol-m-6 m-3">@v.Marca @v.Modelo</h5>
+							</div>
+							<div class="card- body m-3">
+								<p class="card-text">@v.NumeroPlaca</p>
+								<p class="card-text">@v.Year</p>
+								<p class="card-text">@v.Estatus</p>
+								<div class="btn-group" role="group" aria-label="Basic mixed styles example">
+									<span @onclick="()=>btnEditarClick(v)" class="btn btn-outline-warning">Editar</span>
+									<span @onclick="()=>btnEliminarClick(v)" class="btn btn-outline-danger">Eliminar</span>
+									<span @onclick="()=>btnVerClick(v)" class="btn btn-outline-primary">Ver</span>
+								</div>
+								<span @onclick="()=>btnRentarClick(v)" class="btn btn-primary">Rentar</span>
+
+							</div>
+						</div>
+					}
+					@if (v.Estatus == "Mantenimiento")
+					{
+						@*Tarjeta de vehiculo*@
+
+						<div class="card m-3 text-black border border-danger mb-3 d-inline-flex" style="width: 18rem;">
+							<div class="card-header bg-danger">
+								<h5 class="card-title textcol-m-6 m-3">@v.Marca @v.Modelo</h5>
+							</div>
+							<div class="card- body m-3">
+								<p class="card-text">@v.NumeroPlaca</p>
+								<p class="card-text">@v.Year</p>
+								<p class="card-text">@v.Estatus</p>
+								<div class="btn-group" role="group" aria-label="Basic mixed styles example">
+									<span @onclick="()=>btnEditarClick(v)" class="btn btn-outline-warning">Editar</span>
+									<span @onclick="()=>btnEliminarClick(v)" class="btn btn-outline-danger">Eliminar</span>
+									<span @onclick="()=>btnVerClick(v)" class="btn btn-outline-primary">Ver</span>
+								</div>
+								<span @onclick="()=>btnRentarClick(v)" class="btn btn-primary">Rentar</span>
+
+							</div>
+						</div>
+					}
 
 
 				}
@@ -166,13 +242,36 @@ else
 
 
 @code {
-	
+
+
+
+
+
+
+
+	public int Contador {get; set; }= 0;
+
+	public  DateTime FechaRenta{ get; set; } = DateTime.Today;
+	public  DateTime FechaEntrega { get; set; } = DateTime.Today;
+
+	public int DiasdeRenta => (FechaEntrega - FechaRenta).Days;
+
+	public void btnCalcularDias()
+	{
+
+		
+
+		 
+		 
+
+	}
+
 	public void btnAgregarVehiculo()
 	{
 		ShowForm = true;
 	}
 	public void btnCancelar()
-	{
+	{		
 		ShowForm = false;
 	}
 	public void btnGuardarVehiculo()
