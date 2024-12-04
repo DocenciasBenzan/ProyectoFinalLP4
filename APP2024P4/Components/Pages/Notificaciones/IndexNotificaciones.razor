@@ -1,71 +1,69 @@
-﻿@rendermode InteractiveServer
-@attribute [StreamRendering]
+﻿@attribute [StreamRendering]
 @page "/notificaciones"
-@using System.Security.Claims
-@using APP2024P4.Data.Dtos
-@using APP2024P4.Service
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject INotificationService NotificationService
-@inject IColaboradorService service
 
-
-<div class="card">
-    <div class="card-header">
-        Notificaciones
+<div class="notification-container">
+    <div class="notification-header">
+        <h4>Notificaciones</h4>
     </div>
-    <div class="card-body">
+    <div class="notification-body">
         @if (Notifications.Count > 0)
         {
             @foreach (var p in Notifications)
             {
-                <div class="card mb-3">
-                    <div class="card-header ">Para: @p.RenderEmail </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Invitacion a colaborar</h5>
-                        <span class="btn btn-primary" @onclick="() => btnAgregarClick(p.Id,p.TareaId)">Aceptar</span>
-                        <span class="btn btn-primary" @onclick="() => btnEliminarClick(p.Id)">Rechazar</span>
+                <div class="notification-item">
+                    <div class="notification-content">
+                        <strong>Invitación a colaborar</strong>
+                        <p>Para: <span class="email-highlight">@p.RenderEmail</span></p>
+                        <p class="small-text">Enviado por: @p.SenderEmail</p>
                     </div>
-                    <div class="card-footer">Enviado por @p.SenderEmail</div>
+                    <div class="notification-actions">
+                        <button class="btn btn-success btn-sm" @onclick="() => btnAgregarClick(p.Id, p.TareaId)">Aceptar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => btnEliminarClick(p.Id)">Rechazar</button>
+                    </div>
                 </div>
             }
+        }
+        else
+        {
+            <div class="no-notifications">
+                <p>No hay notificaciones nuevas.</p>
+            </div>
         }
     </div>
 </div>
 
 @code {
+    [Parameter]
+    public EventCallback<int> OnNotificationCountChanged { get; set; }
+
     private List<NotificacionDto> Notifications = new();
     private string CurrentUserEmail = null!;
     private ClaimsPrincipal? currentUser;
-    public ColaboradorRequest Micolaborador { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        var authStateUser = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        currentUser = authState.User;
 
         if (user.Identity!.IsAuthenticated)
         {
             CurrentUserEmail = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value!;
         }
+
         await ConsultarNotificaciones();
+        await UpdateNotificationCount();
     }
 
     public async Task btnAgregarClick(int notificationId, int tareaId)
     {
         try
         {
-            var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId)) return;
-            // Responder a la invitación y agregar colaborador
-            var result = await NotificationService.RespondToInvitationAsync(notificationId, true, userId, tareaId);
+            var result = await NotificationService.RespondToInvitationAsync(notificationId, true, CurrentUserEmail, tareaId);
             if (result.Succesd)
             {
-                // Actualizar las notificaciones
-                await ConsultarNotificaciones();
                 await NotificationService.Delete(notificationId);
-                StateHasChanged();
+                await ConsultarNotificaciones();
+                await UpdateNotificationCount();
             }
         }
         catch (Exception ex)
@@ -74,22 +72,83 @@
         }
     }
 
-    async Task ConsultarNotificaciones()
-    {
-        var result = await NotificationService.GetNotificacionByEmail(CurrentUserEmail);
-        if (result.Succesd)
-        {
-            Notifications =
-                result.Data?.ToList()
-                ??
-                new List<NotificacionDto>();
-        }
-    }
-
     public async Task btnEliminarClick(int notificationId)
     {
         await NotificationService.Delete(notificationId);
-        StateHasChanged();
+        await ConsultarNotificaciones();
+        await UpdateNotificationCount();
     }
 
+    private async Task UpdateNotificationCount()
+    {
+        await OnNotificationCountChanged.InvokeAsync(Notifications.Count);
+    }
+
+    private async Task ConsultarNotificaciones()
+    {
+        var result = await NotificationService.GetNotificacionByEmail(CurrentUserEmail);
+        Notifications = result.Data?.ToList() ?? new List<NotificacionDto>();
+    }
 }
+<style>
+    .notification-container {
+        background-color: #f8f9fa;
+        border: 1px solid #e3e6eb;
+        border-radius: 8px;
+        padding: 1rem;
+        max-width: 500px;
+        margin: auto;
+    }
+
+    .notification-header {
+        margin-bottom: 1rem;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .notification-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .notification-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border: 1px solid #e3e6eb;
+        border-radius: 8px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .email-highlight {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .small-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .notification-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .no-notifications {
+        text-align: center;
+        color: #6c757d;
+    }
+</style>

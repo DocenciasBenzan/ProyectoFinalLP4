@@ -38,7 +38,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddScoped<IColaboradorService,ColaboradorService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
-builder.Services.AddScoped<ITareaSevice, TareaService>();
+builder.Services.AddScoped<ITareaService, TareaService>();
 builder.Services.AddScoped<IUserService, UserService>();
 var app = builder.Build();
 

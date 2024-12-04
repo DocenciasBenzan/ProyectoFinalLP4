@@ -15,6 +15,7 @@ public class Tarea
     public DateTime? FechaCreacion { get; set; }
     public DateTime? FechaLimite { get; set; }
     public bool IsCompleted { get; set; }
+    public string CreadorEmail { get; set; } = null!;   
 
     public static Tarea Create
         (

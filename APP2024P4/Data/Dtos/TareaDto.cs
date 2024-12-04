@@ -11,7 +11,7 @@ public record TareaDto(
  DateTime? FechaLimite = null!,
  bool IsCompleted = false,
  string CreadorEmail = null!,  // Nueva propiedad para el correo del creador
- List<string> Colaboradores = null! // Nueva propiedad para la lista de colaboradores
+ List<ColaboradorDto> Colaboradores = null! // Nueva propiedad para la lista de colaboradores
  )
 {
     public TareaRequest ToRequest()
@@ -40,7 +40,9 @@ public class TareaRequest
     public DateTime? FechaCreacion { get; set; }
     public DateTime? FechaLimite { get; set; }
     public bool IsCompleted { get; set; }
-    
+    public string CreadorEmail { get; set; } =null!;
+    public List<ColaboradorDto> Colaboradores { get; set; } = new List<ColaboradorDto>();
+
 }
 public class ColaboradorRequest
 {

@@ -3,11 +3,11 @@
 
 <div class="card mb-3">
     <div class="card-header">
-        Tareas del Colaborador
+        <h5>Tareas del Colaborador</h5>
     </div>
     <div class="card-body">
-        <table class="table">
-            <thead>
+        <table class="table table-hover">
+            <thead class="thead-dark">
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Título</th>
@@ -18,6 +18,7 @@
                     <th scope="col">Fecha Límite</th>
                     <th scope="col">Creador</th>
                     <th scope="col">Colaboradores</th>
+                    <th scope="col">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -33,10 +34,39 @@
                             <td>@tarea.Estado</td>
                             <td>@tarea.FechaCreacion?.ToShortDateString()</td>
                             <td>@tarea.FechaLimite?.ToShortDateString()</td>
-                            <td>@tarea.Colaboradores</td>
-                            <td>@tarea.CreadorEmail</td>
+                            <td>
+                                <span class="badge badge-success">@tarea.CreadorEmail</span>
+                            </td>
+                            <td>
+                                @if (tarea.Colaboradores.Any())
+                                {
+                                    <ul class="list-unstyled">
+                                        @foreach (var colaborador in tarea.Colaboradores)
+                                        {
+                                            <li>
+                                                <span class="badge badge-primary">@colaborador.ColaboradorEmail</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-secondary">Sin colaboradores</span>
+                                }
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-comment"></i> Agregar Comentario
+                                </button>
+                            </td>
                         </tr>
                     }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="10" class="text-center">No hay tareas disponibles.</td>
+                    </tr>
                 }
             </tbody>
         </table>
@@ -46,7 +76,6 @@
 @code {
     private string CorreoUsuarioActual = string.Empty;
     private List<TareaDto> ListaTareas = new();
-    private List<ColaboradorDto> ListColaboradores = new();
 
     protected override async Task OnInitializedAsync()
     {

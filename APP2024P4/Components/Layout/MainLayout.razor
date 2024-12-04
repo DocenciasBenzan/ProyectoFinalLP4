@@ -9,11 +9,18 @@
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    @context.User.Identity?.Name!
+                    <div>
+                        <NavLink class="nav-link" href="notificaciones">
+                            <button type="button" class="btn btn-primary position-relative">
+                                Inbox
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    @NotificationCount
+                                    <span class="visually-hidden">unread messages</span>
+                                </span>
+                            </button>
+                        </NavLink>
+                    </div>
                 </Authorized>
-                <NotAuthorized>
-                    <a href="">Sign Up</a>
-                </NotAuthorized>
             </AuthorizeView>
         </div>
 
@@ -23,8 +30,12 @@
     </main>
 </div>
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+@code {
+    public int NotificationCount { get; set; } = 0;
+
+    public void UpdateNotificationCount(int count)
+    {
+        NotificationCount = count;
+        StateHasChanged();
+    }
+}
