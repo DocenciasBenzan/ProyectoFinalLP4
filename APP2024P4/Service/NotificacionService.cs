@@ -8,7 +8,7 @@ namespace APP2024P4.Service;
 public interface INotificationService
 {
     Task<Result> SendNotificationAsync(NotifiacioRequest notificacion, string userId, int tareaId, string renderEmail);
-    Task<ResultList<NotificacionDto>> GetNotificacionByEmail(string renderEmail);
+    Task<ResultList<NotificacionDto>> GetNotificacionByEmail(string renderEmail, bool Isread);
     Task<Result> RespondToInvitationAsync(int notificationId, bool isAccepted, string userId, int tareaId);
     Task<Result> Delete(int Id);
 }
@@ -30,9 +30,8 @@ public partial class NotificationService : INotificationService
     {
         try
         {
-            // Verificar si ya existe una notificación para el usuario con la misma tareaId 
             var existingNotification = await _context.Notificaciones
-            .FirstOrDefaultAsync(n => n.UserId == userId && n.TareaId == tareaId && n.RenderEmail == renderEmail);
+            .FirstOrDefaultAsync(n => n.UserId == userId && n.TareaId == tareaId && n.RenderEmail == renderEmail || n.Isread == true);
             if (existingNotification != null)
             {
                 
@@ -64,11 +63,11 @@ public partial class NotificationService : INotificationService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
-    public async Task<ResultList<NotificacionDto>> GetNotificacionByEmail(string renderEmail)
+    public async Task<ResultList<NotificacionDto>> GetNotificacionByEmail(string renderEmail, bool isread)
     {
         try
         {
-            var entity = await _context.Notificaciones.Where(n => n.RenderEmail == renderEmail)
+            var entity = await _context.Notificaciones.Where(n => n.RenderEmail == renderEmail || n.Isread == isread)
                 .Select(n => new NotificacionDto(
                     n.Id,
                     n.UserId,

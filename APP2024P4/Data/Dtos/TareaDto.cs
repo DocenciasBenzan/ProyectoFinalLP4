@@ -10,7 +10,6 @@ public record TareaDto(
  DateTime? FechaCreacion = null!,
  DateTime? FechaLimite = null!,
  bool IsCompleted = false,
- string CreadorEmail = null!,  // Nueva propiedad para el correo del creador
  List<ColaboradorDto> Colaboradores = null! // Nueva propiedad para la lista de colaboradores
  )
 {

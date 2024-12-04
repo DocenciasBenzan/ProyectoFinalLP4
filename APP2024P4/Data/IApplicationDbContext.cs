@@ -7,6 +7,7 @@ public interface IApplicationDbContext
     DbSet<Tarea> Tareas { get; set; }
     DbSet<Colaborador> Colaboradores { get; set; }
     DbSet<Notificacion> Notificaciones { get; set; }
+    DbSet<Comentario> Comentarios { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
 

@@ -7,16 +7,18 @@ public class Tarea
 {
     [Key]
     public int Id { get; set; }
+    [Required]
     public string Titulo { get; set; } = null!;
     public string UserId { get; set; } = null!;
+    [Required]
     public string Estado { get; set; } = null!;
+    [Required]
     public string Prioridad { get; set; } = null!;
     public string? Descripcion { get; set; }
     public DateTime? FechaCreacion { get; set; }
+    [Required]
     public DateTime? FechaLimite { get; set; }
     public bool IsCompleted { get; set; }
-    public string CreadorEmail { get; set; } = null!;   
-
     public static Tarea Create
         (
         string titulo,
@@ -89,4 +91,6 @@ public class Tarea
     [ForeignKey(nameof(UserId))]
     public virtual ApplicationUser? User { get; set; }    
     public virtual ICollection<Colaborador>? Colaboradores { get; set; }
+    public virtual ICollection<Comentario>? Comentarios { get; set; }
+
 }

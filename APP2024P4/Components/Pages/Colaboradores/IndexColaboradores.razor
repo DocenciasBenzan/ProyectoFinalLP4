@@ -1,77 +1,105 @@
-﻿@page "/colaboradores"
+﻿@inject IJSRuntime JSRuntime
+@page "/colaboradores"
+@rendermode InteractiveServer
 @attribute [Authorize]
+@attribute [StreamRendering]
 
-<div class="card mb-3">
-    <div class="card-header">
-        <h5>Tareas del Colaborador</h5>
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Tareas del Colaborador</h5>
+        <button class="btn btn-sm btn-light">
+            <i class="fas fa-plus"></i> Nueva Tarea
+        </button>
     </div>
-    <div class="card-body">
-        <table class="table table-hover">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Título</th>
-                    <th scope="col">Descripción</th>
-                    <th scope="col">Prioridad</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Fecha de Creación</th>
-                    <th scope="col">Fecha Límite</th>
-                    <th scope="col">Creador</th>
-                    <th scope="col">Colaboradores</th>
-                    <th scope="col">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (ListaTareas.Any())
-                {
-                    @foreach (var tarea in ListaTareas)
+    <div class="card-body p-4">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Título</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Prioridad</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Fecha de Creación</th>
+                        <th scope="col">Fecha Límite</th>
+                        <th scope="col">Creador</th>
+                        <th scope="col">Colaboradores</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ListaTareas.Any())
+                    {
+                        @foreach (var tarea in ListaTareas)
+                        {
+                            <tr>
+                                <th scope="row" class="align-middle">@tarea.Id</th>
+                                <td class="align-middle">@tarea.Titulo</td>
+                                <td class="align-middle">@tarea.Descripcion</td>
+                                <td class="align-middle">
+                                    <span style="font-size: 14px; padding: 5px;" class="badge badge-light text-dark @(tarea.Prioridad == "Alta" ? "badge-danger" : tarea.Prioridad == "Media" ? "badge-warning" : "badge-success")">
+                                        @tarea.Prioridad
+                                    </span>
+                                </td>
+                                <td class="align-middle">
+
+                                    <span style="font-size: 14px; padding: 5px;" class="badge badge-light text-dark @(tarea.Estado == "Completado" ? "badge-success" : "badge-secondary"  )">
+                                        @tarea.Estado
+                                    </span>
+                                </td>
+                                <td class="align-middle">@tarea.FechaCreacion?.ToShortDateString()</td>
+                                <td class="align-middle">@tarea.FechaLimite?.ToShortDateString()</td>
+                                <td class="align-middle">
+                                    @if (tarea.Colaboradores.Any())
+                                    {
+                                        <span class="badge badge-light text-dark" style="font-size: 14px; padding: 5px;">
+                                            @tarea.Colaboradores.FirstOrDefault()?.CreadorEmail
+                                        </span>
+                                    }
+                                </td>
+                                <!-- Colaboradores como lista desplegable -->
+                                <td class="align-middle">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Ver Colaboradores
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            @foreach (var colaborador in tarea.Colaboradores)
+                                            {
+                                                <li>
+                                                    <span class="dropdown-item">@colaborador.ColaboradorEmail</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </td>
+                                <!-- Botones de acciones -->
+                                <td class="align-middle">
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-comment"></i> Comentario
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <th scope="row">@tarea.Id</th>
-                            <td>@tarea.Titulo</td>
-                            <td>@tarea.Descripcion</td>
-                            <td>@tarea.Prioridad</td>
-                            <td>@tarea.Estado</td>
-                            <td>@tarea.FechaCreacion?.ToShortDateString()</td>
-                            <td>@tarea.FechaLimite?.ToShortDateString()</td>
-                            <td>
-                                <span class="badge badge-success">@tarea.CreadorEmail</span>
-                            </td>
-                            <td>
-                                @if (tarea.Colaboradores.Any())
-                                {
-                                    <ul class="list-unstyled">
-                                        @foreach (var colaborador in tarea.Colaboradores)
-                                        {
-                                            <li>
-                                                <span class="badge badge-primary">@colaborador.ColaboradorEmail</span>
-                                            </li>
-                                        }
-                                    </ul>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-secondary">Sin colaboradores</span>
-                                }
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-comment"></i> Agregar Comentario
-                                </button>
-                            </td>
+                            <td colspan="10" class="text-center text-muted">No hay tareas disponibles.</td>
                         </tr>
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="10" class="text-center">No hay tareas disponibles.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
+
+
 
 @code {
     private string CorreoUsuarioActual = string.Empty;

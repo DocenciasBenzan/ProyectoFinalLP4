@@ -1,5 +1,8 @@
-﻿@attribute [StreamRendering]
+﻿@rendermode InteractiveServer
+@attribute [StreamRendering]
+@attribute [Authorize]
 @page "/notificaciones"
+
 
 <div class="notification-container">
     <div class="notification-header">
@@ -17,8 +20,8 @@
                         <p class="small-text">Enviado por: @p.SenderEmail</p>
                     </div>
                     <div class="notification-actions">
-                        <button class="btn btn-success btn-sm" @onclick="() => btnAgregarClick(p.Id, p.TareaId)">Aceptar</button>
-                        <button class="btn btn-danger btn-sm" @onclick="() => btnEliminarClick(p.Id)">Rechazar</button>
+                        <span class="btn btn-success btn-sm" @onclick="() => btnAgregarClick(p.Id, p.TareaId)">Aceptar</span>
+                        <span class="btn btn-danger btn-sm" @onclick="() => btnEliminarClick(p.Id)">Rechazar</span>
                     </div>
                 </div>
             }
@@ -33,37 +36,40 @@
 </div>
 
 @code {
-    [Parameter]
-    public EventCallback<int> OnNotificationCountChanged { get; set; }
 
     private List<NotificacionDto> Notifications = new();
     private string CurrentUserEmail = null!;
     private ClaimsPrincipal? currentUser;
+    public bool Isread;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
+        currentUser = authState.User;
+
 
         if (user.Identity!.IsAuthenticated)
         {
             CurrentUserEmail = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value!;
         }
-
         await ConsultarNotificaciones();
-        await UpdateNotificationCount();
     }
 
     public async Task btnAgregarClick(int notificationId, int tareaId)
     {
         try
         {
-            var result = await NotificationService.RespondToInvitationAsync(notificationId, true, CurrentUserEmail, tareaId);
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            currentUser = authState.User;
+            var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Obtén el ID del usuario actual
+            if (string.IsNullOrEmpty(userId)) return;
+
+            var result = await NotificationService.RespondToInvitationAsync(notificationId, true, userId, tareaId);
             if (result.Succesd)
             {
                 await NotificationService.Delete(notificationId);
-                await ConsultarNotificaciones();
-                await UpdateNotificationCount();
+                Isread = true;
             }
         }
         catch (Exception ex)
@@ -76,17 +82,11 @@
     {
         await NotificationService.Delete(notificationId);
         await ConsultarNotificaciones();
-        await UpdateNotificationCount();
-    }
-
-    private async Task UpdateNotificationCount()
-    {
-        await OnNotificationCountChanged.InvokeAsync(Notifications.Count);
     }
 
     private async Task ConsultarNotificaciones()
     {
-        var result = await NotificationService.GetNotificacionByEmail(CurrentUserEmail);
+        var result = await NotificationService.GetNotificacionByEmail(CurrentUserEmail,Isread);
         Notifications = result.Data?.ToList() ?? new List<NotificacionDto>();
     }
 }

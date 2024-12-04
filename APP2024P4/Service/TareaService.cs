@@ -1,218 +1,211 @@
-﻿using APP2024P4.Data.Dtos;
+﻿using APP2024P4.Data;
+using APP2024P4.Data.Dtos;
 using APP2024P4.Data.Entidades;
-using APP2024P4.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
 using TaskMaster;
 
-namespace APP2024P4.Service
+namespace APP2024P4.Service;
+
+public interface ITareaService
 {
-    public interface ITareaService
+    Task<Result> Create(TareaRequest tarea, string userId);
+    Task<Result> Delete(int id);
+    Task<ResultList<TareaDto>> Get(string filtro = "");
+    Task<ResultList<TareaDto>> GetById(string userId);
+    Task<Result> Update(TareaRequest tarea);
+    Task<ResultList<TareaDto>> ObtenerTareasPorColaborador(string email);
+}
+
+public partial class TareaService : ITareaService
+{
+    private readonly IApplicationDbContext _dbContext;
+
+    public TareaService(IApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
     {
-        Task<Result> Create(TareaRequest tarea, string userId);
-        Task<Result> Delete(int id);
-        Task<ResultList<TareaDto>> Get(string filtro = "");
-        Task<ResultList<TareaDto>> GetById(string userId);
-        Task<Result> Update(TareaRequest tarea);
-        Task<ResultList<TareaDto>> ObtenerTareasPorColaborador(string email);
+        _dbContext = dbContext;
     }
 
-    public partial class TareaService : ITareaService
+    public async Task<Result> Create(TareaRequest tarea, string userId)
     {
-        private readonly IApplicationDbContext _dbContext;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public TareaService(IApplicationDbContext dbContext, UserManager<ApplicationUser> userManager)
+        try
         {
-            _dbContext = dbContext;
-            _userManager = userManager;
+            var entity = Tarea.Create(
+                tarea.Titulo,
+                tarea.FechaCreacion,
+                tarea.FechaLimite,
+                tarea.IsCompleted,
+                tarea.Estado,
+                tarea.Prioridad,
+                tarea.Descripcion
+            );
+            entity.UserId = userId;
+
+            _dbContext.Tareas.Add(entity);
+            await _dbContext.SaveChangesAsync();
+
+            return Result.Success("Tarea registrada con éxito!");
         }
-
-        public async Task<Result> Create(TareaRequest tarea, string userId)
+        catch (Exception ex)
         {
-            try
-            {
-                var entity = Tarea.Create(
-                    tarea.Titulo,
-                    tarea.FechaCreacion,
-                    tarea.FechaLimite,
-                    tarea.IsCompleted,
-                    tarea.Estado,
-                    tarea.Prioridad,
-                    tarea.Descripcion
-                );
-                entity.UserId = userId;
+            return Result.Failure($"Error: {ex.Message}");
+        }
+    }
 
-                _dbContext.Tareas.Add(entity);
+    public async Task<Result> Update(TareaRequest tarea)
+    {
+        try
+        {
+            var entity = _dbContext.Tareas.FirstOrDefault(p => p.Id == tarea.Id);
+            if (entity == null)
+                return Result.Failure($"La tarea '{tarea.Id}' no existe!");
+
+            if (entity.Update(
+                tarea.Titulo,
+                tarea.FechaCreacion,
+                tarea.FechaLimite,
+                tarea.IsCompleted,
+                tarea.Estado,
+                tarea.Prioridad,
+                tarea.Descripcion))
+            {
                 await _dbContext.SaveChangesAsync();
-
-                return Result.Success("Tarea registrada con éxito!");
+                return Result.Success("Tarea actualizada con éxito!");
             }
-            catch (Exception ex)
-            {
-                return Result.Failure($"Error: {ex.Message}");
-            }
+            return Result.Success("No se realizaron cambios.");
         }
-
-        public async Task<Result> Update(TareaRequest tarea)
+        catch (Exception ex)
         {
-            try
-            {
-                var entity = _dbContext.Tareas.FirstOrDefault(p => p.Id == tarea.Id);
-                if (entity == null)
-                    return Result.Failure($"La tarea '{tarea.Id}' no existe!");
-
-                if (entity.Update(
-                    tarea.Titulo,
-                    tarea.FechaCreacion,
-                    tarea.FechaLimite,
-                    tarea.IsCompleted,
-                    tarea.Estado,
-                    tarea.Prioridad,
-                    tarea.Descripcion))
-                {
-                    await _dbContext.SaveChangesAsync();
-                    return Result.Success("Tarea actualizada con éxito!");
-                }
-                return Result.Success("No se realizaron cambios.");
-            }
-            catch (Exception ex)
-            {
-                return Result.Failure($"Error: {ex.Message}");
-            }
+            return Result.Failure($"Error: {ex.Message}");
         }
+    }
 
-        public async Task<Result> Delete(int id)
+    public async Task<Result> Delete(int id)
+    {
+        try
         {
-            try
-            {
-                var entity = _dbContext.Tareas.FirstOrDefault(p => p.Id == id);
-                if (entity == null)
-                    return Result.Failure($"La tarea '{id}' no existe!");
+            var entity = _dbContext.Tareas.FirstOrDefault(p => p.Id == id);
+            if (entity == null)
+                return Result.Failure($"La tarea '{id}' no existe!");
 
-                _dbContext.Tareas.Remove(entity);
-                await _dbContext.SaveChangesAsync();
+            _dbContext.Tareas.Remove(entity);
+            await _dbContext.SaveChangesAsync();
 
-                return Result.Success("Tarea eliminada con éxito!");
-            }
-            catch (Exception ex)
-            {
-                return Result.Failure($"Error: {ex.Message}");
-            }
+            return Result.Success("Tarea eliminada con éxito!");
         }
-
-        public async Task<ResultList<TareaDto>> GetById(string userId)
+        catch (Exception ex)
         {
-            try
-            {
-                 var tareas = await _dbContext.Tareas
-                .Where(p => p.UserId == userId)
+            return Result.Failure($"Error: {ex.Message}");
+        }
+    }
+
+    public async Task<ResultList<TareaDto>> GetById(string userId)
+    {
+        try
+        {
+            var tareas = await _dbContext.Tareas
+           .Where(p => p.UserId == userId)
+           .Include(t => t.Colaboradores)
+           .Select(t => new TareaDto(
+           t.Id,
+           t.UserId,
+           t.Titulo,
+           t.Descripcion!,
+           t.Estado,
+           t.Prioridad,
+           t.FechaCreacion,
+           t.FechaLimite,
+           t.IsCompleted,
+           t.Colaboradores!.Select(c => new ColaboradorDto(
+               c.Id,
+               c.UserId,
+               c.TareaId,
+               c.CreadorEmail,
+               c.ColaboradorEmail,
+               c.IsApproved
+           )).ToList()
+        ))
+        .ToListAsync();
+
+            return ResultList<TareaDto>.Success(tareas);
+        }
+        catch (Exception ex)
+        {
+            return ResultList<TareaDto>.Failure($"Error: {ex.Message}");
+        }
+    }
+
+    public async Task<ResultList<TareaDto>> Get(string filtro = "")
+    {
+        try
+        {
+            var tareas = await _dbContext.Tareas
+                .Where(p => p.Titulo.ToLower().Contains(filtro.ToLower()))
                 .Include(t => t.Colaboradores)
                 .Select(t => new TareaDto(
-        t.Id,
-        t.UserId,
-        t.Titulo,
-        t.Descripcion!,
-        t.Estado,
-        t.Prioridad,
-        t.FechaCreacion,
-        t.FechaLimite,
-        t.IsCompleted,
-        t.CreadorEmail,
-        t.Colaboradores!.Select(c => new ColaboradorDto(
-            c.Id,
-            c.UserId,
-            c.TareaId,
-            c.CreadorEmail,
-            c.ColaboradorEmail,
-            c.IsApproved
-        )).ToList()
-    ))
-    .ToListAsync();
+                t.Id,
+                t.UserId,
+                t.Titulo,
+                t.Descripcion!,
+                t.Estado,
+                t.Prioridad,
+                t.FechaCreacion,
+                t.FechaLimite,
+                t.IsCompleted,
+                t.Colaboradores!.Select(c => new ColaboradorDto(
+                    c.Id,
+                    c.UserId,
+                    c.TareaId,
+                    c.CreadorEmail,
+                    c.ColaboradorEmail,
+                    c.IsApproved
+                )).ToList()
+             ))
+            .ToListAsync();
 
-                return ResultList<TareaDto>.Success(tareas);
-            }
-            catch (Exception ex)
-            {
-                return ResultList<TareaDto>.Failure($"Error: {ex.Message}");
-            }
+            return ResultList<TareaDto>.Success(tareas);
         }
-
-        public async Task<ResultList<TareaDto>> Get(string filtro = "")
+        catch (Exception ex)
         {
-            try
-            {
-                var tareas = await _dbContext.Tareas
-                    .Where(p => p.Titulo.ToLower().Contains(filtro.ToLower()))
-                    .Include(t => t.Colaboradores)
-                    .Select(t => new TareaDto(
- t.Id,
-        t.UserId,
-        t.Titulo,
-        t.Descripcion!,
-        t.Estado,
-        t.Prioridad,
-        t.FechaCreacion,
-        t.FechaLimite,
-        t.IsCompleted,
-        t.CreadorEmail,
-        t.Colaboradores!.Select(c => new ColaboradorDto(
-            c.Id,
-            c.UserId,
-            c.TareaId,
-            c.CreadorEmail,
-            c.ColaboradorEmail,
-            c.IsApproved
-        )).ToList()
-    ))
-    .ToListAsync();
-
-                return ResultList<TareaDto>.Success(tareas);
-            }
-            catch (Exception ex)
-            {
-                return ResultList<TareaDto>.Failure($"Error: {ex.Message}");
-            }
+            return ResultList<TareaDto>.Failure($"Error: {ex.Message}");
         }
+    }
 
-        public async Task<ResultList<TareaDto>> ObtenerTareasPorColaborador(string email)
+    public async Task<ResultList<TareaDto>> ObtenerTareasPorColaborador(string email)
+    {
+        try
         {
-            try
-            {
-                var tareas = await _dbContext.Tareas
-                    .Include(t => t.Colaboradores)
-                    .Where(t => t.Colaboradores!.Any(c => c.CreadorEmail == email || c.ColaboradorEmail == email))
-                    .Select(t => new TareaDto(
-                        t.Id,
-        t.UserId,
-        t.Titulo,
-        t.Descripcion!,
-        t.Estado,
-        t.Prioridad,
-        t.FechaCreacion,
-        t.FechaLimite,
-        t.IsCompleted,
-        t.CreadorEmail,
-        t.Colaboradores!.Select(c => new ColaboradorDto(
-            c.Id,
-            c.UserId,
-            c.TareaId,
-            c.CreadorEmail,
-            c.ColaboradorEmail,
-            c.IsApproved
-        )).ToList()
-    ))
-    .ToListAsync();
-                if (!tareas.Any())
-                    return ResultList<TareaDto>.Failure("No se encontraron tareas asociadas a este colaborador.");
+            var tareas = await _dbContext.Tareas
+                .Include(t => t.Colaboradores)
+                .Where(t => t.Colaboradores!.Any(c => c.CreadorEmail == email || c.ColaboradorEmail == email))
+                .Select(t => new TareaDto(
+                    t.Id,
+                    t.UserId,
+                    t.Titulo,
+                    t.Descripcion!,
+                    t.Estado,
+                    t.Prioridad,
+                    t.FechaCreacion,
+                    t.FechaLimite,
+                    t.IsCompleted,
+                    t.Colaboradores!.Select(c => new ColaboradorDto(
+                    c.Id,
+                    c.UserId,
+                    c.TareaId,
+                    c.CreadorEmail,
+                    c.ColaboradorEmail,
+                    c.IsApproved
+                    )).ToList()
+                ))
+               .ToListAsync();
+            if (!tareas.Any())
+                return ResultList<TareaDto>.Failure("No se encontraron tareas asociadas a este colaborador.");
 
-                return ResultList<TareaDto>.Success(tareas);
-            }
-            catch (Exception ex)
-            {
-                return ResultList<TareaDto>.Failure($"Error: {ex.Message}");
-            }
+            return ResultList<TareaDto>.Success(tareas);
+        }
+        catch (Exception ex)
+        {
+            return ResultList<TareaDto>.Failure($"Error: {ex.Message}");
         }
     }
 }

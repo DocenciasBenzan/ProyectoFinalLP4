@@ -9,6 +9,7 @@ namespace APP2024P4.Data
         public DbSet<Tarea> Tareas { get; set; }
         public DbSet<Colaborador> Colaboradores { get; set; }
         public DbSet<Notificacion> Notificaciones { get; set; }
+        public DbSet<Comentario> Comentarios { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
