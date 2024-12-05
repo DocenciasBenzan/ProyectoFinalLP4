@@ -15,7 +15,12 @@ public partial class ProductoService : IProductoService
     {
         DbContext = dbContext;
     }
-    //CRUD
+
+    /// <summary>
+    /// Crea un nuevo producto en la base de datos.
+    /// </summary>
+    /// <param name="producto">Detalles del producto a crear.</param>
+    /// <returns>Resultado de la operación, indicando si fue exitosa o si ocurrió un error.</returns>
     public async Task<Result> Create(ProductoRequest producto)
     {
         try
@@ -30,6 +35,12 @@ public partial class ProductoService : IProductoService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
+    /// <summary>
+    /// Actualiza los detalles de un producto existente en la base de datos.
+    /// </summary>
+    /// <param name="producto">Detalles del producto a actualizar.</param>
+    /// <returns>Resultado de la operación, indicando si fue exitosa o si no se hicieron cambios.</returns>
     public async Task<Result> Update(ProductoRequest producto)
     {
         try
@@ -49,6 +60,12 @@ public partial class ProductoService : IProductoService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
+    /// <summary>
+    /// Elimina un producto de la base de datos por su ID.
+    /// </summary>
+    /// <param name="Id">ID del producto a eliminar.</param>
+    /// <returns>Resultado de la operación, indicando si fue exitosa o si el producto no existe.</returns>
     public async Task<Result> Delete(int Id)
     {
         try
@@ -65,10 +82,16 @@ public partial class ProductoService : IProductoService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
+    /// <summary>
+    /// Obtiene los detalles de un producto por su ID.
+    /// </summary>
+    /// <param name="Id">ID del producto a obtener.</param>
+    /// <returns>Resultado con los detalles del producto o mensaje de error si no se encuentra.</returns>
     public async Task<Result<ProductoDto>> GetById(int Id)
     {
         try
-        {   
+        {
             var entity = await DbContext.Productos.Where(p => p.Id == Id)
                 .Select(p => new ProductoDto(p.Id, p.Nombre, p.Img, p.CategoriaId, p.Categoria!.Nombre ?? "No definida", p.Precio))
                 .FirstOrDefaultAsync();
@@ -82,6 +105,12 @@ public partial class ProductoService : IProductoService
             return Result<ProductoDto>.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
+    /// <summary>
+    /// Obtiene una lista de productos con un filtro opcional por nombre.
+    /// </summary>
+    /// <param name="filtro">Texto para filtrar productos por nombre (opcional).</param>
+    /// <returns>Resultado con una lista de productos filtrados.</returns>
     public async Task<ResultList<ProductoDto>> Get(string filtro = "")
     {
         try
