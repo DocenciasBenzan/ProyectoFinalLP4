@@ -7,7 +7,7 @@
 <h2>Buscar</h2>
 
 <input type="text" @bind="query" class="form-control" placeholder="Busque una pelicula o serie" />
-<span class="btn btn-outline-success mt-2" @onclick="BuscarPeliculas">
+<span class="btn btn-outline-success mt-2 mb-3" @onclick="BuscarPeliculas">
 	<i class="bi bi-search"></i>
 	Buscar
 </span>
@@ -98,8 +98,6 @@
 
 </style>
 
-
-
 @if (IsLoading)
 {
 	<p>Cargando...</p>
@@ -112,15 +110,15 @@
 			@foreach (var movie in Movies)
 			{
 				<div class="card">
-					<span class="btn btn-outline-dark" @onclick="()=>{MostrarDetalles(movie);}">
+					<span class="btn btn-outline-dark mt-2" @onclick="()=>{MostrarDetalles(movie);}">
 						<i class="bi bi-file-plus"></i>
 					</span>
 					@if (TituloSeleccionado?.TMDbId == movie.TMDbId)
 					{
 						<div class="mb-3">
 							<label for="lista" class="form-label"> Agregar a:</label>
-							<select id="lista" class="form-control" @bind="SelectedListId">
-								<option disabled value="">-- Selecciona una lista --</option>
+							<select id="lista" class="form-select" @bind="SelectedListId">
+								<option selected disabled value="">-- Selecciona una lista --</option>
 								@foreach (var list in UserLists)
 								{
 									<option value="@list.Id">@list.Name</option>
@@ -133,10 +131,8 @@
 						</div>
 					}
 					<CompMovie movie="movie"></CompMovie>
-
 				</div>
 			}
-
 		</div>
 
 	</div>
@@ -168,19 +164,30 @@
 }
 
 @code {
-	private string query;
-	private bool IsLoading;
-	private List<Movie> Movies = new();
-	private Movie TituloSeleccionado;
+	/// <summary>
+	/// Metodos generales.
+	/// </summary>
+	private string query; // Representa la busqueda.
+	private bool IsLoading; // Para mostrar cuando esta cargando.
+	private List<Movie> Movies = new(); //Para usar las propiedades de la entidad Movie.
+	private Movie TituloSeleccionado; // Representa el titulo seleccionado.
 
-	private List<UserList> UserLists = new();
-	private int? SelectedListId;
-	private bool CanAddToList => TituloSeleccionado != null && SelectedListId.HasValue;
+	/// <summary>
+	/// Metodos para agregar a listas.
+	/// </summary>
+	private List<UserList> UserLists = new(); // Para usar la entidad UserList.
+	private int? SelectedListId; // Identifica la lista seleccionada por su ID.
+	private bool CanAddToList => TituloSeleccionado != null && SelectedListId.HasValue; // Metodo que define si es posible guardar en una lista.
 
-	public bool AntesPrimeraBusqueda { get; set; } = true;
-	//NEW
+	public bool AntesPrimeraBusqueda { get; set; } = true; // Para identificar el estado de la barra de busqueda.
+
+
 	private List<Movie> resultados;
 
+	/// <summary>
+	/// Para cargar datos al iniciar la pagina.
+	/// </summary>
+	/// <returns>Carga las listas guardadas en la base de datos.</returns>
 	protected override async Task OnInitializedAsync()
 	{
 		var r = await ListService.GetListsAsync();
@@ -188,10 +195,14 @@
 		{
 			UserLists = r?.Data?.ToList() ?? new();
 		}
-
 	}
 
 
+	/// <summary>
+	/// Metodo para obtener los posters de los titulos.
+	/// </summary>
+	/// <param name="posterPath"></param>
+	/// <returns>Almacena el valor de los posters</returns>
 	private string GetPosterUrl(string posterPath)
 	{
 		if (string.IsNullOrEmpty(posterPath))
@@ -200,10 +211,12 @@
 		return $"https://image.tmdb.org/t/p/w200{posterPath}"; // "w200" es para ajustar el tamaño de imagen
 	}
 
-
+	/// <summary>
+	/// Función para buscar peliculas y series.
+	/// </summary>
+	/// <returns>Titulos acorde a lo digitado en la barra de busqueda.</returns>
 	private async Task BuscarPeliculas()
 	{
-
 		if (string.IsNullOrWhiteSpace(query))
 		{
 			Console.WriteLine("El campo esta vacio");
@@ -230,14 +243,22 @@
 		}
 	}
 
+	/// <summary>
+	/// Función para mostrar detalles.
+	/// </summary>
+	/// <param name="movie"></param>
+	/// Representa el titulo seleccionado a la hora de mostrar detalles.
 	private void MostrarDetalles(Movie movie)
 	{
 		TituloSeleccionado = movie;
 	}
 
+	/// <summary>
+	/// Función para agregar titulos a las listas.
+	/// </summary>
+	/// <returns>Titulos agregados a las listas ya creadas</returns>
 	private async Task AgregarALista()
 	{
-
 		if (CanAddToList)
 		{
 			TituloSeleccionado.Poster_path = GetPosterUrl(TituloSeleccionado.Poster_path);
@@ -250,22 +271,19 @@
 			{
 				TituloSeleccionado.Poster_path = string.Empty;
 			}
-			// Esto no esta funcionando ( drop hide )
+			// ( drop hide )
 			SelectedListId = null; //Reinicia el dropdown
 			Console.WriteLine($"'{TituloSeleccionado.Title}' agregado a la lista con exito.");
 			StateHasChanged();
 		}
 	}
 
+	/// <summary>
+	/// Función para cerrar el menu de agregar listas.
+	/// </summary>
 	private void CancelarAgregarALista()
 	{
 		TituloSeleccionado = null;
 		StateHasChanged();
-	}
-	private async Task BuscarPrueba()
-	{
-		Console.WriteLine($"Buscando: {query}");
-		resultados = await TmdbService.SearchTitlesAsync(query);
-		Console.WriteLine($"Resultados encontrados: {resultados.Count}");
 	}
 }

@@ -69,16 +69,16 @@
 							}
 							<strong>@list.Name</strong>
 						}
-						<div class="justify-content-end ">
+						<div class="justify-content-end">
 							@* Botón para editar lista *@
 							@if (EditingListId != list.Id)
 							{
-								<span class="btn btn-outline-warning   border-0" @onclick="() => EditarLista(list.Id, list.Name)">
+								<span class="btn btn-outline-warning border-0" @onclick="() => EditarLista(list.Id, list.Name)">
 									<i class="bi bi-pencil"></i>
 								</span>
 
 								@* Boton para eliminar listas *@
-								<span class="btn btn-outline-danger btn-sm me-2 border-0" @onclick="() => EliminarLista(list.Id)">
+								<span class="btn btn-outline-danger border-0" @onclick="() => EliminarLista(list.Id)">
 									<i class="bi bi-trash"></i>
 								</span>
 							}
@@ -158,21 +158,31 @@ else
 
 
 @code {
-	public bool ShowForm = false;
-	public bool ShowList = false;
+	/// <summary>
+	/// Metodos generales
+	/// </summary>
+	public bool ShowForm = false; //Muestra el formulario de crear listas.
 
-	public int IdVerMoviesList { get; set; }
-	private string NuevaLista;
-	private List<UserList> Lists;
+	public int IdVerMoviesList { get; set; } // Permite ver las listas en base a su ID.
+	private string NuevaLista; // Se utiliza a la hora de crear una nueva lista.
+	private List<UserList> Lists; // Para usar la entidad UserList.
 
-	private int EditingListId = 0;
-	private string NuevoNombreLista = string.Empty;
+	private int EditingListId = 0; // ID que identifica la lista a modificar.
+	private string NuevoNombreLista = string.Empty; // Para los cambios de nombre en las listas.
 
 
+	/// <summary>
+	/// Metodo para cargar al inicio.
+	/// </summary>
+	/// <returns>Las listas creadas.</returns>
 	protected override async Task OnInitializedAsync()
 	{
 		CargarDatos();
 	}
+
+	/// <summary>
+	/// Función para cargar las listas desde la base de datos usando el servicio.
+	/// </summary>
 	public async void CargarDatos()
 	{
 		var r = await ListService.GetListsAsync();
@@ -183,6 +193,10 @@ else
 		StateHasChanged();
 	}
 
+	/// <summary>
+	/// Función para crear una lista nueva.
+	/// </summary>
+	/// <returns>Nueva lista</returns>
 	private async Task CrearLista()
 	{
 		if (!string.IsNullOrWhiteSpace(NuevaLista))
@@ -195,12 +209,23 @@ else
 		}
 	}
 
+	/// <summary>
+	/// Funcion para editar listas.
+	/// </summary>
+	/// <param name="id"></param>
+	/// <param name="nombreActual"></param>
+	/// Parametros como el ID de la lista y el nombre nuevo.
 	private void EditarLista(int id, string nombreActual)
 	{
 		ShowForm = false;
 		EditingListId = id;
 		NuevoNombreLista = nombreActual;
 	}
+
+	/// <summary>
+	/// Para guardar el nombre nuevo.
+	/// </summary>
+	/// <returns>Nuevo nombre de la lista.</returns>
 	private async Task GuardarNombreLista()
 	{
 		if (!string.IsNullOrWhiteSpace(NuevoNombreLista))
@@ -218,12 +243,21 @@ else
 			}
 		}
 	}
+
+	/// <summary>
+	/// Para cerrar el menu de editar listas.
+	/// </summary>
 	private void btnCancelarEditarLista()
 	{
 		EditingListId = 0;
 		NuevoNombreLista = string.Empty;
 	}
 
+	/// <summary>
+	/// Para eliminar listas.
+	/// </summary>
+	/// <param name="listaId"></param>
+	/// <returns>ID unico de la lista.</returns>
 	private async Task EliminarLista(int listaId)
 	{
 		var result = await ListService.DeleteListAsync(listaId);
@@ -237,18 +271,29 @@ else
 		}
 	}
 
+	/// <summary>
+	/// Función para mostrar el formulario de crear lista.
+	/// </summary>
 	private void btnShowAddList()
 	{
 		ShowForm = true;
 		NuevaLista = "";
 	}
 
+	/// <summary>
+	/// Para cerrar el menu de crear listas.
+	/// </summary>
 	private void btnCancelarCrearLista()
 	{
 		ShowForm = false;
 		NuevaLista = "";
 	}
 
+	/// <summary>
+	/// Para ver los detalles de las peliculas.
+	/// </summary>
+	/// <param name="idUserList"></param>
+	/// ID de la lista donde se encuentran los titulos.
 	private void btnVerMovies(int idUserList)
 	{
 		if (this.IdVerMoviesList != 0)
@@ -258,7 +303,6 @@ else
 		else
 		{
 			this.IdVerMoviesList = idUserList;
-
 		}
 		StateHasChanged();
 	}

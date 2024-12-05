@@ -5,11 +5,16 @@ using ProyectoLP4.web.Data;
 using ProyectoLP4.web;
 
 /// <summary>
-/// Servicio para el gesitonamiento de las listas
+/// Servicio para el gestionamiento de las listas
 /// </summary>
 public class ListService : IListService
 {
 
+    /// <summary>
+    /// Metodo para poder tener conexion con el AppDbContext.
+    /// </summary>
+    /// <param name="context"></param>
+    /// Variable usada para establecer dicha conexión.
     public ListService(IApplicationDbContext context)
     {
         this.context = context;
@@ -17,9 +22,9 @@ public class ListService : IListService
     private readonly IApplicationDbContext context;
 
     /// <summary>
-    ///     Obtienes todas las listas existentes en la base de datos
+    ///     Función para obtener todas las listas existentes en la base de datos.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Todas las listas ya creadas</returns>
     public async Task<ResultList<UserList>> GetListsAsync()
     {
         try
@@ -38,11 +43,12 @@ public class ListService : IListService
             return ResultList<UserList>.Failure($"Ocurrio un error al obtener las listas ::: {ex.Message}");
         }
     }
+    
     /// <summary>
-    /// Crea una nueva lista
+    /// Función para crear listas nuevas
     /// </summary>
     /// <param name="nombre"></param>
-    /// <returns></returns>
+    /// <returns>Nombre de la lista</returns>
     public async Task<Result> CrearListaAsync(string nombre)
     {
         try
@@ -59,11 +65,11 @@ public class ListService : IListService
     }
 
     /// <summary>
-    ///     Agrega una lista
+    /// Función para agregar titulos a una lista (ambas: peliculas y series).
     /// </summary>
     /// <param name="listaId"></param>
     /// <param name="movie"></param>
-    /// <returns></returns>
+    /// <returns>Parametros que contienen el ID de la lista seleccionada y la información de la pelicula a guardar.</returns>
     public async Task<Result> AddMovieToListAsync(int listaId, Movie movie)
     {
         try
@@ -83,14 +89,13 @@ public class ListService : IListService
         {
             return Result.Failure($"ALGO FALLO AL AGREGAR LA PELICULA: {ex.Message}");
         }
-
     }
 
     /// <summary>
-    ///     Obtiene lista por su id
+    /// Para obtener las listas por su ID.
     /// </summary>
     /// <param name="listaId"></param>
-    /// <returns></returns>
+    /// <returns>El ID único de la lista.</returns>
     public async Task<Result<UserList>> GetListByIdAsync(int listaId)
     {
         try
@@ -105,16 +110,17 @@ public class ListService : IListService
         }
         catch (Exception ex)
         {
-            return Result<UserList>.Failure($"Algo fallo al momento de obtenr la lista: {ex.Message}");
+            return Result<UserList>.Failure($"Algo fallo al momento de obtener la lista: {ex.Message}");
         }
     }
 
+
     /// <summary>
-    ///     Actualiza una lista
+    /// Para actualizar listas (Editar nombre).
     /// </summary>
     /// <param name="listaId"></param>
     /// <param name="nuevoNombre"></param>
-    /// <returns></returns>
+    /// <returns>Representan el ID y el nuevo nombre de la lista.</returns>
 	public async Task<Result> UpdateListAsync(int listaId, string nuevoNombre)
 	{
 		try
@@ -137,10 +143,10 @@ public class ListService : IListService
 	}
 
     /// <summary>
-    /// Elimina una lista
+    /// Para eliminar una lista.
     /// </summary>
     /// <param name="listaId"></param>
-    /// <returns></returns>
+    /// <returns>ID de la lista.</returns>
 	public async Task<Result> DeleteListAsync(int listaId)
 	{
 		try
@@ -162,11 +168,12 @@ public class ListService : IListService
 			return Result.Failure($"Error trying to delete list: {ex.Message}");
 		}
 	}
+    
     /// <summary>
-    /// Elimina una pelicula de una lista
+    /// Elimina una pelicula de una lista.
     /// </summary>
     /// <param name="movieId"></param>
-    /// <returns></returns>
+    /// <returns>ID del titulo a eliminar.</returns>
 	public async Task<Result> DeleteMovieFromListAsync(int movieId)
 	{
 		try

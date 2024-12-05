@@ -4,7 +4,7 @@
 
 
 <div class="col">
-	<div class="card mb-3" style="max-width: 400px;" @onclick="() => ShowDetails = !ShowDetails" role="button" aria-expanded="@ShowDetails.ToString()" aria-label="Toggle details for @movie.Title or @movie.Name">
+	<div class="card mb-3" style="max-width: 400px; min-width: 300px;" @onclick="() => ShowDetails = !ShowDetails" role="button" aria-expanded="@ShowDetails.ToString()" aria-label="Toggle details for @movie.Title or @movie.Name">
 		<div class="row g-0">
 			<div class="col-md-4">
 				<img src="@GetPosterUrl()" class="img-fluid rounded-start pt-2" alt="Poster of @(string.IsNullOrEmpty(movie.Title) ? movie.Name : movie.Title)" />
@@ -13,23 +13,26 @@
 				<div class="card-body">
 					<h5 class="card-title d-flex justify-content-between align-items-center">
 						@(string.IsNullOrEmpty(movie.Title) ? movie.Name : movie.Title)
-						<span class="badge bg-secondary">@(movie.Release_date ?? movie.First_air_date)</span>
+						
 					</h5>
+					<h5><span class="badge bg-secondary">@(movie.Release_date ?? movie.First_air_date)</span></h5>
 					<p class="card-text"><small class="text-muted">Average Vote: @movie.Vote_average</small></p>
 					@if (ShowDetails)
 					{
-						<div class="col-md-8 d-flex flex-column justify-content-start">
+						<div class="col-md-15 d-flex flex-column justify-content-start">
 							<p class="card-text mt-2">@movie.Overview</p>
 							@if (!string.IsNullOrWhiteSpace(movie.Name))
 							{
 								<p class="card-text">
-									<strong>Series Name:</strong> @movie.Name<br />
 									<strong>First Air Date:</strong> @movie.First_air_date
 								</p>
 							}
-							<span class="btn btn-outline-danger btn-sm mt-2" @onclick="EliminarMovie">
-								<i class="bi bi-trash"></i> Eliminar
-							</span>
+							@if (OnMovieDeleted.HasDelegate)
+							{
+								<span class="btn btn-outline-danger btn-sm mt-2" @onclick="EliminarMovie">
+									<i class="bi bi-trash"></i> Eliminar
+								</span>
+							}
 						</div>
 					}
 				</div>
@@ -39,13 +42,24 @@
 </div>
 
 @code {
+	/// <summary>
+	/// Parametro con la entidad Movie para utilizar sus propiedades.
+	/// </summary>
 	[Parameter]
 	public Movie movie { get; set; } = null!;
-	public bool ShowDetails { get; set; }
 
+	public bool ShowDetails { get; set; } // Mostrar detalles del titulo seleccionado.
+
+	/// <summary>
+	/// Metodo para la eliminación de titulos dentro de una lista.
+	/// </summary>
 	[Parameter]
-	public EventCallback<int> OnMovieDeleted { get; set; } // Para notificar al padre.
+	public EventCallback<int> OnMovieDeleted { get; set; } // Para notificar al componente padre.
 
+	/// <summary>
+	/// Para obtener los posters de los titulos.
+	/// </summary>
+	/// <returns></returns>
 	private string GetPosterUrl()
 	{
 		if (string.IsNullOrWhiteSpace(movie.Poster_path))
@@ -62,6 +76,10 @@
 		}
 	}
 
+	/// <summary>
+	/// Para eliminar un titulo dentro de una lista.
+	/// </summary>
+	/// <returns></returns>
 	private async Task EliminarMovie()
 	{
 		var result = await ListService.DeleteMovieFromListAsync(movie.Id);
@@ -75,4 +93,4 @@
 		}
 		StateHasChanged();
 	}
-		}
+}

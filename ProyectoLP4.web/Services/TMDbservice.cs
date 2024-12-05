@@ -6,11 +6,14 @@ using Microsoft.Extensions.Configuration;
 using ProyectoLP4.web.Models;
 using Newtonsoft.Json;
 
+/// <summary>
+/// Servicio para conectar con la API y obtener sus datos.
+/// </summary>
 public class TMDbService : ITMDbservice
 {
 
 	/// <summary>
-	/// Se encarga del gestionamiento de las consultas a la base de datos
+	/// Se encarga del gestionamiento de las consultas generales a la API.
 	/// </summary>
 	private readonly HttpClient _httpClient;
 	private const string ApiKey = "f080810985003cec1aeef1e10d5ce41b";
@@ -21,7 +24,7 @@ public class TMDbService : ITMDbservice
 		_httpClient = httpClient;
 	}
 	/// <summary>
-	/// Busca peliculas por titulo
+	/// Función para buscar peliculas usando la API.
 	/// </summary>
 	/// <param name="query"></param>
 	/// Hace referencia al valor introducido por el usuario para la busqueda
@@ -81,6 +84,11 @@ public class TMDbService : ITMDbservice
 		#endregion
 	}
 
+	/// <summary>
+	/// Función para utilizar los datos brinda la API a la hora de buscar.
+	/// </summary>
+	/// <param name="response"></param>
+	/// <returns>Representa la variable utilizada para recibir la respuestas en tipo string.</returns>
 	private async Task<List<Movie>> ParseResponseAsync(HttpResponseMessage response)
 	{
 		if (!response.IsSuccessStatusCode)
@@ -90,10 +98,7 @@ public class TMDbService : ITMDbservice
 		}
 
 		var json = await response.Content.ReadAsStringAsync();
-		//Console.WriteLine($"Respuesta JSON: {json}");
-
-		//var result = JsonSerializer.Deserialize<TMDbSearchResult>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
-		//return result?.Results ?? new List<Movie>();
+		
 		var r = JsonConvert.DeserializeObject<TMDbSearchResult>(json);
 		var movies = r.Results.Select(x => new Movie()
 		{
@@ -108,6 +113,44 @@ public class TMDbService : ITMDbservice
 
 		}).ToList();
 		return movies;
+	}
+
+	/// <summary>
+	/// Función para obtener las peliculas y series en tendencia.
+	/// </summary>
+	/// <param name="mediaType"></param>
+	/// <param name="timeWindow"></param>
+	/// <returns>Una representa el tipo de titulo (pelicula o serie) y el otro el rango de tiempo</returns>
+	public async Task<List<Movie>> GetTrendingAsync(string mediaType, string timeWindow = "week")
+	{
+		try
+		{
+			var response = await _httpClient.GetAsync($"{BaseUrl}trending/{mediaType}/{timeWindow}?api_key={ApiKey}");
+			if (!response.IsSuccessStatusCode)
+			{
+				Console.WriteLine($"Error al obtener tendencias: {response.StatusCode}");
+				return new List<Movie>();
+			}
+
+			var json = await response.Content.ReadAsStringAsync();
+			var result = JsonConvert.DeserializeObject<TMDbSearchResult>(json);
+			return result.Results.Select(x => new Movie
+			{
+				Title = x.title,
+				Overview = x.overview,
+				TMDbId = x.id,
+				Poster_path = x.poster_path,
+				Release_date = x.release_date,
+				Name = x.Name,
+				First_air_date = x.First_air_date,
+				Vote_average = x?.vote_average?.ToString() ?? "0.00"
+			}).ToList();
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error al obtener tendencias: {ex.Message}");
+			return new List<Movie>();
+		}
 	}
 }
 

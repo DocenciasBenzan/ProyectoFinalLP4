@@ -1,7 +1,210 @@
-﻿@page "/"
+﻿@rendermode InteractiveServer
+@attribute [StreamRendering]
+
+@page "/"
+
+@using ProyectoLP4.web.Models;
 
 <PageTitle>Dashboard</PageTitle>
 
-<h1>Dashboard</h1>
+<h1>Home</h1>
 
-¡Busca tus series y peliculas para guardar en listas!
+<strong>Bienvenidos a WatchGuide!</strong><br>
+Busca tus series y peliculas favoritas. Guardalas en listas creadas por ti, para tenerlas organizadas comodamente en un solo lugar.
+
+<br>
+<br>
+
+<h2>Trending</h2>
+
+
+<div class="card mt-3 mb-3" style="padding: 10px">
+    <h3 class="mb-2">TOP 12 Películas tendencia esta semana!</h3>
+    <div class="row">
+        @if (TrendingMovies != null)
+        {
+            @foreach (var movie in TrendingMovies.Take(12))
+            {
+                <div class="col-md-2 text-center" @onclick="() => ShowDetails(movie)">
+                    <img src="https://image.tmdb.org/t/p/w200/@movie.Poster_path" alt="@movie.Title" class="img-fluid" style="border-radius: 10px; max-width: 150px" />
+                    <p class="btn btn-outline-dark mt-2">@movie.Title</p>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<div class="card mt-3 mb-3" style="padding: 10px">
+    <h3 class="mb-2">TOP 12 Series tendencia esta semana!</h3>
+    <div class="row">
+        @if (TrendingTvShows != null)
+        {
+            @foreach (var tvShow in TrendingTvShows.Take(12))
+            {
+                <div class="col-md-2 text-center" @onclick="() => ShowDetails(tvShow)">
+                    <img src="https://image.tmdb.org/t/p/w200/@tvShow.Poster_path" alt="@tvShow.Name" class="img-fluid" style="border-radius: 10px; max-width: 150px;" />
+                    <p class="btn btn-outline-dark mt-2">@tvShow.Name</p>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@* Modal para mostrar detalles de los titulos en tendencia. *@
+
+@if (SelectedTitle != null)
+{
+    <div class="modal" style="display: block;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title"><strong>@(SelectedTitle.Title ?? SelectedTitle.Name)</strong></h5>
+                    <button type="button" class="btn-close" @onclick="CloseDetails"></button>
+                </div>
+
+                <div class="modal-body">
+                    <img src="https://image.tmdb.org/t/p/w300/@SelectedTitle.Poster_path" alt="@SelectedTitle.Title ?? @SelectedTitle.Name" class="img-fluid" style="border-radius: 10px; max-width: 150px;" />
+                    <p class="mt-2"><strong>Fecha de estreno:</strong> @(SelectedTitle.Release_date ?? SelectedTitle.First_air_date)</p>
+                    <p>@SelectedTitle.Overview</p>
+                    <p class="card-text"><small class="text-muted">Calificación: @SelectedTitle.Vote_average</small></p>
+                    @* Selector de listas *@
+                    <div class="mb-3">
+                        <label for="lista" class="form-label">Agregar a una lista:</label>
+                        <select id="lista" class="form-select" @bind="SelectedListId">
+                            <option selected disabled value="">-- Seleccione una lista --</option>
+                            @foreach (var list in UserLists)
+                            {
+                                <option value="@list.Id">@list.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    @* Botón para agregar *@
+                    <span class="btn btn-outline-info mb-2" @onclick="AgregarALista" disabled="@(!CanAddToList)">
+                        Agregar a lista
+                    </span>
+                    @if (AgregadoConExito)
+                    {
+                        <div class="alert alert-success" role="alert">
+                            Agregado con exito!
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// Metodos para usos generales.
+    /// </summary>
+    private List<Movie> TrendingMovies { get; set; } // Identifica las peliculas en tendencia.
+    private List<Movie> TrendingTvShows { get; set; } //Identifica las series en tendencia.
+    private Movie SelectedTitle { get; set; } //Identifica la pelicula o serie seleccionada.
+
+    /// <summary>
+    /// Metodos para guardar en las listas.
+    /// </summary>
+    private List<UserList> UserLists = new(); // Para usar la entidad de UserList
+    private int? SelectedListId; // Identifica la lista seleccionada
+    private bool CanAddToList => SelectedTitle != null && SelectedListId.HasValue; // Evalua si es posible agregar a listas o no.
+    private bool AgregadoConExito = false; // Para mostrar una alerta de exito al agregar a listas.
+
+
+    /// <summary>
+    /// Metodo para cargar contenido al iniciarse la pagina.
+    /// </summary>
+    /// <returns>Las listas, ademas de los títulos en tendencia.</returns>
+    protected override async Task OnInitializedAsync()
+    {
+        TrendingMovies = await TmdbService.GetTrendingAsync("movie");
+        TrendingTvShows = await TmdbService.GetTrendingAsync("tv");
+
+        Console.WriteLine("Inicializando componente y cargando listas...");
+        var r = await ListService.GetListsAsync();
+        if (r.Succeeded)
+        {
+            UserLists = r?.Data?.ToList() ?? new();
+            Console.WriteLine($"{UserLists.Count} listas cargadas.");
+        }
+        else
+        {
+            Console.WriteLine("Error al cargar listas: " + r.Message);
+        }
+    }
+
+    /// <summary>
+    /// Función para mostrar detalles en base al título seleccionado.
+    /// </summary>
+    /// <param name="title"></param>
+    /// Representa la pelicula seleccionada dentro de esta función.
+    private void ShowDetails(Movie title)
+    {
+        SelectedTitle = title;
+        Console.WriteLine($"Titulo seleccionado: {title.Title ?? title.Name}");
+    }
+
+    /// <summary>
+    /// Pequeña función para cerrar la vista de detalles.
+    /// </summary>
+    private void CloseDetails()
+    {
+        SelectedTitle = null;
+        AgregadoConExito = false;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Metodo para obtener el poster (foto) de los titulos.
+    /// </summary>
+    /// <param name="posterPath"></param>
+    /// <returns>variable usada para contener los posters.</returns>
+    private string GetPosterUrl(string posterPath)
+    {
+        if (string.IsNullOrEmpty(posterPath))
+            return "https://via.placeholder.com/100x150?text=No+Image"; // Imagen de reemplazo por si no hay póster
+
+        return $"https://image.tmdb.org/t/p/w200{posterPath}"; // "w200" es para ajustar el tamaño de imagen
+    }
+
+    /// <summary>
+    /// Función para agregar titulos en tendencia a las listas ya creadas.
+    /// </summary>
+    /// <returns></returns>
+    private async Task AgregarALista()
+    {
+        // Lógica para agregar el elemento seleccionado a la lista
+        if (CanAddToList)
+        {
+            //Comprobando si agrega a la lista o no.
+            Console.WriteLine($"Agregando '{SelectedTitle.Title ?? SelectedTitle.Name}' a la lista con ID: {SelectedListId.Value}...");
+
+            SelectedTitle.Poster_path = GetPosterUrl(SelectedTitle.Poster_path);
+            SelectedTitle.Release_date = SelectedTitle.Release_date ?? ""; // Valor por defecto si es null
+            SelectedTitle.First_air_date = SelectedTitle.First_air_date ?? ""; // Valor por defecto si es null
+            SelectedTitle.Name = SelectedTitle.Name ?? ""; // Valor por defecto si es null
+            SelectedTitle.Title = SelectedTitle.Title ?? ""; // Valor por defecto si es null
+            SelectedTitle.Vote_average = string.IsNullOrEmpty(SelectedTitle.Vote_average) ? "0.0" : SelectedTitle.Vote_average; // Valor por defecto si es null
+
+            var result = await ListService.AddMovieToListAsync(SelectedListId.Value, SelectedTitle);
+            if (result.Succeeded)
+            {
+                AgregadoConExito = true;
+                Console.WriteLine($"'{SelectedTitle.Title ?? SelectedTitle.Name}' added to list successfully.");
+            }
+            else
+            {
+                AgregadoConExito = false;
+                Console.WriteLine($"Failed to add '{SelectedTitle.Title ?? SelectedTitle.Name}' to list: {result.Message}");
+            }
+            SelectedListId = null; //Reinicia el menu de listas.
+            StateHasChanged();
+        }
+        else
+        {
+            Console.WriteLine("No se puede agregar a la lista. Verifique que el título esté seleccionado y que haya una lista seleccionada.");
+        }
+    }
+}
