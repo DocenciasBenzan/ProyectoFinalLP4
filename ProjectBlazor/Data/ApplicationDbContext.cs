@@ -6,9 +6,10 @@ namespace ProjectBlazor.Data
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options), IApplicationDbContext
     {
-        public DbSet<Vehiculo> Vehiculos { get; set; }
+        public required DbSet<Vehiculo> Vehiculos { get; set; }
 
-        public DbSet<Cliente> Clientes { get; set; }
+        public required DbSet<Cliente> Clientes { get; set; }
+        public required DbSet<Renta> Rentas { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

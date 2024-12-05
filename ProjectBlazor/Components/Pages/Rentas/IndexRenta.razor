@@ -5,50 +5,12 @@
 
 
 
-@page "/clientes"
-<h3>Listado de Clientes</h3>
+@page "/Renta"
+<h3>Listado de Rentas</h3>
 
-@if (ShowForm)
-{
-    <div class="card">
-        <h5 class="card-header">@Accion Clientes</h5>
-        <div class="card-body">
-            <div class="input-group mb-3">
-                <span class="input-group-text">Nombre</span>
-                <input @bind-value="MiCliente.Nombre" type="text" class="form-control" disabled="@DisableInputs">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">Apellido</span>
-                <input @bind-value="MiCliente.Apellido" type="text" class="form-control" disabled="@DisableInputs">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">Teléfono</span>
-                <input @bind-value="MiCliente.NumeroTelefonico" type="text" class="form-control" disabled="@DisableInputs">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">Cédula</span>
-                <input @bind-value="MiCliente.Cedula" type="text" class="form-control" disabled="@DisableInputs">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text">Dirección</span>
-                <input @bind-value="MiCliente.Direccion" type="text" class="form-control" disabled="@DisableInputs">
-            </div>
-
-            @if (Accion != Constants.Acciones.Ver)
-            {
-                <span class="btn btn-primary" @onclick="Aceptar">Aceptar</span>
-            }
-            <span class="btn btn-danger" @onclick="Cancelar">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
-        </div>
-    </div>
-}
-else
-{
     @if (ClienteList != null && ClienteList.Count > 0)
     {
-        <div class="mb-3">
-            <button class="btn btn-primary mb-3" @onclick="AgregarClick">Agregar Cliente</button>
-        </div>
+      
         <table class="table table-bordered">
             <thead class="table-primary">
                 <tr>
@@ -82,11 +44,11 @@ else
     else
     {
         <div class="text-center">
-            <p>No hay clientes registrados.</p>
+            <p>No hay rentas registrados.</p>
             <button class="btn btn-primary" @onclick="AgregarClick">Agregar Cliente</button>
         </div>
     }
-}
+
 
 @code {
     [Parameter]
@@ -151,16 +113,16 @@ else
 
     public async Task Aceptar()
     {
-        
-        
-            Result r =
 
-            Accion == Constants.Acciones.Registrar ? await ClienteService.Create(MiCliente):
-            Accion == Constants.Acciones.Modificar ? await ClienteService.Update(MiCliente) :
-            Accion == Constants.Acciones.Eliminar  ? await ClienteService.Delete(MiCliente.ClienteId) :
-            Result.Failure("Acción no soportada");
-    
-        
+
+        Result r =
+
+        Accion == Constants.Acciones.Registrar ? await ClienteService.Create(MiCliente) :
+        Accion == Constants.Acciones.Modificar ? await ClienteService.Update(MiCliente) :
+        Accion == Constants.Acciones.Eliminar ? await ClienteService.Delete(MiCliente.ClienteId) :
+        Result.Failure("Acción no soportada");
+
+
 
         if (r.Succesd)
         {

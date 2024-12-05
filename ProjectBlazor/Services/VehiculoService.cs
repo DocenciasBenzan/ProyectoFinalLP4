@@ -61,10 +61,10 @@ namespace ProjectBlazor.Services
 			{
 				var entity = dbContext.Vehiculos.Where(v => v.VehiculoId == VehiculoId).FirstOrDefault();
 				if (entity == null)
-					return Result.Failure($"El producto '{VehiculoId}' no existe!");
+					return Result.Failure($"El vehiculo '{VehiculoId}' no existe!");
 				dbContext.Vehiculos.Remove(entity);
 				await dbContext.SaveChangesAsync();
-				return Result.Success("✅Producto eliminado con exito!");
+				return Result.Success("✅Vehiculo eliminado con exito!");
 			}
 			catch (Exception Ex)
 			{
@@ -79,7 +79,7 @@ namespace ProjectBlazor.Services
 					.Select(v => new VehiculoDto(v.VehiculoId, v.Marca, v.Modelo, v.Matricula, v.NumeroPlaca, v.Tipo, v.Year, v.Estatus, v.Precio))
 					.FirstOrDefaultAsync();
 				if (entity == null)
-					return Result<VehiculoDto>.Failure($"El producto '{VehiculoId}' no existe!");
+					return Result<VehiculoDto>.Failure($"El vehiculo '{VehiculoId}' no existe!");
 
 				return Result<VehiculoDto>.Success(entity);
 			}

@@ -10,7 +10,7 @@ public record class VehiculoDto(int VehiculoId, string Marca, string? Modelo, st
     //public string Tipo { get; set; }
     //public string Estatus { get; set; }
     //public decimal Precio { get; set; }
-    //public string PrecioText => $"RD$ {Precio.ToString("N2")}";
+    public string PrecioText => $"RD$ {Precio.ToString("N2")}";
     public VehiculoRequest ToRequest()
 		=> new()
 		{

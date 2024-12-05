@@ -2,6 +2,7 @@
 
 
 @page "/Vehiculos"
+@using ProjectBlazor.Entities
 
 
 <h3>Vehiculos</h3>
@@ -14,67 +15,6 @@
 	<div class="card">
 		<h5 class="card-header">@Accion Vehiculo</h5>
 		<div class="card-body">
-			<div class="input-group mb-3">
-				<span  class="input-group-text" id="inputGroup-sizing-Default">Marca</span>
-				<input @bind-value="MiVehiculo.Marca" type="text" class="form-control" id="marca" disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Modelo</span>
-				<input @bind-value="MiVehiculo.Modelo" type="text" class="form-control" id="modelo"  disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Matricula</span>
-				<input @bind-value="MiVehiculo.Matricula" type="text" class="form-control" id="matricula"  disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Placa</span>
-				<input @bind-value="MiVehiculo.NumeroPlaca" type="text" class="form-control" id="placa"  disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Tipo</span>
-				<input @bind-value="MiVehiculo.Tipo" type="text" class="form-control" id="tipo" disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Año</span>
-				<input @bind-value="MiVehiculo.Year" type="text" class="form-control" id="tipo"  disabled="@DisableInputs">
-			</div>
-
-			<div class="input-group mb-3">
-				<apan class="input-group-text" id="inputGroup-sizing-Default">Estatus</apan>
-				<select disabled="@DisableInputs" @bind="MiVehiculo.Estatus" class="form-select" aria-label="Default select example">
-					<option selected>Seleccione el estado del vehiculo</option>
-					<option value="Disponible">Disponible</option>
-					<option value="Rentado">Rentado</option>
-					<option value="Mantenimiento">Mantenimiento</option>
-				</select>
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Precio (RD$)</span>
-				<input @bind-value="MiVehiculo.Precio" type="text" class="form-control" id="precio" disabled="@DisableInputs"></input>
-			</div>
-
-			@if (Accion != Constants.Acciones.Ver)
-			{
-				<span class="btn btn-primary" @onclick="Aceptar">Aceptar</span>
-			}
-			<span class="btn btn-danger" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
-		</div>
-	</div>
-
-	<label @bind="Contador"></label>
-
-}
-@*Formulario para renta*@
-@if (ShowFormRenta == true)
-{
-
-	<div class="card">
-		<h5 class="card-header">@Accion Vehiculo</h5>
-		<div class="card-body mb-3">
-			<h5 class="card-header">Datos del Cliente</h5>
-		</div>
-		<div class="card-body">
-			<h5 class="card-header">Datos del Vehiculo</h5>
 			<div class="input-group mb-3">
 				<span class="input-group-text" id="inputGroup-sizing-Default">Marca</span>
 				<input @bind-value="MiVehiculo.Marca" type="text" class="form-control" id="marca" disabled="@DisableInputs">
@@ -99,15 +39,20 @@
 				<span class="input-group-text" id="inputGroup-sizing-Default">Año</span>
 				<input @bind-value="MiVehiculo.Year" type="text" class="form-control" id="tipo" disabled="@DisableInputs">
 			</div>
+
 			<div class="input-group mb-3">
 				<apan class="input-group-text" id="inputGroup-sizing-Default">Estatus</apan>
-				<input @bind-value="MiVehiculo.Estatus " type="text" class="form-control" id="Estatus" disabled="@DisableInputs">
+				<select disabled="@DisableInputs" @bind="MiVehiculo.Estatus" class="form-select" aria-label="Default select example">
+					<option selected>Seleccione el estado del vehiculo</option>
+					<option value="Disponible">Disponible</option>
+					<option value="Rentado">Rentado</option>
+					<option value="Mantenimiento">Mantenimiento</option>
+				</select>
 			</div>
 			<div class="input-group mb-3">
 				<span class="input-group-text" id="inputGroup-sizing-Default">Precio (RD$)</span>
 				<input @bind-value="MiVehiculo.Precio" type="text" class="form-control" id="precio" disabled="@DisableInputs"></input>
 			</div>
-
 
 			@if (Accion != Constants.Acciones.Ver)
 			{
@@ -117,34 +62,128 @@
 		</div>
 	</div>
 
-	<div>
-		<div class="form-control">
 
-			<h5 class="card-header">Datos de Renta</h5>
 
-			<div class="card-body">
-				<label class="form-control">Fecha de Renta</label>
-				<input type="date" @bind="FechaRenta">
-				<input type="time">
+}
+@*Formulario para renta*@
+@if (ShowFormRenta == true)
+{
+	<h5>@Accion Vehiculo</h5>
+	<div class="form-control">
+
+		<div class="form-control mb-3">
+
+			<h5>Datos del Cliente</h5>
+
+			<div class="input-group mb-3">
+				<span class="input-group-text" id="inputGroup-sizing-Default">Nombre</span>
+				<select @bind="ClienteSeleccionadoId" id="cliente" class="form-select">
+					<option selected>Seleccione el cliente</option>
+					@if (ClienteList != null)
+					{
+						@foreach (var MiCliente in ClienteList)
+						{
+
+							<option value="@MiCliente.ClienteId">@MiCliente.Nombre</option>
+
+						}
+					}
+				</select>
 			</div>
-			<div class="card-body">
-				<label class="form-control">Fecha de Entrega</label>
-				<input type="date" @bind="FechaEntrega">
-				<input type="time">
+			<div class="input-group mb-3">
+				<span class="input-group-text" id="inputGroup-sizing-Default">Apellido</span>
+				<input value="@ClienteSeleccionado?.Apellido" readonly type="text" class="form-control" id="modelo" disabled="@DisableInputs">
 			</div>
-			<div class="card-body">
-				<p>
-					Dias seleccionados: @DiasdeRenta
-				</p>
+			<div class="input-group mb-3">
+				<span class="input-group-text" id="inputGroup-sizing-Default">Telefono</span>
+				<input value="@ClienteSeleccionado?.NumeroTelefonico" readonly type="text" class="form-control" id="matricula" disabled="@DisableInputs">
 			</div>
+			<div class="input-group mb-3">
+				<span class="input-group-text" id="inputGroup-sizing-Default">Cedula</span>
+				<input value="@ClienteSeleccionado?.Cedula" readonly type="text" class="form-control" id="placa" disabled="@DisableInputs">
+			</div>
+			<div class="input-group mb-3">
+				<span class="input-group-text" id="inputGroup-sizing-Default">Direccion</span>
+				<input value="@ClienteSeleccionado?.Direccion" readonly type="text" class="form-control" id="tipo" disabled="@DisableInputs">
+			</div>
+
+
 
 		</div>
+
+
+		<div class="form-control mb-3">
+			<h5>Datos del Vehiculo</h5>
+			<table class="table table-bordered">
+				<thead class="table-warning ">
+					<tr>
+						<th>Marca</th>
+						<th>Modelo</th>
+						<th>Matricula</th>
+						<th>Placa</th>
+						<th>Tipo</th>
+						<th>Año</th>
+						<th>Precio</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>@MiVehiculo.Marca</td>
+						<td>@MiVehiculo.Modelo</td>
+						<td>@MiVehiculo.Matricula</td>
+						<td>@MiVehiculo.NumeroPlaca</td>
+						<td>@MiVehiculo.Tipo</td>
+						<td>@MiVehiculo.Year</td>
+						<td>@MiVehiculo.Precio</td>
+					</tr>
+				</tbody>
+			</table>
+
+		</div>
+		<div class="form-control mb-3">
+			<h5>Datos de Renta</h5>
+			<div class="container-fluid mb-3">
+
+				<div class="card-header d-inline-flex">
+					<label class="form-control">Fecha de Renta</label>
+					<input type="date" @bind="FechaRenta">
+					<input type="time" @bind="HoraRenta">
+				</div>
+				<div class="card-body d-inline-flex">
+					<label class="form-control">Fecha de Entrega</label>
+					<input type="date" @bind="FechaEntrega">
+					<input type="time" @bind="HoraEntrega">
+				</div>
+				<div class="form-control d-inline-flex">
+					<h3 class="fw-bold text-md-center">Facturacion</h3>
+					<div class="card-body">
+						<h5>Dias seleccionados: @DiasdeRenta</h5>
+						<h5>Precio x Dia: @MiVehiculo.Precio</h5>
+						<h5>Total a pagar @TotalPagar</h5>
+						<span class="btn btn-primary mt-3 align-content-start d-print-none" @onclick="btnCotizarClick">Cotizar</span>
+					</div>
+
+
+					<div class="card d-inline-flex">
+						<PrintButton></PrintButton>
+						<span class="btn btn-danger mt-3 align-content-lg-end d-print-none" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
+						<span class="btn btn-primary mt-3 align-content-lg-end d-print-none" @onclick="btnCotizarClick">Aceptar e Imprimir</span>
+					</div>
+
+
+
+				</div>
+			</div>
+		</div>
 	</div>
+
+
+
 }
 else
 {
 
-	@if (VehiculoList != null && ShowForm==false)
+	@if (VehiculoList != null && ShowForm == false)
 	{
 
 
@@ -158,7 +197,7 @@ else
 				{
 
 					@*Tarjeta de vehiculo*@
-					@if(v.Estatus == "Disponible")
+					@if (v.Estatus == "Disponible")
 					{
 						<div class="card m-3 text-black border border-primary mb-3 d-inline-flex" style="width: 18rem;">
 							<div class="card-header bg-primary">
@@ -177,6 +216,7 @@ else
 
 							</div>
 						</div>
+
 					}
 					@if (v.Estatus == "Rentado")
 					{
@@ -227,7 +267,7 @@ else
 				}
 			</div>
 		}
-		else 
+		else
 		{
 			<div class="mb-3 mt-3 align-content-center text-center">
 				<label class="align-text-top">No hay vehiculos registrados</label>
@@ -245,48 +285,53 @@ else
 
 
 
-
-
-
-
-	public int Contador {get; set; }= 0;
-
-	public  DateTime FechaRenta{ get; set; } = DateTime.Today;
-	public  DateTime FechaEntrega { get; set; } = DateTime.Today;
-
-	public int DiasdeRenta => (FechaEntrega - FechaRenta).Days;
-
-	public void btnCalcularDias()
+	private int ClienteSeleccionadoId;
+	private ClienteDto? ClienteSeleccionado => ClienteList?.FirstOrDefault(p => p.ClienteId == ClienteSeleccionadoId);
+	async Task ConsultarClientes()
 	{
-
-		
-
-		 
-		 
-
+		var result = await ClienteService.Get();
+		if (result.Succesd)
+		{
+			ClienteList = result.Data?.ToList() ?? new List<ClienteDto>();
+		}
 	}
 
-	public void btnAgregarVehiculo()
+
+
+	public int Contador { get; set; } = 0;
+
+	public DateTime FechaRenta { get; set; } = DateTime.Today;
+	public DateTime FechaEntrega { get; set; } = DateTime.Today;
+	public DateTime HoraRenta { get; set; } = DateTime.Now;
+	public DateTime HoraEntrega { get; set; } = DateTime.Now;
+
+	public decimal DiasdeRenta => (FechaEntrega - FechaRenta).Days;
+	public decimal TotalPagar = 0;
+
+	public void btnCotizarClick()
 	{
-		ShowForm = true;
+		TotalPagar = (DiasdeRenta * MiVehiculo.Precio);
 	}
-	public void btnCancelar()
-	{		
-		ShowForm = false;
-	}
-	public void btnGuardarVehiculo()
+	public void btnGuardarImprimir()
 	{
 
-		ShowForm = false;
 	}
 
 	#region Propiedades del componente Index.Razor
-	public List<VehiculoDto> Vehiculos { get; set; } = new();
 	public string Accion { get; set; } = "Registrar";
+	public List<VehiculoDto> Vehiculos { get; set; } = new();
 	public VehiculoRequest MiVehiculo { get; set; } = new();
 
+	public RentaRequest MiRenta { get; set; } = new();
+	public List<RentaDto> Rentas { get; set; } = new();
+	public List<RentaDto> RentaList { get; set; } = new();
+
+	public List<ClienteDto>? ClienteList { get; set; }
+	public ClienteRequest MiCliente { get; set; } = new();
+	public List<ClienteDto>? Clientes { get; set; }
+
 	public List<VehiculoDto>? VehiculoList { get; set; }
-	bool ShowForm = false,ShowFormRenta = false, DisableInputs = false;
+	bool ShowForm = false, ShowFormRenta = false, DisableInputs = false;
 	#endregion Propiedades del componente Index.Razor
 
 	#region Metodos del ciclo de vida de la aplicacion (para este componente)
@@ -294,6 +339,7 @@ else
 	{
 		await ConsultarVehiculos();
 		await Consultar();
+		await ConsultarClientes();
 	}
 	#endregion Metodos del ciclo de vida de la aplicacion (para este componente)
 
@@ -330,8 +376,8 @@ else
 	{
 		Accion = Constants.Acciones.Rentar;
 		ShowFormRenta = true;
-		
-		DisableInputs = false;
+
+		DisableInputs = true;
 		MiVehiculo = dto.ToRequest();
 	}
 	public void btnCancelarClick()
@@ -363,11 +409,15 @@ else
 			new List<VehiculoDto>();
 		}
 	}
+	
+	
 	public void Limpiar()
 	{
 		ShowForm = false;
 		ShowFormRenta = false;
 		MiVehiculo = new();
+		MiCliente = new();
+		ClienteSeleccionadoId = new();
 	}
 	public async Task Aceptar()
 	{
