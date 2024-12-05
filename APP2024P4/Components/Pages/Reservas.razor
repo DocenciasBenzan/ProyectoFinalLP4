@@ -1,205 +1,329 @@
-﻿@page "/reserva"
+﻿@page "/reservas"
 @rendermode InteractiveServer
-@using System.ComponentModel.DataAnnotations
-@using APP2024P4.Data.Request
-@inject ILogger<ReservaModelo> Logger
-@inject IJSRuntime js
+@inject IReservaService reservaService
+@inject IServicioService servicioService
+@inject IClienteService clienteService
+@inject IVehiculoServicio VehiculoService
+@inject IEmpleadoServicio empleadoService
 
-<PageTitle>Reservas</PageTitle>
+<h3>Gestión de reservas</h3>
 
-<div class="container mt-4">
-    <h1 class="text-center mb-4">Gestión de Reservas</h1>
 
-    <!-- Botón para abrir el modal de nueva reserva -->
-    <div class="d-flex justify-content-end mb-3">
-        <button class="btn btn-outline-dark" @onclick="btnRegistrar">
-            @if (MostrarRegistrar)
-            {
-                <i class="bi bi-x"></i>
-
-            }
-            else
-            {
-                <i class="bi bi-plus-circle me-2 p-1">Nueva Reserva</i>
-
-            }
-        </button>
-    </div>
-    @if (!MostrarRegistrar)
-    {
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col">Empleado</th>
-                        <th scope="col">Horario</th>
-                        <th scope="col">Servicio</th>
-                        <th scope="col">Cliente</th>
-                        <th scope="col" class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var empleado in Empleados)
-                    {
-                        foreach (var reserva in empleado.Reservas)
-                        {
-                            <tr>
-                                <td>@empleado.Nombre</td>
-                                <td>@reserva.FechaHoraInicio.ToString("g")</td>
-                                <td>@reserva.TipoServicio</td>
-                                <td>@reserva.NombreCliente</td>
-                                <td class="text-center">
-                                    <button class="btn btn-warning btn-sm mx-2" data-bs-toggle="modal" data-bs-target="#editReservationModal" onclick="editReservation(@reserva, @empleado.Id)" title="Modificar">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteReservation(@reserva, @empleado.Id)" title="Eliminar">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-</div>
-
-@if (MostrarRegistrar)
+@if (MostrarForm)
 {
-    <EditForm Model="@reserva" FormName="AgregarReserva" OnInvalidSubmit="AgregarReserva">
-        <div class="container mt-5">
-            <h3 class="text-center mb-4">Agregar Reserva</h3>
-            <!-- Row 1: Empleado y servicios-->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="employee" class="form-label">Empleado</label>
-                    <select id="employee" class="form-control" @bind="reserva.EmpleadoId">
-                        <option selected value="1">Francisco Rosario</option>
-                        <option value="2">Luis Fernando</option>
-                    </select>
-                </div>
-                <div class="col-md-6">
-                    <label for="service" class="form-label">Servicio</label>
-                    <select id="service" class="form-control" @bind="reserva.ServicioId">
-                        <option selected>Lavado Interior</option>
-                        <option>Other Service</option>
-                    </select>
-                </div>
-            </div>
-            <!-- Row 2: Vehicle -->
-            <div class="row mb-3">
-                <div class="col-12">
-                    <label for="vehicle" class="form-label">Vehiculo</label>
-                    <input id="vehicle" class="form-control" type="text" placeholder="Ford Explorer Roja" @bind="reserva.VehiculoId" />
-                </div>
-            </div>
-            <!-- Row 3: Service Time and Estimated Time -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="serviceTime" class="form-label">Hora Servicio</label>
-                    <input id="serviceTime" class="form-control" type="datetime-local" @bind="reserva.Inicio" />
-                </div>
-                <div class="col-md-6">
-                    <label for="estimatedTime" class="form-label">Tiempo Estimado Fin</label>
-                    <input id="estimatedTime" class="form-control" type="datetime-local" @bind="reserva.Fin" />
-                </div>
-            </div>
-            <!-- Row 4: Price and Notes -->
-            @* Basado en el servicio *@
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label for="price" class="form-label">Precio</label>
-                    <input id="price" class="form-control" type="number" step="0.01" placeholder="999.00" disabled />
-                </div>
-                <div class="col-md-6">
-                    <label for="notes" class="form-label">Notas</label>
-                    <textarea id="notes" class="form-control" rows="2" placeholder="Notas extra/Informacion" @bind="reserva.NotasAdicionales"></textarea>
-                </div>
-            </div>
-            <!-- Row 5: Buttons -->
-            <div class="row">
-                <div class="col-md-6">
-                    <button type="button" class="btn btn-danger w-100">Cancel</button>
-                </div>
-                <div class="col-md-6">
-                    <button type="submit" class="btn btn-primary w-100">Create Reservation</button>
-                </div>
-            </div>
-        </div>
-    </EditForm>
+	<!-- Formulario para Agregar/Actualizar reserva -->
+	<div class="card mb-4">
+		<div class="card-header">
+			<h5 class="card-title">@((reserva.Id == 0) ? "Agregar reserva" : "Actualizar reserva")</h5>
+		</div>
+		<div class="card-body">
+			<EditForm Model="@reserva" OnValidSubmit="GuardarReserva" FormName="FormularioReservas">
+				<DataAnnotationsValidator />
+				<ValidationSummary />
+
+				@* Cliente *@
+				<div class="mb-3">
+					<label for="cliente" class="form-label">Cliente</label>
+					<InputSelect id="cliente" class="form-control"
+								 Value="reserva.ClienteId"
+								 ValueExpression="@(()=>reserva.ClienteId)"
+								 ValueChanged="@((int x)=>CargarVehiculosCliente(x))">
+						<option disabled value="0"> Selecciona un cliente</option>
+						@foreach (var cliente in Clientes)
+						{
+							<option value="@cliente.Id"> @cliente.Nombre</option>
+						}
+					</InputSelect>
+				</div>
+
+				@* Vehiculo *@
+				<div class="mb-3">
+					<label for="vehiculo" class="form-label">Vehiculo</label>
+					<InputSelect id="vehiculo" class="form-control" @bind-Value="reserva.VehiculoId">
+						@if (Vehiculos.Any())
+						{
+							<option selected disabled value="0"> Selecciona un Vehículo</option>
+							@foreach (var vehiculo in Vehiculos)
+							{
+								<option value="@vehiculo.Id"> @vehiculo.Marca (@vehiculo.Modelo - # @vehiculo.Placa)</option>
+							}
+						}
+						else
+						{
+							<option disabled selected value="0"> Sin vehiculos registrados</option>
+						}
+					</InputSelect>
+					@if (!Vehiculos.Any())
+					{
+						<a href="vehiculos" class="text-warning">Registrar Vehiculo</a>
+					}
+				</div>
+
+				@* Servicio *@
+				<div class="mb-3">
+					<label for="servicio" class="form-label">Servicio</label>
+					<InputSelect id="cliente" class="form-control" @bind-Value="reserva.ServicioId">
+						@if (Servicios.Any())
+						{
+							<option disabled value="0"> Selecciona un servicio</option>
+							@foreach (var serv in Servicios)
+							{
+								<option value="@serv.Id"> @serv.Nombre</option>
+							}
+						}
+						else
+						{
+							<option disabled selected> Sin servicios registrados</option>
+						}
+					</InputSelect>
+					@if (!Servicios.Any())
+					{
+						<a href="servicios" class="text-warning">Registrar Servicio</a>
+					}
+				</div>
+
+				@* Empleado *@
+				<div class="mb-3">
+					<label for="empleado" class="form-label">Empleado </label>
+					<InputSelect id="empleado" class="form-control" @bind-Value="reserva.EmpleadoId">
+						@if (Empleados.Any())
+						{
+							<option disabled value="0"> Selecciona un Empleado</option>
+							@foreach (var emp in Empleados)
+							{
+								<option value="@emp.Id"> @emp.Nombre</option>
+							}
+						}
+						else
+						{
+							<option disabled selected> Sin Empleados registrados</option>
+						}
+					</InputSelect>
+					@if (!Empleados.Any())
+					{
+						<a href="empleados" class="text-warning">Registrar Empleado</a>
+					}
+				</div>
+
+				@* Fecha Inicio *@
+				<div class="mb-3">
+					<label for="Inicio" class="form-label">Fecha</label>
+					<input type="datetime-local"
+						   class="form-control"
+						   @bind-value="reserva.Inicio"
+						   id="Inicio"
+						   name="Inicio" />
+				</div>
+
+
+				@*Notas adicionales*@
+				<div class="mb-3">
+					<label for="notas" class="form-label">Mensaje Adicional</label>
+					<InputText id="notas" class="form-control" @bind-Value="reserva.NotasAdicionales"></InputText>
+
+				</div>
+
+				@* Estado *@
+				<div class="mb-3">
+					<label for="estado" class="form-label">Estado</label>
+					<InputSelect id="estado" class="form-control" @bind-Value="reserva.Estado">
+						<option disabled value=""> Selecciona un estado</option>
+						<option selected value="pendiente">Pendiente</option>
+						<option value="realizada">Realizada</option>
+					</InputSelect>
+				</div>
+
+				<button type="submit" class="btn btn-primary">@((reserva.Id == 0) ? "Crear Reserva" : "Actualizar Reserva")</button>
+				<span class="btn btn-outline-dark" @onclick="Limpiar">cancelar</span>
+			</EditForm>
+		</div>
+	</div>
 }
+else
+{
+	<div class="mb-4">
+		<span class="btn btn-outline-primary" @onclick="btnAgregarReserva">
+			<i class="bi bi-file-plus"></i> Agregar reserva
+		</span>
+	</div>
+
+	@if (reservas.Any())
+	{
+		<!-- Tabla de Reservas -->
+		<div class="card">
+			<div class="card-header">
+				<h5 class="card-title">Lista de Reservas</h5>
+			</div>
+			<div class="card-body">
+				<table class="table table-bordered">
+					<thead>
+						<tr>
+							<th>Nombre Cliente</th>
+							<th>Fecha</th>
+							<th>Detalles</th>
+							<th>Estado</th>
+							<th>Acciones</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var item in reservas)
+						{
+							<tr>
+								<td>@item.Cliente.Nombre</td>
+								<td>@item.Inicio.ToShortDateString()</td>
+								<td>@item.NotasAdicionales</td>
+								<td>@item.Estado</td>
+								<td>
+									<button class="btn btn-warning btn-sm" @onclick="() => btnEditarReserva(item.ToRequest())">Editar</button>
+									<button class="btn btn-danger btn-sm" @onclick="() => EliminarReserva(item.Id)">Eliminar</button>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	}
+	else
+	{
+		<p>Sin reservas registrados</p>
+	}
+}
+
+
 @code {
 
-    private ReservaRequest reserva = new();
-    private List<Empleado> Empleados { get; set; } = new List<Empleado>
-    {
-        new Empleado { Id = 1, Nombre = "Carlos López", Reservas = new List<ReservaModelo> {
-            new ReservaModelo { FechaHoraInicio = DateTime.Now.AddHours(2), FechaHoraFin = DateTime.Now.AddHours(3), TipoServicio = "Lavado Exterior", NombreCliente = "Ana Torres", TelefonoCliente = "123-456-7890", Detalles = "Con aspirado" }
-        }},
-        new Empleado { Id = 2, Nombre = "María González", Reservas = new List<ReservaModelo>
-        {
-            new ReservaModelo { FechaHoraInicio = DateTime.Now.AddHours(3), FechaHoraFin = DateTime.Now.AddHours(4), TipoServicio = "Limpieza Interior", NombreCliente = "Pedro Ramírez", TelefonoCliente = "098-765-4321", Detalles = "Con limpieza de tapicería" }
-        }},
-        new Empleado { Id = 3, Nombre = "Luis Fernández", Reservas = new List<ReservaModelo>() }
-    };
-    private int EmpleadoSeleccionadoId { get; set; } = 0;
-    private bool MostrarRegistrar { get; set; }
-    private void selectEmployee(int empleadoId)
-    {
-        EmpleadoSeleccionadoId = empleadoId;
-        reserva = new ReservaRequest(); // Resetear el formulario para una nueva reserva
-    }
-    private void AgregarReserva()
-    {
-        var empleado = Empleados.FirstOrDefault(e => e.Id == EmpleadoSeleccionadoId);
-        if (empleado == null)
-        {
-            Logger.LogError($"Empleado con ID {EmpleadoSeleccionadoId} no encontrado.");
-            return;
-        }
-        // Verificar si ya existe una reserva en el mismo horario
+	#region	Propiedades
 
-        // Agregar nueva reserva
+	private ReservaRequest reserva = new();
+	private List<ReservaResponse> reservas = new List<ReservaResponse>();
+	private List<ClienteResponse> Clientes = new List<ClienteResponse>();
+	private List<ServicioResponse> Servicios = new List<ServicioResponse>();
+	private List<VehiculoResponse> Vehiculos = new List<VehiculoResponse>();
+	private List<EmpleadoResponse> Empleados = new List<EmpleadoResponse>();
 
-    }
-    private void editReservation(ReservaModelo reserva, int empleadoId)
-    {
-        // Lógica para editar una reserva
-    }
-    private void deleteReservation(ReservaModelo reserva, int empleadoId)
-    {
-        var empleado = Empleados.FirstOrDefault(e => e.Id == empleadoId);
-        if (empleado != null)
-        {
-            empleado.Reservas.Remove(reserva);
-        }
-    }
-    private void btnRegistrar()
-    {
-        MostrarRegistrar = !MostrarRegistrar;
-    }
-    private class Empleado
-    {
-        public int Id { get; set; }
-        public string Nombre { get; set; } = string.Empty;
-        public List<ReservaModelo> Reservas { get; set; } = new();
-    }
-    private class ReservaModelo
-    {
-        [Required]
-        public DateTime FechaHoraInicio { get; set; }
-        [Required]
-        public DateTime FechaHoraFin { get; set; }
-        [Required]
-        [StringLength(50)]
-        public string TipoServicio { get; set; } = string.Empty;
-        [Required]
-        [StringLength(100)]
-        public string NombreCliente { get; set; } = string.Empty;
-        [Required]
-        [StringLength(20)]
-        public string TelefonoCliente { get; set; } = string.Empty;
-        public string? Detalles { get; set; }
-    }
+
+	public bool MostrarForm { get; set; }
+
+	#endregion
+
+	protected override async Task OnInitializedAsync()
+	{
+		await CargarReservas();
+	}
+
+
+	private async Task CargarDatos()
+	{
+		var clientesTask = clienteService.ObtenerClientes();
+		var serviciosTask = servicioService.ObtenerServicios();
+		//var taskVehiculos = VehiculoService.ObtenerVehiculos();
+		var empleadosTask = empleadoService.ObtenerEmpleados();
+
+		await Task.WhenAll(clientesTask, serviciosTask, empleadosTask);
+
+		var resultClientes = await clientesTask;
+		var resultServicios = await serviciosTask;
+		var resultEmpleados = await empleadosTask;
+
+		Clientes = resultClientes.Succeeded ? resultClientes?.Data?.ToList() ?? new() : new();
+		Servicios = resultServicios.Succeeded ? resultServicios?.Data?.ToList() ?? new() : new();
+		Empleados = resultEmpleados.Succeeded ? resultEmpleados?.Data?.ToList() ?? new() : new();
+		StateHasChanged();
+	}
+
+	private async Task CargarReservas()
+	{
+
+		var result = await reservaService.ObtenerTodasLasReservas();
+		if (result.Succeeded)
+		{
+			reservas = result?.Data?.ToList() ?? new();
+			StateHasChanged();
+		}
+	}
+
+	private async Task CargarVehiculosCliente(int clientId)
+	{
+		reserva.ClienteId = clientId;
+		var r = VehiculoService.ObtenerVehiculos(clientId);
+		Vehiculos = r.Succeeded ? r?.Data?.ToList() ?? new() : new();
+		StateHasChanged();
+	}
+
+	private async Task GuardarReserva()
+	{
+		Result result;
+		if (reserva.Id == 0) // Agregar
+		{
+			result = await reservaService.CrearReserva(reserva);
+		}
+		else // Actualizar
+		{
+			result = await reservaService.ActualizarReservaAsync(reserva);
+		}
+
+		if (result.Succeeded)
+		{
+			Limpiar();
+			await CargarReservas();
+		}
+	}
+
+	private async Task btnAgregarReserva()
+	{
+
+		MostrarForm = true;
+		StateHasChanged();
+		await CargarDatos();
+		await CargarVehiculosCliente(reserva.ClienteId);
+		reserva = new ReservaRequest()
+			{
+				Estado = "pendiente",
+				EmpleadoId = 0,
+				ClienteId = 0,
+				VehiculoId = 0,
+				ServicioId = 0
+
+			};
+	}
+
+	private async Task btnEditarReserva(ReservaRequest request)
+	{
+		MostrarForm = true;
+		reserva = new ReservaRequest()
+			{
+				Id = request.Id,
+				EmpleadoId = request.EmpleadoId,
+				ClienteId = request.ClienteId,
+				VehiculoId = request.VehiculoId,
+				ServicioId = request.ServicioId,
+				Estado = request.Estado.ToLower(),
+				Inicio = request.Inicio,
+				Vehiculo = request.Vehiculo,
+				Cliente = request.Cliente,
+				Servicio = request.Servicio,
+				NotasAdicionales = request.NotasAdicionales
+			};
+
+		await CargarDatos();
+		await CargarVehiculosCliente(request.ClienteId);
+		StateHasChanged();
+	}
+
+	private async Task EliminarReserva(int id)
+	{
+		var result = await reservaService.EliminarReservaAsync(id);
+		if (result.Succeeded)
+		{
+			await CargarReservas();
+		}
+	}
+
+	private void Limpiar()
+	{
+		MostrarForm = false;
+		reserva = new();
+		StateHasChanged();
+	}
 }

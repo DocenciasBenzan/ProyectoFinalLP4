@@ -15,7 +15,7 @@ public class Reserva
 	public int VehiculoId { get; set; }
 	public int ServicioId { get; set; }
 	public int EmpleadoId { get; set; }
-	public string Estado { get; set; } = null!; // pendiente, completada, cancelada
+	public string Estado { get; set; } = null!;
 	public string? NotasAdicionales { get; set; }
 
 	#region Foreign Keys
@@ -24,12 +24,12 @@ public class Reserva
 	[ForeignKey(nameof(ServicioId))]
 	public virtual Servicio Servicio { get; set; } = null!;
 	[ForeignKey(nameof(EmpleadoId))]
-	public virtual Empleado Empleado { get; set; } = null!;	
+	public virtual Empleado Empleado { get; set; } = null!;
 	[ForeignKey(nameof(VehiculoId))]
 	public virtual Vehiculo Vehiculo { get; set; } = null!;
 
 	#endregion
-	
+
 	#region Metodos
 	public bool Actualizar(ReservaRequest request)
 	{
@@ -82,20 +82,59 @@ public class Reserva
 
 	public ReservaResponse ToResponse()
 	{
-
 		return new ReservaResponse
 		{
 			Id = this.Id,
 			Inicio = this.Inicio,
-			Fin = this.Fin,
+			Fin = this.Inicio.AddHours((double)this.Servicio.DuracionEstimada),
 			ClienteId = this.Id,
-			Cliente = this.Cliente.ToResponse(),
+			Cliente = new ClienteResponse()
+			{
+				Id = this.Cliente.Id,
+				Nombre = this.Cliente.Nombre,
+				Telefono = this.Cliente.Telefono,
+				CorreoElectronico = this.Cliente.CorreoElectronico,
+				Direcion = this.Cliente.Direcion
+			},
 			VehiculoId = this.Id,
-			Vehiculo = this.Vehiculo.ToResponse(),
+			Vehiculo = new VehiculoResponse()
+			{
+				Id = this.Vehiculo.Id,
+				Placa = this.Vehiculo.Placa,
+				Marca = this.Vehiculo.Marca,
+				Modelo = this.Vehiculo.Modelo,
+				Color = this.Vehiculo.Color,
+				Tipo = this.Vehiculo.Tipo,
+				Cliente = new ClienteResponse()
+				{
+					Id = this.Cliente.Id,
+					Nombre = this.Cliente.Nombre,
+					Telefono = this.Cliente.Telefono,
+					CorreoElectronico = this.Cliente.CorreoElectronico,
+					Direcion = this.Cliente.Direcion
+				}
+			},
 			ServicioId = this.Id,
-			Servicio = this.Servicio.ToResponse(),
+			Servicio = new ServicioResponse()
+			{
+				Id = this.Servicio.Id,
+				Nombre = this.Servicio.Nombre,
+				Descripcion = this.Servicio.Descripcion,
+				DuracionEstimada = this.Servicio.DuracionEstimada,
+				Precio = this.Servicio.Precio
+			},
 			EmpleadoId = this.Id,
-			Empleado = this.Empleado.ToResponse(),
+			Empleado = new EmpleadoResponse()
+			{
+				Id = this.Empleado.Id,
+				Nombre = this.Empleado.Nombre,
+				Apellido = this.Empleado.Apellido,
+				Telefono = this.Empleado.Telefono,
+				CorreoElectronico = this.Empleado.CorreoElectronico,
+				InicioTrabajo = this.Empleado.InicioTrabajo,
+				FinTrabajo = this.Empleado.FinTrabajo,
+				Activo = this.Empleado.Activo
+			},
 			Estado = this.Estado,
 			NotasAdicionales = this.NotasAdicionales
 		};
