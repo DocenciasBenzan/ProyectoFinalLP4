@@ -60,28 +60,27 @@ public partial class TareaService : ITareaService
     {
         try
         {
-            var entity = _dbContext.Tareas.FirstOrDefault(p => p.Id == tarea.Id);
+            var entity = await _dbContext.Tareas.SingleOrDefaultAsync(p => p.Id == tarea.Id);
             if (entity == null)
-                return Result.Failure($"La tarea '{tarea.Id}' no existe!");
-
-            if (entity.Update(
-                tarea.Titulo,
-                tarea.FechaCreacion,
-                tarea.FechaLimite,
-                tarea.IsCompleted,
-                tarea.Estado,
-                tarea.Prioridad,
-                tarea.Descripcion))
             {
-                await _dbContext.SaveChangesAsync();
-                return Result.Success("Tarea actualizada con éxito!");
+                return Result.Failure($"La tarea con ID '{tarea.Id}' no existe!");
             }
 
-            return Result.Success("No se realizaron cambios.");
+            entity.Titulo = tarea.Titulo;
+            entity.FechaCreacion = tarea.FechaCreacion;
+            entity.FechaLimite = tarea.FechaLimite;
+            entity.IsCompleted = false; // Siempre marcar como no completada
+            entity.Estado = tarea.Estado;
+            entity.Prioridad = tarea.Prioridad;
+            entity.Descripcion = tarea.Descripcion;
+
+            await _dbContext.SaveChangesAsync();
+
+            return Result.Success("Tarea actualizada con éxito!");
         }
         catch (Exception ex)
         {
-            return Result.Failure($"Error: {ex.Message}");
+            return Result.Failure($"Error al actualizar la tarea: {ex.Message}");
         }
     }
 
