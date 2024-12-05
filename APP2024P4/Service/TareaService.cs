@@ -16,6 +16,7 @@ public interface ITareaService
     Task<Result> Update(TareaRequest tarea);
     Task<ResultList<TareaDto>> ObtenerTareasPorColaborador(string email);
     Task<Result> MarcarTareaComoCompletada(int tareaId, string userId);
+    Task<ResultList<TareaDto>> GetByCompletedTarea(string userId, bool isCompleted);
 }
 
 public partial class TareaService : ITareaService
@@ -255,6 +256,42 @@ public partial class TareaService : ITareaService
         catch (Exception ex)
         {
             return Result.Failure($"Error: {ex.Message}");
+        }
+    }
+    public async Task<ResultList<TareaDto>> GetByCompletedTarea(string userId, bool isCompleted)
+    {
+        try
+        {
+            var tareas = await _dbContext.Tareas
+                .Where(p => p.UserId == userId && p.IsCompleted != isCompleted)
+                .Include(t => t.Colaboradores)
+                .Select(t => new TareaDto(
+                    t.Id,
+                    t.UserId,
+                    t.Titulo,
+                    t.Descripcion!,
+                    t.Estado,
+                    t.Prioridad,
+                    t.FechaCreacion,
+                    t.FechaLimite,
+                    t.IsCompleted,
+                    t.Colaboradores!.Select(c => new ColaboradorDto(
+                        c.Id,
+                        c.UserId,
+                        c.TareaId,
+                        c.CreadorEmail,
+                        c.ColaboradorEmail,
+                        c.IsApproved,
+                        c.IsCompleted
+                    )).ToList()
+                ))
+                .ToListAsync();
+
+            return ResultList<TareaDto>.Success(tareas);
+        }
+        catch (Exception ex)
+        {
+            return ResultList<TareaDto>.Failure($"Error: {ex.Message}");
         }
     }
 }
