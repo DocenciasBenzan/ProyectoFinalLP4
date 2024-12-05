@@ -8,46 +8,36 @@
 @page "/Renta"
 <h3>Listado de Rentas</h3>
 
-    @if (ClienteList != null && ClienteList.Count > 0)
-    {
-      
-        <table class="table table-bordered">
-            <thead class="table-primary">
+   
+
+    <table class="table table-bordered">
+        <thead class="table-primary">
+            <tr>
+                <th>ID</th>
+                <th>Fecha de Renta</th>
+                <th>Fecha de Entrega</th>
+                <th>Total Pagado</th>
+                <th>ClienteID</th>
+                <th>VehiculoID</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in RentaList)
+            {
                 <tr>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Teléfono</th>
-                    <th>Cédula</th>
-                    <th>Dirección</th>
-                    <th>Acciones</th>
+                    <td>@c.rentaId</td>
+                    <td>@c.fechaRenta</td>
+                    <td>@c.fechaEntrega</td>
+                    <td>@c.totalPagado</td>
+                    <td>@c.clienteId</td>
+                    <td>@c.vehiculoId</td>
+
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var cliente in ClienteList)
-                {
-                    <tr>
-                        <td>@cliente.Nombre</td>
-                        <td>@cliente.Apellido</td>
-                        <td>@cliente.NumeroTelefonico</td>
-                        <td>@cliente.Cedula</td>
-                        <td>@cliente.Direccion</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" @onclick="() => EditarClick(cliente)">Editar</button>
-                            <button class="btn btn-danger btn-sm" @onclick="() => EliminarClick(cliente)">Eliminar</button>
-                            <button class="btn btn-primary btn-sm" @onclick="() => VerClick(cliente)">Ver</button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <div class="text-center">
-            <p>No hay rentas registrados.</p>
-            <button class="btn btn-primary" @onclick="AgregarClick">Agregar Cliente</button>
-        </div>
-    }
+            }
+        </tbody>
+    </table>
+    
+   
 
 
 @code {
@@ -61,73 +51,22 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await ConsultarClientes();
+        await ConsultarRentas();
     }
 
-    async Task ConsultarClientes()
+    public RentaRequest MiRenta { get; set; } = new();
+    public List<RentaDto> Rentas { get; set; } = new();
+    public List<RentaDto> RentaList { get; set; } = new();
+
+    async Task ConsultarRentas()
     {
-        var result = await ClienteService.Get();
+        var result = await RentaService.GetAll();
         if (result.Succesd)
         {
-            ClienteList = result.Data?.ToList() ?? new List<ClienteDto>();
-        }
-    }
-
-    public void AgregarClick()
-    {
-        Accion = Constants.Acciones.Registrar;
-        ShowForm = true;
-        MiCliente = new();
-        DisableInputs = false;
-    }
-
-    public void EditarClick(ClienteDto cliente)
-    {
-        Accion = Constants.Acciones.Modificar;
-        ShowForm = true;
-        MiCliente = cliente.ToRequest();
-        DisableInputs = false;
-    }
-
-    public void EliminarClick(ClienteDto cliente)
-    {
-        Accion = Constants.Acciones.Eliminar;
-        ShowForm = true;
-        MiCliente = cliente.ToRequest();
-        DisableInputs = true;
-    }
-
-    public void VerClick(ClienteDto cliente)
-    {
-        Accion = Constants.Acciones.Ver;
-        ShowForm = true;
-        MiCliente = cliente.ToRequest();
-        DisableInputs = true;
-    }
-
-    public void Cancelar()
-    {
-        ShowForm = false;
-        MiCliente = new();
-    }
-
-    public async Task Aceptar()
-    {
-
-
-        Result r =
-
-        Accion == Constants.Acciones.Registrar ? await ClienteService.Create(MiCliente) :
-        Accion == Constants.Acciones.Modificar ? await ClienteService.Update(MiCliente) :
-        Accion == Constants.Acciones.Eliminar ? await ClienteService.Delete(MiCliente.ClienteId) :
-        Result.Failure("Acción no soportada");
-
-
-
-        if (r.Succesd)
-        {
-            await ConsultarClientes();
-            Cancelar();
+            RentaList =
+            result.Data?.ToList()
+            ??
+            new List<RentaDto>();
         }
     }
 }

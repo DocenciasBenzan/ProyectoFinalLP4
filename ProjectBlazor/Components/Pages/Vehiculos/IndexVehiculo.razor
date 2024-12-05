@@ -61,7 +61,9 @@
 			<span class="btn btn-danger" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
 		</div>
 	</div>
-
+	
+		
+		
 
 
 }
@@ -117,6 +119,7 @@
 			<table class="table table-bordered">
 				<thead class="table-warning ">
 					<tr>
+						<th>ID</th>
 						<th>Marca</th>
 						<th>Modelo</th>
 						<th>Matricula</th>
@@ -128,6 +131,7 @@
 				</thead>
 				<tbody>
 					<tr>
+						<td>@MiVehiculo.VehiculoId</td>
 						<td>@MiVehiculo.Marca</td>
 						<td>@MiVehiculo.Modelo</td>
 						<td>@MiVehiculo.Matricula</td>
@@ -141,15 +145,15 @@
 
 		</div>
 		<div class="form-control mb-3">
-			<h5>Datos de Renta</h5>
+			
 			<div class="container-fluid mb-3">
-
-				<div class="card-header d-inline-flex">
+				<h5>Datos de Renta</h5>
+				<div class="card d-inline-flex">
 					<label class="form-control">Fecha de Renta</label>
 					<input type="date" @bind="FechaRenta">
 					<input type="time" @bind="HoraRenta">
 				</div>
-				<div class="card-body d-inline-flex">
+				<div class="card d-inline-flex">
 					<label class="form-control">Fecha de Entrega</label>
 					<input type="date" @bind="FechaEntrega">
 					<input type="time" @bind="HoraEntrega">
@@ -167,7 +171,7 @@
 					<div class="card d-inline-flex">
 						<PrintButton></PrintButton>
 						<span class="btn btn-danger mt-3 align-content-lg-end d-print-none" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
-						<span class="btn btn-primary mt-3 align-content-lg-end d-print-none" @onclick="btnCotizarClick">Aceptar e Imprimir</span>
+						<span class="btn btn-primary mt-3 align-content-lg-end d-print-none" @onclick="Aceptar">Aceptar e Imprimir</span>
 					</div>
 
 
@@ -175,6 +179,7 @@
 				</div>
 			</div>
 		</div>
+		
 	</div>
 
 
@@ -340,6 +345,8 @@ else
 		await ConsultarVehiculos();
 		await Consultar();
 		await ConsultarClientes();
+		await ConsultarRentas();
+
 	}
 	#endregion Metodos del ciclo de vida de la aplicacion (para este componente)
 
@@ -409,6 +416,17 @@ else
 			new List<VehiculoDto>();
 		}
 	}
+	async Task ConsultarRentas()
+	{
+		var result = await RentaService.GetAll();
+		if (result.Succesd)
+		{
+			RentaList =
+			result.Data?.ToList()
+			??
+			new List<RentaDto>();
+		}
+	}
 	
 	
 	public void Limpiar()
@@ -425,11 +443,13 @@ else
 		Accion == Constants.Acciones.Registrar ? await VehiculoService.Create(MiVehiculo) :
 		Accion == Constants.Acciones.Modificar ? await VehiculoService.Update(MiVehiculo) :
 		Accion == Constants.Acciones.Eliminar ? await VehiculoService.Delete(MiVehiculo.VehiculoId) :
+		Accion == Constants.Acciones.Rentar ? await RentaService.Create(MiRenta) :	
 		Accion == Constants.Acciones.Ver ? Result.Success("") :
 		Result.Failure("Accion no soportada");
 		if (r.Succesd)
 		{
 			await Consultar();
+			await ConsultarRentas();
 			Limpiar();
 		}
 	}
