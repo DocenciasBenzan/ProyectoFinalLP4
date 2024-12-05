@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using APP2024P4.Data.Entities;
+﻿using APP2024P4.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace APP2024P4.Data
 {
-    public class IApplicacionDbContext
+    public interface IApplicationDbContext
     {
         DbSet<Producto> Productos { get; set; }
+        DbSet<Categoria> Categorias { get; set; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
