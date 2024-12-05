@@ -1,7 +1,8 @@
 ﻿namespace APP2024P4.Data.Dtos
 {
-    public class ComentarioDto
+    public record ComentarioDto
     (
+        int id,
        string contenido,
        string userId,
        string creadorEmail,
@@ -14,6 +15,7 @@
         public ComentarioRequest ToRequest()
         => new()
         {
+            Id = id,
             Contenido = contenido,
             UserId = userId,
             CreadorEmail = creadorEmail,

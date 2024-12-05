@@ -20,25 +20,28 @@
 
         <AuthorizeView>
             <Authorized>
-
+                <!-- Tareas -->
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="tareas">
-                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Tareas
+                        <span class="content-center bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Tareas
                     </NavLink>
                 </div>
 
-                <div class="nav-item px-3">
+                <!-- Colaboradores -->
+                <div class="nav-item px-2">
                     <NavLink class="nav-link" href="colaboradores">
                         <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Colaboradores
                     </NavLink>
                 </div>
 
-                <div class="nav-item px-3">
+                <!-- Usuario -->
+                <div class="nav-item px-3 ">
                     <NavLink class="nav-link" href="Account/Manage">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
+                        <span class="content-center bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
                     </NavLink>
                 </div>
 
+                <!-- Logout -->
                 <div class="nav-item px-3">
                     <form action="Account/Logout" method="post">
                         <AntiforgeryToken />
@@ -48,22 +51,22 @@
                         </button>
                     </form>
                 </div>
-
             </Authorized>
-            <NotAuthorized>
 
+            <NotAuthorized>
+                <!-- Register -->
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Register">
                         <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
                     </NavLink>
                 </div>
 
+                <!-- Login -->
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Login">
                         <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
                     </NavLink>
                 </div>
-
             </NotAuthorized>
         </AuthorizeView>
 

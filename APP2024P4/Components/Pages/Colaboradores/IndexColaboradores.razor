@@ -3,33 +3,37 @@
 @rendermode InteractiveServer
 @attribute [Authorize]
 @attribute [StreamRendering]
+@inject IComentatioService ComentatioService
 
-<div class="card mb-4 shadow-sm border-0">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Tareas del Colaborador</h5>
-        <button class="btn btn-sm btn-light">
-            <i class="fas fa-plus"></i> Nueva Tarea
-        </button>
-    </div>
-    <div class="card-body p-4">
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped table-hover">
-                <thead class="bg-dark text-white">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Título</th>
-                        <th scope="col">Descripción</th>
-                        <th scope="col">Prioridad</th>
-                        <th scope="col">Estado</th>
-                        <th scope="col">Fecha de Creación</th>
-                        <th scope="col">Fecha Límite</th>
-                        <th scope="col">Creador</th>
-                        <th scope="col">Colaboradores</th>
-                        <th scope="col">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (ListaTareas.Any())
+<!-- Table Tareas de Colaboradores-->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Tareas del Colaborador</h5>
+            <NavLink >
+            <button class="btn btn-sm btn-light">
+                <i class="fas fa-plus"></i> Nueva Tarea
+            </button>
+            </NavLink>
+        </div>
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="bg-dark text-white">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Título</th>
+                            <th scope="col">Descripción</th>
+                            <th scope="col">Prioridad</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Fecha de Creación</th>
+                            <th scope="col">Fecha Límite</th>
+                            <th scope="col">Creador</th>
+                            <th scope="col">Colaboradores</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ListaTareas.Any())
                     {
                         @foreach (var tarea in ListaTareas)
                         {
@@ -51,36 +55,58 @@
                                 <td class="align-middle">@tarea.FechaCreacion?.ToShortDateString()</td>
                                 <td class="align-middle">@tarea.FechaLimite?.ToShortDateString()</td>
                                 <td class="align-middle">
-                                    @if (tarea.Colaboradores.Any())
+                                    @if (tarea.Colaboradores!.Any())
                                     {
                                         <span class="badge badge-light text-dark" style="font-size: 14px; padding: 5px;">
-                                            @tarea.Colaboradores.FirstOrDefault()?.CreadorEmail
+                                            @tarea.Colaboradores!.FirstOrDefault()?.CreadorEmail
                                         </span>
                                     }
                                 </td>
-                                <!-- Colaboradores como lista desplegable -->
                                 <td class="align-middle">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Ver Colaboradores
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                            @foreach (var colaborador in tarea.Colaboradores)
-                                            {
-                                                <li>
-                                                    <span class="dropdown-item">@colaborador.ColaboradorEmail</span>
-                                                </li>
-                                            }
-                                        </ul>
+                                    <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#colaboradoresModal_@tarea.Id">
+                                        Ver Colaboradores
+                                    </button>
+
+                                    <!-- Modal Colaboradores-->
+                                    <div class="modal fade" id="colaboradoresModal_@tarea.Id" tabindex="-1" aria-labelledby="colaboradoresModalLabel_@tarea.Id" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="colaboradoresModalLabel_@tarea.Id">Colaboradores</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    @if (tarea.Colaboradores?.Count > 0)
+                                                    {
+                                                        <ul class="list-group">
+                                                            @foreach (var colaborador in tarea.Colaboradores)
+                                                            {
+                                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                    @colaborador.ColaboradorEmail
+                                                                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteColaboradores(colaborador.Id)">
+                                                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                                                    </button>
+                                                                </li>
+                                                            }
+                                                        </ul>
+                                                    }
+                                                    else
+                                                    {
+                                                        <p class="text-muted">No hay colaboradores disponibles.</p>
+                                                    }
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
+
                                 <!-- Botones de acciones -->
                                 <td class="align-middle">
-                                    <button class="btn btn-sm btn-outline-primary">
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#comentariosModal" @onclick="() => ConsultarComentarios(tarea.Id)">
                                         <i class="fas fa-comment"></i> Comentario
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger">
-                                        <i class="fas fa-trash-alt"></i> Eliminar
                                     </button>
                                 </td>
                             </tr>
@@ -98,18 +124,91 @@
     </div>
 </div>
 
-
-
+<!-- Modal Comentarios-->
+<div class="modal fade" id="comentariosModal" tabindex="-1" aria-labelledby="comentariosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="comentariosModalLabel">Comentarios</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-4">
+                    <h4>@(IsEditMode ? "Editar Comentario" : "Añadir un nuevo comentario")</h4>
+                    <div class="form-group">
+                        <label for="contenido">Contenido:</label>
+                        <textarea @bind="@MiComentario.Contenido" id="contenido" class="form-control" placeholder="Escribe tu comentario aquí"></textarea>
+                    </div>
+                    <button class="btn btn-primary mt-2" @onclick="SaveComentario">
+                        @(IsEditMode ? "Actualizar" : "Guardar")
+                    </button>
+                </div>
+                <hr />
+                <div>
+                    <h4>Lista de Comentarios</h4>
+                    <div class="comentarios">
+                        @if (ListComentarios?.Count > 0)
+                        {
+                            @foreach (var c in ListComentarios)
+                            {
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">@c.creadorEmail</h5>
+                                        <p class="card-text">@c.contenido</p>
+                                        <small class="text-muted">
+                                            @if (c.fechaActualizacion > c.fechaCreacion)
+                                            {
+                                                <a>Creado: @c.fechaCreacion.ToString("g") | Modificado: @c.fechaActualizacion.ToString("g")</a>
+                                            }
+                                            else
+                                            {
+                                                <a>Creado: @c.fechaCreacion.ToString("g")</a>
+                                            }
+                                        </small>
+                                        <div class="mt-2">
+                                            <button class="btn btn-warning btn-sm" @onclick="() => EditComentario(c)">Editar</button>
+                                            <button class="btn btn-danger btn-sm" @onclick="() => DeleteComentario(comentarioId = c.id)">Eliminar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div>
+                                <h5 class="text-center">No hay comentarios disponibles.</h5>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
+
+    private ClaimsPrincipal? currentUser;
     private string CorreoUsuarioActual = string.Empty;
+    public TareaRequest MiTarea { get; set; } = new();
     private List<TareaDto> ListaTareas = new();
+    private List<ComentarioDto> ListComentarios = new();
+    public ComentarioRequest MiComentario { get; set; } = new();
+    private bool IsEditMode = false;
+    public int tareaIdComentario;
+    public int comentarioId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var estadoAutenticacion = await ProveedorEstadoAutenticacion.GetAuthenticationStateAsync();
         var usuario = estadoAutenticacion.User;
-
+        var authState = await ProveedorEstadoAutenticacion.GetAuthenticationStateAsync();
+        currentUser = authState.User;
+        var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value; // Obtén el ID del usuario actual
+        if (string.IsNullOrEmpty(userId)) return;
         if (usuario.Identity?.IsAuthenticated == true)
         {
             CorreoUsuarioActual = usuario.FindFirst(c => c.Type == ClaimTypes.Email)?.Value ?? string.Empty;
@@ -128,6 +227,79 @@
         else
         {
             ListaTareas = new List<TareaDto>();
+        }
+    }
+
+    private async Task ConsultarComentarios(int tareaId)
+    {
+        tareaIdComentario = tareaId;
+        var resultado = await ComentatioService.ConsultarComentario(tareaId);
+        if (resultado.Succesd)
+        {
+            ListComentarios = resultado.Data?.ToList() ?? new();
+        }
+        else
+        {
+            ListComentarios = new();
+        }
+    }
+
+    private void EditComentario(ComentarioDto comentario)
+    {
+        MiComentario = comentario.ToRequest();
+        IsEditMode = true;
+    }
+
+    private async Task DeleteComentario(int comentarioId)
+    {
+        var result = await ComentatioService.Delete(comentarioId);
+        if (result.Succesd)
+        {
+            await ConsultarComentarios(tareaIdComentario);
+        }
+    }
+
+    private async Task SaveComentario()
+    {
+        if (IsEditMode)
+        {
+             MiComentario.FechaActualizacion = DateTime.Now;
+            var result = await ComentatioService.Update(MiComentario);
+            if (result.Succesd)
+            {
+                IsEditMode = false;
+                await ConsultarComentarios(tareaIdComentario);
+            }
+        }
+        else
+        {
+            var estadoAutenticacion = await ProveedorEstadoAutenticacion.GetAuthenticationStateAsync();
+            var usuario = estadoAutenticacion.User;
+
+            if (usuario.Identity?.IsAuthenticated == true)
+            {
+                MiComentario.FechaCreacion = DateTime.Now;
+                MiComentario.TareaId = tareaIdComentario;
+                CorreoUsuarioActual = usuario.FindFirst(c => c.Type == ClaimTypes.Email)?.Value ?? string.Empty;
+                var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId)) return;
+                var result = await ComentatioService.Create(MiComentario, userId, CorreoUsuarioActual);
+                if (result.Succesd)
+                {
+                    await ConsultarComentarios(tareaIdComentario);
+                }
+            }
+        }
+
+        MiComentario = new();
+    }
+
+    private async Task DeleteColaboradores(int ColaboradorId)
+    {
+        var result = await ServiceColaborador.Delete(ColaboradorId);
+        if (result.Succesd)
+        {
+            await ConsultarTareasColaborador();
         }
     }
 }

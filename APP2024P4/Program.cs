@@ -40,6 +40,7 @@ builder.Services.AddScoped<IColaboradorService,ColaboradorService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<ITareaService, TareaService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IComentatioService, ComentatioService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
