@@ -1,0 +1,46 @@
+﻿@page "/facturas"
+@using APP2024P4.Data.Request
+@using APP2024P4.Data.Response
+@using APP2024P4.Servicios
+@rendermode InteractiveServer
+@inject IFacturaServicio FacturaServicio
+
+
+
+
+
+
+@if (facturas.Any())
+{
+	@foreach (var fact in facturas)
+	{
+		<p>Factura a nombre de @fact.Cliente.Nombre</p>
+		@* @foreach (var part in fact.FacturaPartes)
+		{
+			<p> @part.pieza.Nombre - (@part.Cantidad)</p>
+		} *@
+	}
+}
+else
+{
+	<p> Sin facturas registrada</p>
+}
+
+
+
+
+@code {
+	public List<FacturaResponse> facturas { get; set; } = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		base.OnInitializedAsync();
+		var rFacturas = await FacturaServicio.ObtenerTodasLasFacturas();
+
+		if (rFacturas.Ok)
+		{
+			facturas = rFacturas.Data.ToList();
+		}
+
+	}
+}

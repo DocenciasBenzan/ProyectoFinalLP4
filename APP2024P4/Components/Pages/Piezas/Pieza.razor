@@ -1,0 +1,189 @@
+﻿@rendermode InteractiveServer
+@page "/piezas"
+@using APP2024P4.Data.Request
+@using APP2024P4.Data.Response
+@using APP2024P4.Servicios
+@using System.Text
+@inject IPiezaServicio PiezaServicio
+
+<h3>Gestión de Piezas</h3>
+
+<button class="btn btn-primary mb-3" @onclick="MostrarFormulario">Agregar Pieza</button>
+
+@if (mostrarFormulario)
+{
+	<EditForm Model="pieza" OnValidSubmit="GuardarPieza">
+		<DataAnnotationsValidator />
+		<ValidationSummary />
+
+		<div class="mb-3">
+			<label for="nombre" class="form-label">Nombre</label>
+			<InputText id="nombre" class="form-control" @bind-Value="pieza.Nombre" />
+		</div>
+		<div class="mb-3">
+			<label for="precio" class="form-label">Precio</label>
+			<InputNumber id="precio" class="form-control" @bind-Value="pieza.Precio" />
+		</div>
+		<div class="mb-3">
+			<label for="cantidad" class="form-label">Cantidad Disponible</label>
+			<InputNumber id="cantidad" class="form-control" @bind-Value="pieza.CantidadDisponible" />
+		</div>
+		<div class="mb-3">
+			<label for="marca" class="form-label">Marca</label>
+			<InputText id="marca" class="form-control" @bind-Value="pieza.Marca" />
+		</div>
+
+		<div class="mb-3">
+			<label for="cargarImagen" class="form-label">Imagen:</label>
+			<InputFile class="form-control" id="cargarImagen" OnChange="CargarImagen" accept=".jpeg, .png, .jpg" />
+			<ValidationMessage For="@(() => pieza.Imagen)" />
+
+			@if (!string.IsNullOrWhiteSpace(pieza.Imagen))
+			{
+				<img src="@pieza.Imagen" alt="Imagen de @pieza.Nombre"/>
+			}
+		</div>
+
+		<button type="submit" class="btn btn-success">Guardar</button>
+		<button type="button" class="btn btn-secondary" @onclick="CancelarFormulario">Cancelar</button>
+	</EditForm>
+}
+
+@if (piezas != null && piezas.Count > 0)
+{
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Nombre</th>
+				<th>Precio</th>
+				<th>Cantidad</th>
+				<th>Marca</th>
+				<th>Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var p in piezas)
+			{
+				<tr>
+					<td>@p.Id</td>
+					<td>@p.Nombre</td>
+					<td>@p.Precio</td>
+					<td>@p.CantidadDisponible</td>
+					<td>@p.Marca</td>
+					<td>
+						<button class="btn btn-warning me-2" @onclick="() => EditarPieza(p)">Editar</button>
+						<button class="btn btn-danger" @onclick="() => EliminarPieza(p.Id)">Eliminar</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+else
+{
+	<p>No hay piezas registradas.</p>
+}
+
+@code {
+	private List<PiezaResponse> piezas = new();
+	private PiezaRequest pieza = new();
+	private bool mostrarFormulario = false;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await CargarPiezas();
+	}
+
+	private async Task CargarPiezas()
+	{
+		var result = await PiezaServicio.ObtenerTodasLasPiezas();
+		if (result.Ok)
+		{
+			piezas = result.Data.ToList();
+		}
+	}
+
+	private void MostrarFormulario()
+	{
+		pieza = new PiezaRequest(); // Reiniciar el formulario
+		mostrarFormulario = true;
+	}
+
+	private void CancelarFormulario()
+	{
+		mostrarFormulario = false;
+	}
+
+	private async Task CargarImagen(InputFileChangeEventArgs e)
+	{
+		try
+		{
+			var file = e.File;
+			var contenType = file.ContentType;
+
+			var espacio = Encoding.UTF8.GetByteCount($"data:{file.ContentType};base64,");
+
+			var buffer = new byte[file.Size];
+			await file.OpenReadStream().ReadAsync(buffer);
+
+			string img = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
+
+			pieza.Imagen = img;
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Errir agregando la imagen: {ex.Message}");
+
+		}
+		finally
+		{
+			StateHasChanged();
+		}
+
+	}
+
+	private async Task GuardarPieza()
+	{
+		if (pieza.Id == 0)
+		{
+			// Crear nueva pieza
+			var result = await PiezaServicio.CrearPieza(pieza);
+			if (result.Ok)
+			{
+				await CargarPiezas();
+				CancelarFormulario();
+			}
+		}
+		else
+		{
+			// Actualizar pieza existente
+			var result = await PiezaServicio.ActualizarPieza(pieza.Id, pieza);
+			if (result.Ok)
+			{
+				await CargarPiezas();
+				CancelarFormulario();
+			}
+		}
+	}
+
+	private void EditarPieza(PiezaResponse piezaExistente)
+	{
+		pieza.Id = piezaExistente.Id;
+		pieza.Nombre = piezaExistente.Nombre;
+		pieza.Precio = piezaExistente.Precio;
+		pieza.CantidadDisponible = piezaExistente.CantidadDisponible;
+		pieza.Marca = piezaExistente.Marca;
+		pieza.Imagen = piezaExistente.Imagen;
+		mostrarFormulario = true;
+	}
+
+	private async Task EliminarPieza(int id)
+	{
+		var result = await PiezaServicio.EliminarPieza(id);
+		if (result.Ok)
+		{
+			await CargarPiezas();
+		}
+	}
+}

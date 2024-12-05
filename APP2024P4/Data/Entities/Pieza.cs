@@ -1,43 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using APP2024P4.Data.Response;
+using APP2024P4.Data.Request;
 
 namespace APP2024P4.Data.Entities;
-
-
-
-public class FacturaParte
-{
-	[Key]
-	public int Id { get; set; }
-
-
-	public int FacturaID { get; set; }
-	[ForeignKey(nameof(FacturaID))]
-	public Factura Factura { get; set; }
-
-	public int PiezaId { get; set; }
-	[ForeignKey(nameof(PiezaId))]
-	public Pieza Pieza { get; set; }
-
-	[Required]
-	public int Cantidad { get; set; }
-}
-public class Factura
-{
-	[Key]
-	public int FacturaID { get; set; } 
-
-	[Required]
-	public DateTime Fecha { get; set; } 
-
-	[Required]
-	[Column(TypeName = "decimal(10, 2)")]
-	public decimal Total { get; set; }
-	public List<FacturaParte> FacturaPartes { get; set; } = new();
-    public int ClienteId { get; set; }
-	[ForeignKey(nameof(ClienteId))]
-    public Cliente Cliente { get; set; }
-}
 public class Pieza
 {
 	[Key]
@@ -52,13 +18,52 @@ public class Pieza
 	public decimal Precio { get; set; }
 
 	public string Imagen { get; set; } = null!;
-    public string Marca { get; set; } = null!;
+	public string Marca { get; set; } = null!;
 
-	[Range(0,int.MaxValue,ErrorMessage ="Cantidad debe ser al menos 0")]
-    public int CantidadDisponible { get; set; }
-    public List<FacturaParte> FacturaPartes { get; set; } = new();
-}
-public class Cliente{
-    public int Id { get; set; }
-	public string Nombre { get; set; } = null!;
+	[Range(0, int.MaxValue, ErrorMessage = "Cantidad debe ser al menos 0")]
+	public int CantidadDisponible { get; set; }
+	public List<FacturaParte> FacturaPartes { get; set; } = new();
+	public PiezaResponse ToResponse()
+	{
+		return new PiezaResponse
+		{
+			Id = Id,
+			Nombre = Nombre,
+			Precio = Precio,
+			Imagen = Imagen,
+			Marca = Marca,
+			CantidadDisponible = CantidadDisponible
+		};
+	}
+
+	public bool Actualizar(PiezaRequest request)
+	{
+		var cambios = false;
+		if (Nombre != request.Nombre)
+		{
+			this.Nombre = request.Nombre;
+			cambios = true;
+		}
+		if (Precio != request.Precio)
+		{
+			this.Precio = request.Precio;
+			cambios = true;
+		}
+		if (Imagen != request.Imagen)
+		{
+			this.Imagen = request.Imagen;
+			cambios = true;
+		}
+		if (Marca != request.Marca)
+		{
+			this.Marca = request.Marca;
+			cambios = true;
+		}
+		if (CantidadDisponible != request.CantidadDisponible)
+		{
+			this.CantidadDisponible = request.CantidadDisponible;
+			cambios = true;
+		}
+		return cambios;
+	}
 }

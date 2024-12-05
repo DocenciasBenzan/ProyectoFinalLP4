@@ -1,0 +1,130 @@
+﻿@page "/clientes"
+@using APP2024P4.Data.Request
+@using APP2024P4.Data.Response
+@using APP2024P4.Servicios
+@rendermode InteractiveServer
+@inject IClienteServicio ClienteServicio
+
+<h3>Gestión de Clientes</h3>
+
+<button class="btn btn-primary mb-3" @onclick="MostrarFormulario">Agregar Cliente</button>
+
+@if (mostrarFormulario)
+{
+	<EditForm Model="cliente" OnValidSubmit="GuardarCliente">
+		<DataAnnotationsValidator />
+		<ValidationSummary />
+
+		<div class="mb-3">
+			<label for="nombre" class="form-label">Nombre</label>
+			<InputText id="nombre" class="form-control" @bind-Value="cliente.Nombre" />
+		</div>
+
+		<button type="submit" class="btn btn-success">Guardar</button>
+		<button type="button" class="btn btn-secondary" @onclick="CancelarFormulario">Cancelar</button>
+	</EditForm>
+}
+
+@if (clientes != null && clientes.Count > 0)
+{
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Nombre</th>
+				<th>Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var c in clientes)
+			{
+				<tr>
+					<td>@c.Id</td>
+					<td>@c.Nombre</td>
+					<td>
+						<button class="btn btn-warning me-2" @onclick="() => EditarCliente(c)">Editar</button>
+						<button class="btn btn-danger" @onclick="() => EliminarCliente(c.Id)">Eliminar</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+else
+{
+	<p>No hay clientes registrados.</p>
+}
+
+@code {
+	private List<ClienteResponse> clientes = new();
+	private ClienteRequest cliente = new();
+	private bool mostrarFormulario = false;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await CargarClientes();
+	}
+
+	private async Task CargarClientes()
+	{
+		var result = await ClienteServicio.ObtenerTodosLosClientes();
+		if (result.Ok)
+		{
+			clientes = result.Data.ToList();
+		}
+	}
+
+	private void MostrarFormulario()
+	{
+		cliente = new ClienteRequest(); // Reiniciar el formulario
+		mostrarFormulario = true;
+	}
+
+	private void CancelarFormulario()
+	{
+		mostrarFormulario = false;
+	}
+
+	private async Task GuardarCliente()
+	{
+		if (cliente.Id == 0)
+		{
+			// Crear nuevo cliente
+			var result = await ClienteServicio.CrearCliente(cliente);
+			if (result.Ok)
+			{
+				await CargarClientes();
+				CancelarFormulario();
+			}
+		}
+		else
+		{
+			// Actualizar cliente existente
+			var result = await ClienteServicio.ActualizarCliente(cliente.Id, cliente);
+			if (result.Ok)
+			{
+				await CargarClientes();
+				CancelarFormulario();
+			}
+		}
+	}
+
+	private void EditarCliente(ClienteResponse clienteExistente)
+	{
+		cliente.Id = clienteExistente.Id;
+		cliente.Nombre = clienteExistente.Nombre;
+		mostrarFormulario = true;
+		StateHasChanged();
+	}
+
+	private async Task EliminarCliente(int id)
+	{
+		var result = await ClienteServicio.EliminarCliente(id);
+		if (result.Ok)
+		{
+			await CargarClientes();
+			StateHasChanged();
+
+		}
+	}
+}

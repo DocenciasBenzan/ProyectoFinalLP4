@@ -1,6 +1,7 @@
 using APP2024P4.Components;
 using APP2024P4.Components.Account;
 using APP2024P4.Data;
+using APP2024P4.Servicios;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,11 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+// Servicos
+builder.Services.AddScoped<IPiezaServicio, PiezaServicio>();
+builder.Services.AddScoped<IClienteServicio, ClienteServicio>();
+builder.Services.AddScoped<IFacturaServicio, FacturaServicio>();
+// Servicos
 
 var app = builder.Build();
 
