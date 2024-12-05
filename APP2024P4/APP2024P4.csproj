@@ -8,21 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Components\Pages\Admin\Categorias\IndexCategorias.razor.css" />
-    <None Remove="Components\Pages\Admin\IndexAdmin.razor.css" />
-    <None Remove="Components\Pages\Admin\Marcas\IndexMarcas.razor.css" />
-    <None Remove="Components\Pages\Admin\Modelos\IndexModelos.razor.css" />
-    <None Remove="Components\Pages\Admin\Productos\IndexProductos.razor.css" />
-    <None Remove="Components\Pages\Admin\Usuarios\IndexUsuarios.razor.css" />
+    <None Remove="Components\Pages\Categorias\IndexCategorias.razor.css" />
+    <None Remove="Components\Pages\Marcas\IndexMarcas.razor.css" />
+    <None Remove="Components\Pages\Modelos\IndexModelos.razor.css" />
+    <None Remove="Components\Pages\Productos\IndexProductos.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Components\Pages\Admin\Categorias\IndexCategorias.razor.css" />
-    <Content Include="Components\Pages\Admin\IndexAdmin.razor.css" />
-    <Content Include="Components\Pages\Admin\Marcas\IndexMarcas.razor.css" />
-    <Content Include="Components\Pages\Admin\Modelos\IndexModelos.razor.css" />
-    <Content Include="Components\Pages\Admin\Productos\IndexProductos.razor.css" />
-    <Content Include="Components\Pages\Admin\Usuarios\IndexUsuarios.razor.css" />
+    <Content Include="Components\Pages\Categorias\IndexCategorias.razor.css" />
+    <Content Include="Components\Pages\Marcas\IndexMarcas.razor.css" />
+    <Content Include="Components\Pages\Modelos\IndexModelos.razor.css" />
+    <Content Include="Components\Pages\Productos\IndexProductos.razor.css" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +29,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Icon\" />
   </ItemGroup>
 
 </Project>

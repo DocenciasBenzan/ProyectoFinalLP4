@@ -1,6 +1,7 @@
 ﻿@rendermode InteractiveServer
 @attribute [StreamRendering]
 @page "/productos"
+@using APP2024P4.Components.Elements
 @using APP2024P4.Data.Datos
 @using APP2024P4.Data.Entities
 @using System.Text
@@ -21,110 +22,113 @@ Imagen
 {
 	@* Formularion de accion*@
 	<div class="card">
-		<h5 class="card-header">@Accion Producto</h5>
+		<h5 class="card-h5">@Accion Producto</h5>
 		<div class="card-body">
 			<EditForm Model="@MiProducto" OnValidSubmit="Aceptar" FormName="FormProducto">
 				<DataAnnotationsValidator />
-				@* 				<ValidationSummary /> *@
+				<!-- <ValidationSummary /> -->
 
-				<div>
-					<label class="form-label">Nombre:</label>
-					<InputText class="form-control" id="nombre" @bind-Value="MiProducto.Nombre" />
-					<ValidationMessage For="@(() => MiProducto.Nombre)" />
-				</div>
-				<div class="col-md-6">
-					<label for="marca" class="form-label">Marca</label>
-					<InputSelect class="form-control" id="marca"
-								 Value="@MarcaActualId"
-								 ValueExpression="@(()=>MarcaActualId)"
-								 ValueChanged="@((int x)=>OnMarcaChange(x))">
-						<option disabled value="0" selected>Selecciona una Marca</option>
+				<div class="row">
+					<div class="col-md-6 mb-3">
+						<label class="form-label">Nombre:</label>
+						<InputText class="form-control" id="nombre" @bind-Value="MiProducto.Nombre" disabled="@DisableInputs" />
+						<ValidationMessage For="@(() => MiProducto.Nombre)" />
+					</div>
 
-						@foreach (var marca in Marcas)
-						{
-							<option value="@marca.Id">@marca.Nombre</option>
-						}
-
-
-					</InputSelect>
-				</div>
-
-				<div class="col-md-6">
-					<label for="modelo" class="form-label">Modelo</label>
-					<select @bind="@MiProducto.ModeloId" id="modelo" class="form-select">
-						@if (MarcaActualId == 0)
-						{
-							<option selected disabled value="0">Selecciona una marca primero</option>
-						}
-						else
-						{
-							<option disabled>Selecciona el modelo</option>
-						}
-						@if (ModelosFiltrados != null)
-						{
-							@foreach (var modelo in ModelosFiltrados)
+					<div class="col-md-6 mb-3">
+						<label for="categoria" class="form-label">Categoría</label>
+						<select @bind="@MiProducto.CategoriaId" id="categoria" class="form-select" disabled="@DisableInputs">
+							<option disabled selected>Seleccione una categoría</option>
+							@if (Categorias != null)
 							{
-								<option value="@modelo.Id">@modelo.Nombre</option>
+								@foreach (var categoria in Categorias)
+								{
+									<option value="@categoria.Id">@categoria.Nombre</option>
+								}
 							}
-						}
-					</select>
-				</div>
-				<div>
-					<label for="categoria" class="form-label">Categoría</label>
-					<select @bind="@MiProducto.CategoriaId" id="categoria" class="form-select">
-						<option disabled selected>Seleccione una categoría</option>
-						@if (Categorias != null)
-						{
-							@foreach (var categoria in Categorias)
+						</select>
+						<ValidationMessage For="@(() => MiProducto.CategoriaId)" />
+					</div>
+
+					<div class="col-md-6 mb-3">
+						<label for="marca" class="form-label">Marca</label>
+						<InputSelect class="form-select" id="marca" disabled="@DisableInputs"
+									 Value="@MarcaActualId"
+									 ValueExpression="@(()=>MarcaActualId)"
+									 ValueChanged="@((int x)=>OnMarcaChange(x))">
+							<option disabled value="0" selected>Selecciona una Marca</option>
+							@foreach (var marca in Marcas)
 							{
-								<option value="@categoria.Id">@categoria.Nombre</option>
+								<option value="@marca.Id">@marca.Nombre</option>
 							}
-						}
-					</select>
-					<ValidationMessage For="@(() => MiProducto.CategoriaId)" />
+						</InputSelect>
+					</div>
+
+					<div class="col-md-6 mb-3">
+						<label for="modelo" class="form-label">Modelo</label>
+						<select @bind="@MiProducto.ModeloId" id="modelo" class="form-select" disabled="@DisableInputs">
+							@if (MarcaActualId == 0)
+							{
+								<option selected disabled value="0">Selecciona una marca primero</option>
+							}
+							else
+							{
+								<option disabled>Selecciona el modelo</option>
+							}
+							@if (ModelosFiltrados != null)
+							{
+								@foreach (var modelo in ModelosFiltrados)
+								{
+									<option value="@modelo.Id">@modelo.Nombre</option>
+								}
+							}
+						</select>
+					</div>
+
+					<div class="col-md-6 mb-3">
+						<label class="form-label">Fecha:</label>
+						<InputDate id="fechaLanzamiento" class="form-control" @bind-Value="MiProducto.FechaL"
+								   max="2025-12-31" min="2000-01-01" disabled="@DisableInputs" />
+						<ValidationMessage For="@(() => MiProducto.FechaL)" />
+					</div>
+
+					<div class="col-md-6 mb-3">
+						<label for="color" class="form-label">Color</label>
+						<input type="text" @bind-value="MiProducto.Color" class="form-control" id="color" placeholder="Color" disabled="@DisableInputs">
+						<ValidationMessage For="@(() => MiProducto.Color)" />
+					</div>
+
+					<div class="col-md-6 mb-3">
+						<label class="form-label">Cantidad:</label>
+						<InputNumber class="form-control" id="cantidad" @bind-Value="MiProducto.Cantidad" disabled="@DisableInputs" />
+						<ValidationMessage For="@(() => MiProducto.Cantidad)" />
+					</div>
+
+					<div class="col-md-6 mb-3">
+						<label class="form-label">Precio:</label>
+						<InputNumber class="form-control" id="precio" @bind-Value="MiProducto.Precio" disabled="@DisableInputs" />
+						<ValidationMessage For="@(() => MiProducto.Precio)" />
+					</div>
 				</div>
 
-				<div>
-					<label class="form-label">Fecha:</label>
-					<InputDate id="fechaLanzamiento" class="form-control" @bind-Value="MiProducto.FechaL"
-							   min="1980-01-01" max="2025-12-31" />
-					<ValidationMessage For="@(() => MiProducto.FechaL)" />
-				</div>
-
-				<div>
-					<label class="form-label">Cantidad:</label>
-					<InputNumber class="form-control" id="cantidad" @bind-Value="MiProducto.Cantidad" />
-					<ValidationMessage For="@(() => MiProducto.Cantidad)" />
-				</div>
-
-				<div>
-					<label class="form-label">Precio:</label>
-					<InputNumber class="form-control" id="precio" @bind-Value="MiProducto.Precio" />
-					<ValidationMessage For="@(() => MiProducto.Precio)" />
-				</div>
-				<div class="col-md-6">
-					<label for="color" class="form-label">Color</label>
-					<input type="text" @bind-value="MiProducto.Color" class="form-control" id="color" placeholder="Color">
-					<ValidationMessage For="@(() => MiProducto.Color)" />
-
-				</div>
 				<div class="mb-3">
 					<label for="descripcion" class="form-label">Descripción</label>
 					<textarea @bind="MiProducto.Descripcion" class="form-control" id="descripcion" rows="3" disabled="@DisableInputs"></textarea>
-
 				</div>
+
 				<div class="mb-3">
 					<label for="ImageUpload" class="form-label">Imagen:</label>
-					<InputFile class="form-control" id="ImageUpload" OnChange="ImageLoad" accept=".jpeg, .png, .jpg" />
+					<InputFile class="form-control" id="ImageUpload" OnChange="ImageLoad" accept=".jpeg, .png, .jpg" disabled="@DisableInputs" />
 					<ValidationMessage For="@(() => MiProducto.Imagen)" />
-
 					@if (!string.IsNullOrEmpty(ImagenActual))
 					{
-						<img src="@ImagenActual" alt="Imagen de @MiProducto.Nombre" />
+						<img src="@ImagenActual" alt="Imagen de @MiProducto.Nombre" class="img-fluid mt-3" />
 					}
 				</div>
-
-				<button type="submit" class="btn btn-success">Enviar</button>
+				@if (Accion != Constants.Acciones.Ver)
+				{
+					<span class="btn btn-primary me-2" @onclick="Aceptar">Aceptar</span>
+				}
 				<span class="btn btn-danger" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
 			</EditForm>
 		</div>
@@ -136,15 +140,31 @@ else
 	{
 		@* Formularion de los registros*@
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-		<a href="/admin" class="btn btn-outline-primary " type="button">⬅️ Volver</a>
-		<div class="card mb-3 mt-3">
+		<div class="card">
 			<div class="card-header">
-				<span class="btn btn-success" @onclick="btnAgregarClick">
-					<i class="bi bi-plus-circle"></i> Agregar Dispositivo
-				</span>
+				<div class="card-h5 d-print-none">
+					<h2 style="text-align:center">Registrar Productos</h2>
+				</div>
+
+				<div class="text-center">
+					<img src="/Icon/W&W Tech Inventory.jpg" alt="Icono" class="img-fluid mt-2 d-none d-print-inline" style="max-width: 150px; height: auto;" /><br />
+					<br /><h1 class="d-none d-print-inline mt-2">Reporte de productos</h1>
+				</div>
+
+				<div class="d-print-none">
+					<span class="btn btn-outline-light" @onclick="btnAgregarClick">
+						<i class="bi bi-plus-circle"></i> Agregar Producto
+					</span>
+					<PrintButton />
+				</div>
+
 			</div>
 			<div class="card-body">
-				<table class="table">
+				<div class="input-group w-25 mt-3 d-print-none">
+					<input type="text" class="form-control" placeholder="Buscar producto..." @bind="searchText" @bind:event="oninput">
+					<span class="input-group-text"><i class="bi bi-search"></i></span>
+				</div>
+				<table class="table mt-3">
 					<thead>
 						<tr>
 							<th scope="col">#</th>
@@ -152,13 +172,13 @@ else
 							<th scope="col">Modelo</th>
 							<th scope="col">Categoría</th>
 							<th scope="col">Precio</th>
-							<th scope="col">Acciones</th>
+							<th scope="col" class="d-print-none">Acciones</th>
 						</tr>
 					</thead>
 					<tbody>
-						@if (ProductoList.Count > 0)
+						@if (ProductoFiltradoList?.Count > 0)
 						{
-							@foreach (var p in ProductoList)
+							@foreach (var p in ProductoFiltradoList)
 							{
 								<tr>
 									<th scope="row">@p.Id</th>
@@ -167,7 +187,7 @@ else
 									<td>@p.Categoria.Nombre</td>
 									<td>@p.PrecioText</td>
 									<td>
-										<div class="btn-group" role="group" aria-label="Basic mixed styles example">
+										<div class="btn-group d-print-none" role="group" aria-label="Basic mixed styles example">
 											<span @onclick="()=>btnEditarClick(p)" class="btn btn-secondary rounded me-2">
 												<i class="bi bi-pencil"></i> Editar
 											</span>
@@ -181,6 +201,12 @@ else
 									</td>
 								</tr>
 							}
+						}
+						else
+						{
+							<tr>
+								<td colspan="6" class="text-center">No se encontraron productos.</td>
+							</tr>
 						}
 					</tbody>
 				</table>
@@ -237,7 +263,7 @@ else
 			var espacio = Encoding.UTF8.GetByteCount($"data:{file.ContentType};base64,");
 
 			var buffer = new byte[file.Size];
-			await file.OpenReadStream().ReadAsync(buffer);
+			await file.OpenReadStream(maxAllowedSize: 1048576).ReadAsync(buffer);
 
 			string img = $"data:{file.ContentType};base64,{Convert.ToBase64String(buffer)}";
 
@@ -379,6 +405,23 @@ else
 		}
 	}
 	#endregion Métodos
+
+	private string searchText { get; set; } = "";
+
+	public List<ProductoDatos>? ProductoFiltradoList
+	{
+		get
+		{
+			if (string.IsNullOrWhiteSpace(searchText))
+				return ProductoList;
+
+			return ProductoList?
+				.Where(p => p.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+							p.Modelo.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+							p.Categoria.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+				.ToList();
+		}
+	}
 
 	private DateTime? fechaLanzamiento { get; set; }
 	private int? cantidad { get; set; } = 1;

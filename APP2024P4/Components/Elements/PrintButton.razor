@@ -1,0 +1,12 @@
+﻿@inject IJSRuntime js;
+<span class="bi bi-printer btn btn-outline-danger"
+      @onclick="btnPrintClick">
+    Imprimir
+</span>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+@code {
+    async Task btnPrintClick()
+    {
+        await js.InvokeVoidAsync("PrintPage");
+    }
+}
