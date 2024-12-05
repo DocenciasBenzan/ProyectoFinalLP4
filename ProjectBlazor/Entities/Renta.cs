@@ -31,7 +31,8 @@ public record class Renta
         totalPagado = this.TotalPagado,
         vehiculoId = this.VehiculoId,
         clienteId = this.ClienteId,
-        diasRentado = this.DiasRentado
+        diasRentado = this.DiasRentado,
+        precio = this.Precio
     };
     public static Renta Create(int rentaId, DateTime? fechaRenta = null, DateTime? fechaEntrega = null, decimal totalPagado = 0, int? vehiculoId = null, int? clienteId = null, int diasRentado = 0, decimal precio = 0)
         => new()

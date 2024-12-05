@@ -42,7 +42,7 @@
 
             <div class="input-group mb-3">
                 <apan class="input-group-text" id="inputGroup-sizing-Default">Estatus</apan>
-                <select disabled="@DisableInputs" @bind="MiVehiculo.Estatus" class="form-select" aria-label="Default select example">
+                <select disabled="@DisableInputs" @bind="MiVehiculo.Estatus"  class="form-select" aria-label="Default select example">
                     <option selected>Seleccione el estado del vehiculo</option>
                     <option value="Disponible">Disponible</option>
                     <option value="Rentado">Rentado</option>
@@ -79,7 +79,7 @@
 
             <div class="input-group mb-3">
                 <span class="input-group-text" id="inputGroup-sizing-Default">Nombre</span>
-                <select @bind="ClienteSeleccionadoId" eventcallback="@btnCotizarClick"id="cliente" class="form-select">
+                <select @bind="ClienteSeleccionadoId" bind-value:event="@btnCotizarClick" id="cliente" class="form-select">
                     <option selected>Seleccione el cliente</option>
                     @if (ClienteList != null)
                     {
@@ -315,152 +315,156 @@ else
 
     public void btnCotizarClick()
     {
-       
+
 
         MiRenta.TotalPagado= TotalPagar = (DiasdeRenta * MiVehiculo.Precio);
         MiRenta.FechaRenta = FechaRenta;
-		MiRenta.FechaEntrega = FechaEntrega;
-		MiRenta.VehiculoId = MiVehiculo.VehiculoId;
-		MiRenta.ClienteId = ClienteSeleccionadoId;
-		MiRenta.DiasRentado = DiasdeRenta;
-		MiRenta.Precio = MiVehiculo.Precio;
-	}
-	public void btnGuardarImprimir()
-	{
+        MiRenta.FechaEntrega = FechaEntrega;
+        MiRenta.VehiculoId = MiVehiculo.VehiculoId;
+        MiRenta.ClienteId = ClienteSeleccionadoId;
+        MiRenta.DiasRentado = DiasdeRenta;
+        MiRenta.Precio = MiVehiculo.Precio;
 
-	}
+        
+    }
+    public void btnActualizarEstado()
+    {
+        MiVehiculo.Estatus = MiVehiculo.Estatus;
+    }
 
-	#region Propiedades del componente Index.Razor
-	public string Accion { get; set; } = "Registrar";
-	public List<VehiculoDto> Vehiculos { get; set; } = new();
-	public VehiculoRequest MiVehiculo { get; set; } = new();
+    #region Propiedades del componente Index.Razor
+    public string Accion { get; set; } = "Registrar";
+    public List<VehiculoDto> Vehiculos { get; set; } = new();
+    public VehiculoRequest MiVehiculo { get; set; } = new();
 
-	public RentaRequest MiRenta { get; set; } = new();
-	public List<RentaDto> Rentas { get; set; } = new();
-	public List<RentaDto> RentaList { get; set; } = new();
+    public RentaRequest MiRenta { get; set; } = new();
+    public List<RentaDto> Rentas { get; set; } = new();
+    public List<RentaDto> RentaList { get; set; } = new();
 
-	public List<ClienteDto>? ClienteList { get; set; }
-	public ClienteRequest MiCliente { get; set; } = new();
-	public List<ClienteDto>? Clientes { get; set; }
+    public List<ClienteDto>? ClienteList { get; set; }
+    public ClienteRequest MiCliente { get; set; } = new();
+    public List<ClienteDto>? Clientes { get; set; }
 
-	public List<VehiculoDto>? VehiculoList { get; set; }
-	bool ShowForm = false, ShowFormRenta = false, DisableInputs = false;
-	#endregion Propiedades del componente Index.Razor
+    public List<VehiculoDto>? VehiculoList { get; set; }
+    bool ShowForm = false, ShowFormRenta = false, DisableInputs = false;
+    #endregion Propiedades del componente Index.Razor
 
-	#region Metodos del ciclo de vida de la aplicacion (para este componente)
-	protected override async Task OnInitializedAsync()
-	{
-		await ConsultarVehiculos();
-		await Consultar();
-		await ConsultarClientes();
-		await ConsultarRentas();
+    #region Metodos del ciclo de vida de la aplicacion (para este componente)
+    protected override async Task OnInitializedAsync()
+    {
+        await ConsultarVehiculos();
+        await Consultar();
+        await ConsultarClientes();
+        await ConsultarRentas();
 
-	}
-	#endregion Metodos del ciclo de vida de la aplicacion (para este componente)
+    }
+    #endregion Metodos del ciclo de vida de la aplicacion (para este componente)
 
-	#region Eventos
-	public void btnAgregarClick()
-	{
-		Accion = Constants.Acciones.Registrar;
-		ShowForm = true;
-		StateHasChanged();
-		DisableInputs = false;
-	}
-	public void btnEditarClick(VehiculoDto dto)
-	{
-		Accion = Constants.Acciones.Modificar;
-		ShowForm = true;
-		DisableInputs = false;
-		MiVehiculo = dto.ToRequest();
-	}
-	public void btnEliminarClick(VehiculoDto dto)
-	{
-		Accion = Constants.Acciones.Eliminar;
-		ShowForm = true;
-		DisableInputs = true;
-		MiVehiculo = dto.ToRequest();
-	}
-	public void btnVerClick(VehiculoDto dto)
-	{
-		Accion = Constants.Acciones.Ver;
-		ShowForm = true;
-		DisableInputs = true;
-		MiVehiculo = dto.ToRequest();
-	}
-	public void btnRentarClick(VehiculoDto dto)
-	{
-		Accion = Constants.Acciones.Rentar;
-		ShowFormRenta = true;
+    #region Eventos
+    public void btnAgregarClick()
+    {
+        Accion = Constants.Acciones.Registrar;
+        ShowForm = true;
+        StateHasChanged();
+        DisableInputs = false;
+    }
+    public void btnEditarClick(VehiculoDto dto)
+    {
+        Accion = Constants.Acciones.Modificar;
+        ShowForm = true;
+        DisableInputs = false;
+        MiVehiculo = dto.ToRequest();
+    }
+    public void btnEliminarClick(VehiculoDto dto)
+    {
+        Accion = Constants.Acciones.Eliminar;
+        ShowForm = true;
+        DisableInputs = true;
+        MiVehiculo = dto.ToRequest();
+    }
+    public void btnVerClick(VehiculoDto dto)
+    {
+        Accion = Constants.Acciones.Ver;
+        ShowForm = true;
+        DisableInputs = true;
+        MiVehiculo = dto.ToRequest();
+    }
+    public void btnRentarClick(VehiculoDto dto)
+    {
+        Accion = Constants.Acciones.Rentar;
+        ShowFormRenta = true;
 
-		DisableInputs = true;
-		MiVehiculo = dto.ToRequest();
-	}
-	public void btnCancelarClick()
-	{
-		Limpiar();
-	}
-	#endregion Eventos
+        DisableInputs = true;
+        MiVehiculo = dto.ToRequest();
+    }
+    public void btnCancelarClick()
+    {
+        Limpiar();
+    }
+    #endregion Eventos
 
-	#region Métodos
-	async Task ConsultarVehiculos()
-	{
-		var result = await VehiculoService.Get();
-		if (result.Succesd)
-		{
-			Vehiculos =
-			result.Data?.ToList()
-			??
-			new List<VehiculoDto>();
-		}
-	}
-	async Task Consultar()
-	{
-		var result = await VehiculoService.Get();
-		if (result.Succesd)
-		{
-			VehiculoList =
-			result.Data?.ToList()
-			??
-			new List<VehiculoDto>();
-		}
-	}
-	async Task ConsultarRentas()
-	{
-		var result = await RentaService.GetAll();
-		if (result.Succesd)
-		{
-			RentaList =
-			result.Data?.ToList()
-			??
-			new List<RentaDto>();
-		}
-	}
-	
-	
-	public void Limpiar()
-	{
-		ShowForm = false;
-		ShowFormRenta = false;
-		MiVehiculo = new();
-		MiCliente = new();
-		ClienteSeleccionadoId = new();
-	}
-	public async Task Aceptar()
-	{
-		Result r =
-		Accion == Constants.Acciones.Registrar ? await VehiculoService.Create(MiVehiculo) :
-		Accion == Constants.Acciones.Modificar ? await VehiculoService.Update(MiVehiculo) :
-		Accion == Constants.Acciones.Eliminar ? await VehiculoService.Delete(MiVehiculo.VehiculoId) :
-		Accion == Constants.Acciones.Rentar ? await RentaService.Create(MiRenta) :	
-		Accion == Constants.Acciones.Ver ? Result.Success("") :
-		Result.Failure("Accion no soportada");
-		if (r.Succesd)
-		{
-			await Consultar();
-			await ConsultarRentas();
-			Limpiar();
-		}
-	}
+    #region Métodos
+    async Task ConsultarVehiculos()
+    {
+        var result = await VehiculoService.Get();
+        if (result.Succesd)
+        {
+            Vehiculos =
+            result.Data?.ToList()
+            ??
+            new List<VehiculoDto>();
+        }
+    }
+    async Task Consultar()
+    {
+        var result = await VehiculoService.Get();
+        if (result.Succesd)
+        {
+            VehiculoList =
+            result.Data?.ToList()
+            ??
+            new List<VehiculoDto>();
+        }
+    }
+    async Task ConsultarRentas()
+    {
+        var result = await RentaService.GetAll();
+        if (result.Succesd)
+        {
+            RentaList =
+            result.Data?.ToList()
+            ??
+            new List<RentaDto>();
+        }
+    }
+
+
+    public void Limpiar()
+    {
+        ShowForm = false;
+        ShowFormRenta = false;
+        MiVehiculo = new();
+        MiCliente = new();
+        ClienteSeleccionadoId = new();
+    }
+    public async Task Aceptar()
+    {
+        Result r =
+        Accion == Constants.Acciones.Registrar ? await VehiculoService.Create(MiVehiculo) :
+        Accion == Constants.Acciones.Modificar ? await VehiculoService.Update(MiVehiculo) :
+        Accion == Constants.Acciones.Eliminar ? await VehiculoService.Delete(MiVehiculo.VehiculoId) :
+        Accion == Constants.Acciones.Rentar ? await RentaService.Create(MiRenta) :	
+        Accion == Constants.Acciones.Ver ? Result.Success("") :
+        Result.Failure("Accion no soportada");
+        if (r.Succesd)
+        {
+            await Consultar();
+            await ConsultarRentas();
+            Limpiar();
+            StateHasChanged();
+        }
+        
+    }
 	#endregion Métodos
 }
 
