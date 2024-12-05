@@ -2,164 +2,170 @@
 @inject IClienteService ClienteService
 @rendermode InteractiveServer
 
-<h3>Gestión de Clientes</h3>
+<h3 class="text-center my-4">Gestión de Clientes</h3>
 
 @if (MostrarForm)
 {
-	<!-- Formulario para Agregar/Actualizar Cliente -->
-	<div class="card mb-4">
-		<div class="card-header">
-			<h5 class="card-title">@((cliente.Id == 0) ? "Agregar Cliente" : "Actualizar Cliente")</h5>
-		</div>
-		<div class="card-body">
-			<EditForm Model="@cliente" OnValidSubmit="GuardarCliente" FormName="FormularioClientes">
-				<DataAnnotationsValidator />
-				<ValidationSummary />
+    <!-- Formulario para Agregar/Actualizar Cliente -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5>@((cliente.Id == 0) ? "Agregar Cliente" : "Actualizar Cliente")</h5>
+        </div>
+        <div class="card-body">
+            <EditForm Model="@cliente" OnValidSubmit="GuardarCliente" FormName="FormularioClientes">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
-				<div class="mb-3">
-					<label for="nombre" class="form-label">Nombre</label>
-					<InputText id="nombre" class="form-control" @bind-Value="cliente.Nombre" />
-				</div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <InputText id="nombre" class="form-control" @bind-Value="cliente.Nombre" placeholder="Ejemplo: Juan" />
+                    </div>
 
-				<div class="mb-3">
-					<label for="telefono" class="form-label">Teléfono</label>
-					<InputText id="telefono" class="form-control" @bind-Value="cliente.Telefono" />
-				</div>
+                    <div class="col-md-6 mb-3">
+                        <label for="telefono" class="form-label">Teléfono</label>
+                        <InputText id="telefono" class="form-control" @bind-Value="cliente.Telefono" placeholder="Ejemplo: 123-456-7890" />
+                    </div>
 
-				<div class="mb-3">
-					<label for="correoElectronico" class="form-label">Correo Electrónico</label>
-					<InputText id="correoElectronico" class="form-control" @bind-Value="cliente.CorreoElectronico" />
-				</div>
+                    <div class="col-md-6 mb-3">
+                        <label for="correoElectronico" class="form-label">Correo Electrónico</label>
+                        <InputText id="correoElectronico" class="form-control" @bind-Value="cliente.CorreoElectronico" placeholder="Ejemplo: JuanPerez54@gmail.com" />
+                    </div>
 
-				<div class="mb-3">
-					<label for="direccion" class="form-label">Dirección</label>
-					<InputText id="direccion" class="form-control" @bind-Value="cliente.Direcion" />
-				</div>
+                    <div class="col-md-6 mb-3">
+                        <label for="direccion" class="form-label">Dirección</label>
+                        <InputText id="direccion" class="form-control" @bind-Value="cliente.Direcion" placeholder="Ejemplo: Calle 123" />
+                    </div>
+                </div>
 
-				<button type="submit" class="btn btn-primary">@((cliente.Id == 0) ? "Agregar Cliente" : "Actualizar Cliente")</button>
-			</EditForm>
-		</div>
-	</div>
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary col-5">
+                        @((cliente.Id == 0) ? "Agregar Cliente" : "Actualizar Cliente")
+                    </button>
+                    <button type="button" class="btn btn-danger col-5" @onclick="Limpiar">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
 }
 else
 {
-	<div class="mb-4">
-		<span class="btn btn-outline-primary" @onclick="btnAgregarCliente">
-			<i class="bi bi-file-plus"></i> Agregar Cliente
-		</span>
-	</div>
+    <div class="mb-4">
+        <span class="btn btn-outline-primary" @onclick="btnAgregarCliente">
+            <i class="bi bi-file-plus"></i> Agregar Cliente
+        </span>
+    </div>
 
-	@if (clientes.Any())
-	{
-		<!-- Tabla de Clientes -->
-		<div class="card">
-			<div class="card-header">
-				<h5 class="card-title">Lista de Clientes</h5>
-			</div>
-			<div class="card-body">
-				<table class="table table-bordered">
-					<thead>
-						<tr>
-							<th>Nombre</th>
-							<th>Teléfono</th>
-							<th>Correo Electrónico</th>
-							<th>Dirección</th>
-							<th>Acciones</th>
-						</tr>
-					</thead>
-					<tbody>
-						@foreach (var item in clientes)
-						{
-							<tr>
-								<td>@item.Nombre</td>
-								<td>@item.Telefono</td>
-								<td>@item.CorreoElectronico</td>
-								<td>@item.Direcion</td>
-								<td>
-									<button class="btn btn-warning btn-sm" @onclick="() => EditarCliente(item)">Editar</button>
-									<button class="btn btn-danger btn-sm" @onclick="() => EliminarCliente(item.Id)">Eliminar</button>
-								</td>
-							</tr>
-						}
-					</tbody>
-				</table>
-			</div>
-		</div>
-	}
-	else
-	{
-		<p>Sin clientes registrados</p>
-	}
+    @if (clientes.Any())
+    {
+        <!-- Tabla de Clientes -->
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Correo Electrónico</th>
+                        <th>Dirección</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in clientes)
+                    {
+                        <tr>
+                            <td>@item.Nombre</td>
+                            <td>@item.Telefono</td>
+                            <td>@item.CorreoElectronico</td>
+                            <td>@item.Direcion</td>
+                            <td>
+                                <button class="btn btn-outline-primary btn-sm" @onclick="() => EditarCliente(item)">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" @onclick="() => EliminarCliente(item.Id)">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-center">Sin clientes registrados</p>
+    }
 }
 
 @code {
-	private ClienteRequest cliente = new();
-	private List<ClienteResponse> clientes = new List<ClienteResponse>();
+    private ClienteRequest cliente = new();
+    private List<ClienteResponse> clientes = new List<ClienteResponse>();
 
-	public bool MostrarForm { get; set; }
+    public bool MostrarForm { get; set; }
 
-	protected override async Task OnInitializedAsync()
-	{
-		await CargarClientes();
-	}
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarClientes();
+    }
 
-	private async Task CargarClientes()
-	{
-		var result = await ClienteService.ObtenerClientes();
-		if (result.Succeeded)
-		{
-			clientes = result?.Data?.ToList() ?? new();
-			StateHasChanged();
+    private async Task CargarClientes()
+    {
+        var result = await ClienteService.ObtenerClientes();
+        if (result.Succeeded)
+        {
+            clientes = result?.Data?.ToList() ?? new();
+            StateHasChanged();
+        }
+    }
 
-		}
-	}
+    private async Task GuardarCliente()
+    {
+        Result result;
+        if (cliente.Id == 0) // Agregar
+        {
+            result = await ClienteService.AgregarCliente(cliente);
+        }
+        else // Actualizar
+        {
+            result = await ClienteService.ActualizarCliente(cliente);
+        }
 
-	private async Task GuardarCliente()
-	{
-		Result result;
-		if (cliente.Id == 0) // Agregar
-		{
-			result = await ClienteService.AgregarCliente(cliente);
-		}
-		else // Actualizar
-		{
-			result = await ClienteService.ActualizarCliente(cliente);
-		}
+        if (result.Succeeded)
+        {
+            Limpiar();
+            await CargarClientes();
+        }
+    }
 
-		if (result.Succeeded)
-		{
-			Limpiar();
-			await CargarClientes();
-		}
-	}
+    private async Task btnAgregarCliente()
+    {
+        cliente = new();
+        MostrarForm = true;
+        StateHasChanged();
+    }
 
-	private async Task btnAgregarCliente()
-	{
-		cliente = new();
-		MostrarForm = true;
-		StateHasChanged();
+    private async Task EditarCliente(ClienteResponse client)
+    {
+        cliente = client.ToRequest();
+        MostrarForm = true;
+    }
 
-	}
+    private async Task EliminarCliente(int id)
+    {
+        var result = await ClienteService.EliminarCliente(id);
+        if (result.Succeeded)
+        {
+            await CargarClientes();
+        }
+    }
 
-	private async Task EditarCliente(ClienteResponse client)
-	{
-		cliente = client.ToRequest();
-		MostrarForm = true;
-	}
-
-	private async Task EliminarCliente(int id)
-	{
-		var result = await ClienteService.EliminarCliente(id);
-		if (result.Succeeded)
-		{
-			await CargarClientes();
-		}
-	}
-
-	private void Limpiar()
-	{
-		MostrarForm = false;
-		cliente = new();
-		StateHasChanged();
-	}
+    private void Limpiar()
+    {
+        MostrarForm = false;
+        cliente = new();
+        StateHasChanged();
+    }
 }

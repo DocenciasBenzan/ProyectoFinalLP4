@@ -17,6 +17,7 @@ public class EmpleadoResponse
 	public DateTime InicioTrabajo { get; set; }
 	public DateTime FinTrabajo { get; set; }
 	public bool Activo { get; set; }
+
 }
 public class ServicioResponse
 {
@@ -56,6 +57,7 @@ public class ClienteResponse
 	public string Telefono { get; set; } = null!;
 	public string? CorreoElectronico { get; set; }
 	public string? Direcion { get; set; }
+
 
 	public ClienteRequest ToRequest()
 	{
