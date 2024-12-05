@@ -15,6 +15,8 @@ public record class Renta
     public DateTime? FechaEntrega { get; set; }
     [Column(TypeName = "decimal(18,6)")]
     public decimal TotalPagado { get; set; } = 0;
+    public int DiasRentado { get; set; } = 0;
+    public decimal Precio { get; set; } = 0;
     public int? VehiculoId { get; set; }
     public int? ClienteId { get; set; }
 
@@ -28,9 +30,10 @@ public record class Renta
         fechaEntrega = this.FechaEntrega,
         totalPagado = this.TotalPagado,
         vehiculoId = this.VehiculoId,
-        clienteId = this.ClienteId
+        clienteId = this.ClienteId,
+        diasRentado = this.DiasRentado
     };
-    public static Renta Create(int rentaId, DateTime? fechaRenta = null, DateTime? fechaEntrega = null, decimal totalPagado = 0, int? vehiculoId = null, int? clienteId = null)
+    public static Renta Create(int rentaId, DateTime? fechaRenta = null, DateTime? fechaEntrega = null, decimal totalPagado = 0, int? vehiculoId = null, int? clienteId = null, int diasRentado = 0, decimal precio = 0)
         => new()
         {
             RentaId = rentaId,
@@ -38,7 +41,9 @@ public record class Renta
             FechaEntrega = fechaEntrega,
             TotalPagado = totalPagado,
             VehiculoId = vehiculoId,
-            ClienteId = clienteId
+            ClienteId = clienteId,
+            DiasRentado = diasRentado,
+            Precio = precio
 
         };
 

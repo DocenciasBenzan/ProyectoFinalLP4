@@ -93,11 +93,23 @@ namespace ProjectBlazor.Services
                 return ResultList<ClienteDto>.Failure($"☠️ Error: {Ex.Message}");
             }
         }
-        
 
-        public Task<Result> Delete(int ClienteId)
+
+        public async Task<Result> Delete(int ClienteId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var entity = dbContext.Clientes.Where(v => v.ClienteId == ClienteId).FirstOrDefault();
+                if (entity == null)
+                    return Result.Failure($"Cliente '{ClienteId}' no existe!");
+                dbContext.Clientes.Remove(entity);
+                await dbContext.SaveChangesAsync();
+                return Result.Success("✅Cliente eliminado con exito!");
+            }
+            catch (Exception Ex)
+            {
+                return Result.Failure($"☠️ Error: {Ex.Message}");
+            }
         }
     }
 }

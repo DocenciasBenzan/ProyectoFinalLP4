@@ -11,176 +11,176 @@
 @*Formulario de registrar vehiculo*@
 @if (ShowForm == true)
 {
-	@* Formularion de accion*@
-	<div class="card">
-		<h5 class="card-header">@Accion Vehiculo</h5>
-		<div class="card-body">
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Marca</span>
-				<input @bind-value="MiVehiculo.Marca" type="text" class="form-control" id="marca" disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Modelo</span>
-				<input @bind-value="MiVehiculo.Modelo" type="text" class="form-control" id="modelo" disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Matricula</span>
-				<input @bind-value="MiVehiculo.Matricula" type="text" class="form-control" id="matricula" disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Placa</span>
-				<input @bind-value="MiVehiculo.NumeroPlaca" type="text" class="form-control" id="placa" disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Tipo</span>
-				<input @bind-value="MiVehiculo.Tipo" type="text" class="form-control" id="tipo" disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Año</span>
-				<input @bind-value="MiVehiculo.Year" type="text" class="form-control" id="tipo" disabled="@DisableInputs">
-			</div>
+    @* Formularion de accion*@
+    <div class="card">
+        <h5 class="card-header">@Accion Vehiculo</h5>
+        <div class="card-body">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Marca</span>
+                <input @bind-value="MiVehiculo.Marca" type="text" class="form-control" id="marca" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Modelo</span>
+                <input @bind-value="MiVehiculo.Modelo" type="text" class="form-control" id="modelo" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Matricula</span>
+                <input @bind-value="MiVehiculo.Matricula" type="text" class="form-control" id="matricula" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Placa</span>
+                <input @bind-value="MiVehiculo.NumeroPlaca" type="text" class="form-control" id="placa" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Tipo</span>
+                <input @bind-value="MiVehiculo.Tipo" type="text" class="form-control" id="tipo" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Año</span>
+                <input @bind-value="MiVehiculo.Year" type="text" class="form-control" id="tipo" disabled="@DisableInputs">
+            </div>
 
-			<div class="input-group mb-3">
-				<apan class="input-group-text" id="inputGroup-sizing-Default">Estatus</apan>
-				<select disabled="@DisableInputs" @bind="MiVehiculo.Estatus" class="form-select" aria-label="Default select example">
-					<option selected>Seleccione el estado del vehiculo</option>
-					<option value="Disponible">Disponible</option>
-					<option value="Rentado">Rentado</option>
-					<option value="Mantenimiento">Mantenimiento</option>
-				</select>
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Precio (RD$)</span>
-				<input @bind-value="MiVehiculo.Precio" type="text" class="form-control" id="precio" disabled="@DisableInputs"></input>
-			</div>
+            <div class="input-group mb-3">
+                <apan class="input-group-text" id="inputGroup-sizing-Default">Estatus</apan>
+                <select disabled="@DisableInputs" @bind="MiVehiculo.Estatus" class="form-select" aria-label="Default select example">
+                    <option selected>Seleccione el estado del vehiculo</option>
+                    <option value="Disponible">Disponible</option>
+                    <option value="Rentado">Rentado</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Precio (RD$)</span>
+                <input @bind-value="MiVehiculo.Precio" type="text" class="form-control" id="precio" disabled="@DisableInputs"></input>
+            </div>
 
-			@if (Accion != Constants.Acciones.Ver)
-			{
-				<span class="btn btn-primary" @onclick="Aceptar">Aceptar</span>
-			}
-			<span class="btn btn-danger" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
-		</div>
-	</div>
-	
-		
-		
+            @if (Accion != Constants.Acciones.Ver)
+            {
+                <span class="btn btn-primary" @onclick="Aceptar">Aceptar</span>
+            }
+            <span class="btn btn-danger" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
+        </div>
+    </div>
+
+
+
 
 
 }
 @*Formulario para renta*@
 @if (ShowFormRenta == true)
 {
-	<h5>@Accion Vehiculo</h5>
-	<div class="form-control">
+    <h5>@Accion Vehiculo</h5>
+    <div class="form-control">
 
-		<div class="form-control mb-3">
+        <div class="form-control mb-3">
 
-			<h5>Datos del Cliente</h5>
+            <h5>Datos del Cliente</h5>
 
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Nombre</span>
-				<select @bind="ClienteSeleccionadoId" id="cliente" class="form-select">
-					<option selected>Seleccione el cliente</option>
-					@if (ClienteList != null)
-					{
-						@foreach (var MiCliente in ClienteList)
-						{
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Nombre</span>
+                <select @bind="ClienteSeleccionadoId" eventcallback="@btnCotizarClick"id="cliente" class="form-select">
+                    <option selected>Seleccione el cliente</option>
+                    @if (ClienteList != null)
+                    {
+                        @foreach (var MiCliente in ClienteList)
+                        {
 
-							<option value="@MiCliente.ClienteId">@MiCliente.Nombre</option>
+                            <option value="@MiCliente.ClienteId">@MiCliente.Nombre</option>
 
-						}
-					}
-				</select>
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Apellido</span>
-				<input value="@ClienteSeleccionado?.Apellido" readonly type="text" class="form-control" id="modelo" disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Telefono</span>
-				<input value="@ClienteSeleccionado?.NumeroTelefonico" readonly type="text" class="form-control" id="matricula" disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Cedula</span>
-				<input value="@ClienteSeleccionado?.Cedula" readonly type="text" class="form-control" id="placa" disabled="@DisableInputs">
-			</div>
-			<div class="input-group mb-3">
-				<span class="input-group-text" id="inputGroup-sizing-Default">Direccion</span>
-				<input value="@ClienteSeleccionado?.Direccion" readonly type="text" class="form-control" id="tipo" disabled="@DisableInputs">
-			</div>
-
-
-
-		</div>
-
-
-		<div class="form-control mb-3">
-			<h5>Datos del Vehiculo</h5>
-			<table class="table table-bordered">
-				<thead class="table-warning ">
-					<tr>
-						<th>ID</th>
-						<th>Marca</th>
-						<th>Modelo</th>
-						<th>Matricula</th>
-						<th>Placa</th>
-						<th>Tipo</th>
-						<th>Año</th>
-						<th>Precio</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>@MiVehiculo.VehiculoId</td>
-						<td>@MiVehiculo.Marca</td>
-						<td>@MiVehiculo.Modelo</td>
-						<td>@MiVehiculo.Matricula</td>
-						<td>@MiVehiculo.NumeroPlaca</td>
-						<td>@MiVehiculo.Tipo</td>
-						<td>@MiVehiculo.Year</td>
-						<td>@MiVehiculo.Precio</td>
-					</tr>
-				</tbody>
-			</table>
-
-		</div>
-		<div class="form-control mb-3">
-			
-			<div class="container-fluid mb-3">
-				<h5>Datos de Renta</h5>
-				<div class="card d-inline-flex">
-					<label class="form-control">Fecha de Renta</label>
-					<input type="date" @bind="FechaRenta">
-					<input type="time" @bind="HoraRenta">
-				</div>
-				<div class="card d-inline-flex">
-					<label class="form-control">Fecha de Entrega</label>
-					<input type="date" @bind="FechaEntrega">
-					<input type="time" @bind="HoraEntrega">
-				</div>
-				<div class="form-control d-inline-flex">
-					<h3 class="fw-bold text-md-center">Facturacion</h3>
-					<div class="card-body">
-						<h5>Dias seleccionados: @DiasdeRenta</h5>
-						<h5>Precio x Dia: @MiVehiculo.Precio</h5>
-						<h5>Total a pagar @TotalPagar</h5>
-						<span class="btn btn-primary mt-3 align-content-start d-print-none" @onclick="btnCotizarClick">Cotizar</span>
-					</div>
-
-
-					<div class="card d-inline-flex">
-						<PrintButton></PrintButton>
-						<span class="btn btn-danger mt-3 align-content-lg-end d-print-none" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
-						<span class="btn btn-primary mt-3 align-content-lg-end d-print-none" @onclick="Aceptar">Aceptar e Imprimir</span>
-					</div>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Apellido</span>
+                <input value="@ClienteSeleccionado?.Apellido" bind-value:event="@btnCotizarClick" readonly type="text" class="form-control" id="modelo" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Telefono</span>
+                <input value="@ClienteSeleccionado?.NumeroTelefonico" bind-value:event="@btnCotizarClick" readonly type="text" class="form-control" id="matricula" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Cedula</span>
+                <input value="@ClienteSeleccionado?.Cedula" bind-value:event="@btnCotizarClick" readonly type="text" class="form-control" id="placa" disabled="@DisableInputs">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-Default">Direccion</span>
+                <input value="@ClienteSeleccionado?.Direccion" bind-value:event="@btnCotizarClick" readonly type="text" class="form-control" id="tipo" disabled="@DisableInputs">
+            </div>
 
 
 
-				</div>
-			</div>
-		</div>
-		
-	</div>
+        </div>
+
+
+        <div class="form-control mb-3">
+            <h5>Datos del Vehiculo</h5>
+            <table class="table table-bordered">
+                <thead class="table-warning ">
+                    <tr>
+                        <th>ID</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Matricula</th>
+                        <th>Placa</th>
+                        <th>Tipo</th>
+                        <th>Año</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td bind-value:event="@btnCotizarClick">@MiVehiculo.VehiculoId</td>
+                        <td>@MiVehiculo.Marca</td>
+                        <td>@MiVehiculo.Modelo</td>
+                        <td>@MiVehiculo.Matricula</td>
+                        <td>@MiVehiculo.NumeroPlaca</td>
+                        <td>@MiVehiculo.Tipo</td>
+                        <td>@MiVehiculo.Year</td>
+                        <td>@MiVehiculo.Precio</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <div class="form-control mb-3">
+
+            <div class="container-fluid mb-3">
+                <h5>Datos de Renta</h5>
+                <div class="card d-inline-flex">
+                    <label class="form-control">Fecha de Renta</label>
+                    <input type="date" bind-value:event="@btnCotizarClick" @bind="FechaRenta">
+                    <input type="time" bind-value:event="@btnCotizarClick" @bind="HoraRenta">
+                </div>
+                <div class="card d-inline-flex">
+                    <label class="form-control">Fecha de Entrega</label>
+                    <input type="date" bind-value:event="@btnCotizarClick" @bind="FechaEntrega">
+                    <input type="time" @bind="HoraEntrega">
+                </div>
+                <div class="form-control d-inline-flex">
+                    <h3 class="fw-bold text-md-center">Facturacion</h3>
+                    <div class="card-body">
+                        <h5 bind-value:event="@btnCotizarClick">Dias seleccionados: @DiasdeRenta</h5>
+                        <h5 bind-value:event ="@btnCotizarClick">Precio x Dia: @MiVehiculo.Precio</h5>
+                        <h5 bind-value:event="@btnCotizarClick">Total a pagar @TotalPagar</h5>
+                        <span class="btn btn-primary mt-3 align-content-start d-print-none" @onclick="btnCotizarClick">Cotizar</span>
+                    </div>
+
+
+                    <div class="card d-inline-flex">
+                        <PrintButton></PrintButton>
+                        <span class="btn btn-danger mt-3 align-content-lg-end d-print-none" @onclick="btnCancelarClick">@(Accion != Constants.Acciones.Ver ? "Cancelar" : "Salir")</span>
+                        <span class="btn btn-primary mt-3 align-content-lg-end d-print-none" @onclick="Aceptar">Aceptar e Imprimir</span>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
 
 
 
@@ -188,101 +188,101 @@
 else
 {
 
-	@if (VehiculoList != null && ShowForm == false)
-	{
+    @if (VehiculoList != null && ShowForm == false)
+    {
 
 
-		@if (VehiculoList.Count > 0)
-		{
+        @if (VehiculoList.Count > 0)
+        {
 
 
-			<div class="container flex-column ">
-				<span class="btn btn-primary align-content-end mb-3" @onclick="btnAgregarClick">+</span>
-				@foreach (var v in VehiculoList)
-				{
+            <div class="container flex-column ">
+                <span class="btn btn-primary align-content-end mb-3" @onclick="btnAgregarClick">+</span>
+                @foreach (var v in VehiculoList)
+                {
 
-					@*Tarjeta de vehiculo*@
-					@if (v.Estatus == "Disponible")
-					{
-						<div class="card m-3 text-black border border-primary mb-3 d-inline-flex" style="width: 18rem;">
-							<div class="card-header bg-primary">
-								<h5 class="card-title textcol-m-6 m-3">@v.Marca @v.Modelo</h5>
-							</div>
-							<div class="card- body m-3">
-								<p class="card-text">@v.NumeroPlaca</p>
-								<p class="card-text">@v.Year</p>
-								<p class="card-text">@v.Estatus</p>
-								<div class="btn-group" role="group" aria-label="Basic mixed styles example">
-									<span @onclick="()=>btnEditarClick(v)" class="btn btn-outline-warning">Editar</span>
-									<span @onclick="()=>btnEliminarClick(v)" class="btn btn-outline-danger">Eliminar</span>
-									<span @onclick="()=>btnVerClick(v)" class="btn btn-outline-primary">Ver</span>
-								</div>
-								<span @onclick="()=>btnRentarClick(v)" class="btn btn-primary">Rentar</span>
+                    @*Tarjeta de vehiculo*@
+                    @if (v.Estatus == "Disponible")
+                    {
+                        <div class="card m-3 text-black border border-primary mb-3 d-inline-flex" style="width: 18rem;">
+                            <div class="card-header bg-primary">
+                                <h5 class="card-title textcol-m-6 m-3">@v.Marca @v.Modelo</h5>
+                            </div>
+                            <div class="card- body m-3">
+                                <p class="card-text">@v.NumeroPlaca</p>
+                                <p class="card-text">@v.Year</p>
+                                <p class="card-text">@v.Estatus</p>
+                                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                    <span @onclick="()=>btnEditarClick(v)" class="btn btn-outline-warning">Editar</span>
+                                    <span @onclick="()=>btnEliminarClick(v)" class="btn btn-outline-danger">Eliminar</span>
+                                    <span @onclick="()=>btnVerClick(v)" class="btn btn-outline-primary">Ver</span>
+                                </div>
+                                <span @onclick="()=>btnRentarClick(v)" class="btn btn-primary">Rentar</span>
 
-							</div>
-						</div>
+                            </div>
+                        </div>
 
-					}
-					@if (v.Estatus == "Rentado")
-					{
-						@*Tarjeta de vehiculo*@
+                    }
+                    @if (v.Estatus == "Rentado")
+                    {
+                        @*Tarjeta de vehiculo*@
 
-						<div class="card m-3 text-black border border-warning mb-3 d-inline-flex" style="width: 18rem;">
-							<div class="card-header bg-warning">
-								<h5 class="card-title textcol-m-6 m-3">@v.Marca @v.Modelo</h5>
-							</div>
-							<div class="card- body m-3">
-								<p class="card-text">@v.NumeroPlaca</p>
-								<p class="card-text">@v.Year</p>
-								<p class="card-text">@v.Estatus</p>
-								<div class="btn-group" role="group" aria-label="Basic mixed styles example">
-									<span @onclick="()=>btnEditarClick(v)" class="btn btn-outline-warning">Editar</span>
-									<span @onclick="()=>btnEliminarClick(v)" class="btn btn-outline-danger">Eliminar</span>
-									<span @onclick="()=>btnVerClick(v)" class="btn btn-outline-primary">Ver</span>
-								</div>
-								<span @onclick="()=>btnRentarClick(v)" class="btn btn-primary">Rentar</span>
+                        <div class="card m-3 text-black border border-warning mb-3 d-inline-flex" style="width: 18rem;">
+                            <div class="card-header bg-warning">
+                                <h5 class="card-title textcol-m-6 m-3">@v.Marca @v.Modelo</h5>
+                            </div>
+                            <div class="card- body m-3">
+                                <p class="card-text">@v.NumeroPlaca</p>
+                                <p class="card-text">@v.Year</p>
+                                <p class="card-text">@v.Estatus</p>
+                                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                    <span @onclick="()=>btnEditarClick(v)" class="btn btn-outline-warning">Editar</span>
+                                    <span @onclick="()=>btnEliminarClick(v)" class="btn btn-outline-danger">Eliminar</span>
+                                    <span @onclick="()=>btnVerClick(v)" class="btn btn-outline-primary">Ver</span>
+                                </div>
+                                <span @onclick="()=>btnRentarClick(v)" class="btn btn-primary">Rentar</span>
 
-							</div>
-						</div>
-					}
-					@if (v.Estatus == "Mantenimiento")
-					{
-						@*Tarjeta de vehiculo*@
+                            </div>
+                        </div>
+                    }
+                    @if (v.Estatus == "Mantenimiento")
+                    {
+                        @*Tarjeta de vehiculo*@
 
-						<div class="card m-3 text-black border border-danger mb-3 d-inline-flex" style="width: 18rem;">
-							<div class="card-header bg-danger">
-								<h5 class="card-title textcol-m-6 m-3">@v.Marca @v.Modelo</h5>
-							</div>
-							<div class="card- body m-3">
-								<p class="card-text">@v.NumeroPlaca</p>
-								<p class="card-text">@v.Year</p>
-								<p class="card-text">@v.Estatus</p>
-								<div class="btn-group" role="group" aria-label="Basic mixed styles example">
-									<span @onclick="()=>btnEditarClick(v)" class="btn btn-outline-warning">Editar</span>
-									<span @onclick="()=>btnEliminarClick(v)" class="btn btn-outline-danger">Eliminar</span>
-									<span @onclick="()=>btnVerClick(v)" class="btn btn-outline-primary">Ver</span>
-								</div>
-								<span @onclick="()=>btnRentarClick(v)" class="btn btn-primary">Rentar</span>
+                        <div class="card m-3 text-black border border-danger mb-3 d-inline-flex" style="width: 18rem;">
+                            <div class="card-header bg-danger">
+                                <h5 class="card-title textcol-m-6 m-3">@v.Marca @v.Modelo</h5>
+                            </div>
+                            <div class="card- body m-3">
+                                <p class="card-text">@v.NumeroPlaca</p>
+                                <p class="card-text">@v.Year</p>
+                                <p class="card-text">@v.Estatus</p>
+                                <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+                                    <span @onclick="()=>btnEditarClick(v)" class="btn btn-outline-warning">Editar</span>
+                                    <span @onclick="()=>btnEliminarClick(v)" class="btn btn-outline-danger">Eliminar</span>
+                                    <span @onclick="()=>btnVerClick(v)" class="btn btn-outline-primary">Ver</span>
+                                </div>
+                                <span @onclick="()=>btnRentarClick(v)" class="btn btn-primary">Rentar</span>
 
-							</div>
-						</div>
-					}
+                            </div>
+                        </div>
+                    }
 
 
-				}
-			</div>
-		}
-		else
-		{
-			<div class="mb-3 mt-3 align-content-center text-center">
-				<label class="align-text-top">No hay vehiculos registrados</label>
-			</div>
-			<div class="mb-3 mt-3 align-content-center text-center">
-				<span class="btn btn-primary align-content-end mt-3 mb-3" @onclick="btnAgregarClick">+</span>
-			</div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="mb-3 mt-3 align-content-center text-center">
+                <label class="align-text-top">No hay vehiculos registrados</label>
+            </div>
+            <div class="mb-3 mt-3 align-content-center text-center">
+                <span class="btn btn-primary align-content-end mt-3 mb-3" @onclick="btnAgregarClick">+</span>
+            </div>
 
-		}
-	}
+        }
+    }
 }
 
 
@@ -290,32 +290,40 @@ else
 
 
 
-	private int ClienteSeleccionadoId;
-	private ClienteDto? ClienteSeleccionado => ClienteList?.FirstOrDefault(p => p.ClienteId == ClienteSeleccionadoId);
-	async Task ConsultarClientes()
-	{
-		var result = await ClienteService.Get();
-		if (result.Succesd)
-		{
-			ClienteList = result.Data?.ToList() ?? new List<ClienteDto>();
-		}
-	}
+    private int ClienteSeleccionadoId;
+    private ClienteDto? ClienteSeleccionado => ClienteList?.FirstOrDefault(p => p.ClienteId == ClienteSeleccionadoId);
+    async Task ConsultarClientes()
+    {
+        var result = await ClienteService.Get();
+        if (result.Succesd)
+        {
+            ClienteList = result.Data?.ToList() ?? new List<ClienteDto>();
+        }
+    }
 
 
 
-	public int Contador { get; set; } = 0;
+    public int Contador { get; set; } = 0;
 
-	public DateTime FechaRenta { get; set; } = DateTime.Today;
-	public DateTime FechaEntrega { get; set; } = DateTime.Today;
-	public DateTime HoraRenta { get; set; } = DateTime.Now;
-	public DateTime HoraEntrega { get; set; } = DateTime.Now;
+    public DateTime FechaRenta { get; set; } = DateTime.Today;
+    public DateTime FechaEntrega { get; set; } = DateTime.Today;
+    public DateTime HoraRenta { get; set; } = DateTime.Now;
+    public DateTime HoraEntrega { get; set; } = DateTime.Now;
 
-	public decimal DiasdeRenta => (FechaEntrega - FechaRenta).Days;
-	public decimal TotalPagar = 0;
+    public int DiasdeRenta => (FechaEntrega - FechaRenta).Days;
+    public decimal TotalPagar = 0;
 
-	public void btnCotizarClick()
-	{
-		TotalPagar = (DiasdeRenta * MiVehiculo.Precio);
+    public void btnCotizarClick()
+    {
+       
+
+        MiRenta.TotalPagado= TotalPagar = (DiasdeRenta * MiVehiculo.Precio);
+        MiRenta.FechaRenta = FechaRenta;
+		MiRenta.FechaEntrega = FechaEntrega;
+		MiRenta.VehiculoId = MiVehiculo.VehiculoId;
+		MiRenta.ClienteId = ClienteSeleccionadoId;
+		MiRenta.DiasRentado = DiasdeRenta;
+		MiRenta.Precio = MiVehiculo.Precio;
 	}
 	public void btnGuardarImprimir()
 	{

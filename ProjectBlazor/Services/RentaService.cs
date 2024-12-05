@@ -28,7 +28,7 @@ namespace ProjectBlazor.Services
         {
             try
             {
-				var entity = Renta.Create(renta.RentaId, renta.FechaRenta, renta.FechaEntrega, renta.TotalPagado, renta.VehiculoId, renta.ClienteId);
+				var entity = Renta.Create(renta.RentaId, renta.FechaRenta, renta.FechaEntrega, renta.TotalPagado, renta.VehiculoId, renta.ClienteId, renta.DiasRentado, renta.Precio);
 				dbContext.Rentas.Add(entity);
 				await dbContext.SaveChangesAsync();
 				return Result.Success("✅Renta registrada con exito!");
@@ -47,7 +47,7 @@ namespace ProjectBlazor.Services
 			{
 				var entities = await dbContext.Rentas
 					.Where(v => v.RentaId.ToString().Contains(filtro.ToLower()))
-					.Select(v => new RentaDto(v.RentaId, v.FechaRenta, v.FechaEntrega, v.TotalPagado, v.VehiculoId, v.ClienteId))
+					.Select(v => new RentaDto(v.RentaId, v.FechaRenta, v.FechaEntrega, v.TotalPagado, v.VehiculoId, v.ClienteId, v.DiasRentado, v.Precio))
 					.ToListAsync();
 				return ResultList<RentaDto>.Success(entities);
 			}
@@ -69,7 +69,7 @@ namespace ProjectBlazor.Services
             try
             {
                 var entity = await dbContext.Rentas.Where(v => v.RentaId == RentaId)
-                    .Select(v => new RentaDto(v.RentaId, v.FechaRenta, v.FechaEntrega, v.TotalPagado, v.VehiculoId, v.ClienteId))
+                    .Select(v => new RentaDto(v.RentaId, v.FechaRenta, v.FechaEntrega, v.TotalPagado, v.VehiculoId, v.ClienteId, v.DiasRentado, v.Precio))
                     .FirstOrDefaultAsync();
 
                 if (entity == null)

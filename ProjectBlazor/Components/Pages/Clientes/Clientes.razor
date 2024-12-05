@@ -92,7 +92,7 @@ else
     [Parameter]
     public List<ClienteDto> ClienteList { get; set; } = new();
     [Parameter]
-    public ClienteRequest MiCliente { get; set; } = new();
+    public Dto.ClienteRequest MiCliente { get; set; } = new();
     public string Accion { get; set; } = "Registrar";
     public bool ShowForm { get; set; } = false;
     public bool DisableInputs { get; set; } = false;
