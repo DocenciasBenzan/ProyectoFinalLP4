@@ -5,191 +5,244 @@
 @inject IClienteService clienteService
 @inject IVehiculoServicio VehiculoService
 @inject IEmpleadoServicio empleadoService
-
+@inject IJSRuntime js
 <h3>Gestión de reservas</h3>
 
-
-@if (MostrarForm)
-{
-	<!-- Formulario para Agregar/Actualizar reserva -->
-	<div class="card mb-4">
-		<div class="card-header">
-			<h5 class="card-title">@((reserva.Id == 0) ? "Agregar reserva" : "Actualizar reserva")</h5>
-		</div>
-		<div class="card-body">
-			<EditForm Model="@reserva" OnValidSubmit="GuardarReserva" FormName="FormularioReservas">
-				<DataAnnotationsValidator />
-				<ValidationSummary />
-
-				@* Cliente *@
-				<div class="mb-3">
-					<label for="cliente" class="form-label">Cliente</label>
-					<InputSelect id="cliente" class="form-control"
-								 Value="reserva.ClienteId"
-								 ValueExpression="@(()=>reserva.ClienteId)"
-								 ValueChanged="@((int x)=>CargarVehiculosCliente(x))">
-						<option disabled value="0"> Selecciona un cliente</option>
-						@foreach (var cliente in Clientes)
-						{
-							<option value="@cliente.Id"> @cliente.Nombre</option>
-						}
-					</InputSelect>
-				</div>
-
-				@* Vehiculo *@
-				<div class="mb-3">
-					<label for="vehiculo" class="form-label">Vehiculo</label>
-					<InputSelect id="vehiculo" class="form-control" @bind-Value="reserva.VehiculoId">
-						@if (Vehiculos.Any())
-						{
-							<option selected disabled value="0"> Selecciona un Vehículo</option>
-							@foreach (var vehiculo in Vehiculos)
-							{
-								<option value="@vehiculo.Id"> @vehiculo.Marca (@vehiculo.Modelo - # @vehiculo.Placa)</option>
-							}
-						}
-						else
-						{
-							<option disabled selected value="0"> Sin vehiculos registrados</option>
-						}
-					</InputSelect>
-					@if (!Vehiculos.Any())
-					{
-						<a href="vehiculos" class="text-warning">Registrar Vehiculo</a>
-					}
-				</div>
-
-				@* Servicio *@
-				<div class="mb-3">
-					<label for="servicio" class="form-label">Servicio</label>
-					<InputSelect id="cliente" class="form-control" @bind-Value="reserva.ServicioId">
-						@if (Servicios.Any())
-						{
-							<option disabled value="0"> Selecciona un servicio</option>
-							@foreach (var serv in Servicios)
-							{
-								<option value="@serv.Id"> @serv.Nombre</option>
-							}
-						}
-						else
-						{
-							<option disabled selected> Sin servicios registrados</option>
-						}
-					</InputSelect>
-					@if (!Servicios.Any())
-					{
-						<a href="servicios" class="text-warning">Registrar Servicio</a>
-					}
-				</div>
-
-				@* Empleado *@
-				<div class="mb-3">
-					<label for="empleado" class="form-label">Empleado </label>
-					<InputSelect id="empleado" class="form-control" @bind-Value="reserva.EmpleadoId">
-						@if (Empleados.Any())
-						{
-							<option disabled value="0"> Selecciona un Empleado</option>
-							@foreach (var emp in Empleados)
-							{
-								<option value="@emp.Id"> @emp.Nombre</option>
-							}
-						}
-						else
-						{
-							<option disabled selected> Sin Empleados registrados</option>
-						}
-					</InputSelect>
-					@if (!Empleados.Any())
-					{
-						<a href="empleados" class="text-warning">Registrar Empleado</a>
-					}
-				</div>
-
-				@* Fecha Inicio *@
-				<div class="mb-3">
-					<label for="Inicio" class="form-label">Fecha</label>
-					<input type="datetime-local"
-						   class="form-control"
-						   @bind-value="reserva.Inicio"
-						   id="Inicio"
-						   name="Inicio" />
-				</div>
-
-
-				@*Notas adicionales*@
-				<div class="mb-3">
-					<label for="notas" class="form-label">Mensaje Adicional</label>
-					<InputText id="notas" class="form-control" @bind-Value="reserva.NotasAdicionales"></InputText>
-
-				</div>
-
-				@* Estado *@
-				<div class="mb-3">
-					<label for="estado" class="form-label">Estado</label>
-					<InputSelect id="estado" class="form-control" @bind-Value="reserva.Estado">
-						<option disabled value=""> Selecciona un estado</option>
-						<option selected value="pendiente">Pendiente</option>
-						<option value="realizada">Realizada</option>
-					</InputSelect>
-				</div>
-
-				<button type="submit" class="btn btn-primary">@((reserva.Id == 0) ? "Crear Reserva" : "Actualizar Reserva")</button>
-				<span class="btn btn-outline-dark" @onclick="Limpiar">cancelar</span>
-			</EditForm>
-		</div>
-	</div>
-}
-else
-{
-	<div class="mb-4">
-		<span class="btn btn-outline-primary" @onclick="btnAgregarReserva">
-			<i class="bi bi-file-plus"></i> Agregar reserva
-		</span>
-	</div>
-
-	@if (reservas.Any())
+<div class="d-print-none">
+	@if (MostrarForm)
 	{
-		<!-- Tabla de Reservas -->
-		<div class="card">
+		<!-- Formulario para Agregar/Actualizar reserva -->
+		<div class="card mb-4">
 			<div class="card-header">
-				<h5 class="card-title">Lista de Reservas</h5>
+				<h5 class="card-title">@((reserva.Id == 0) ? "Agregar reserva" : "Actualizar reserva")</h5>
 			</div>
 			<div class="card-body">
-				<table class="table table-bordered">
-					<thead>
-						<tr>
-							<th>Nombre Cliente</th>
-							<th>Fecha</th>
-							<th>Detalles</th>
-							<th>Estado</th>
-							<th>Acciones</th>
-						</tr>
-					</thead>
-					<tbody>
-						@foreach (var item in reservas)
+				<EditForm Model="@reserva" OnValidSubmit="GuardarReserva" FormName="FormularioReservas">
+					<DataAnnotationsValidator />
+					<ValidationSummary />
+
+					@* Cliente *@
+					<div class="mb-3">
+						<label for="cliente" class="form-label">Cliente</label>
+						<InputSelect id="cliente" class="form-control"
+									 Value="reserva.ClienteId"
+									 ValueExpression="@(()=>reserva.ClienteId)"
+									 ValueChanged="@((int x)=>CargarVehiculosCliente(x))">
+							<option disabled value="0"> Selecciona un cliente</option>
+							@foreach (var cliente in Clientes)
+							{
+								<option value="@cliente.Id"> @cliente.Nombre</option>
+							}
+						</InputSelect>
+					</div>
+
+					@* Vehiculo *@
+					<div class="mb-3">
+						<label for="vehiculo" class="form-label">Vehiculo</label>
+						<InputSelect id="vehiculo" class="form-control" @bind-Value="reserva.VehiculoId">
+							@if (Vehiculos.Any())
+							{
+								<option selected disabled value="0"> Selecciona un Vehículo</option>
+								@foreach (var vehiculo in Vehiculos)
+								{
+									<option value="@vehiculo.Id"> @vehiculo.Marca (@vehiculo.Modelo - # @vehiculo.Placa)</option>
+								}
+							}
+							else
+							{
+								<option disabled selected value="0"> Sin vehiculos registrados</option>
+							}
+						</InputSelect>
+						@if (!Vehiculos.Any())
 						{
-							<tr>
-								<td>@item.Cliente.Nombre</td>
-								<td>@item.Inicio.ToShortDateString()</td>
-								<td>@item.NotasAdicionales</td>
-								<td>@item.Estado</td>
-								<td>
-									<button class="btn btn-warning btn-sm" @onclick="() => btnEditarReserva(item.ToRequest())">Editar</button>
-									<button class="btn btn-danger btn-sm" @onclick="() => EliminarReserva(item.Id)">Eliminar</button>
-								</td>
-							</tr>
+							<a href="vehiculos" class="text-warning">Registrar Vehiculo</a>
 						}
-					</tbody>
-				</table>
+					</div>
+
+					@* Servicio *@
+					<div class="mb-3">
+						<label for="servicio" class="form-label">Servicio</label>
+						<InputSelect id="cliente" class="form-control" @bind-Value="reserva.ServicioId">
+							@if (Servicios.Any())
+							{
+								<option disabled value="0"> Selecciona un servicio</option>
+								@foreach (var serv in Servicios)
+								{
+									<option value="@serv.Id"> @serv.Nombre</option>
+								}
+							}
+							else
+							{
+								<option disabled selected> Sin servicios registrados</option>
+							}
+						</InputSelect>
+						@if (!Servicios.Any())
+						{
+							<a href="servicios" class="text-warning">Registrar Servicio</a>
+						}
+					</div>
+
+					@* Empleado *@
+					<div class="mb-3">
+						<label for="empleado" class="form-label">Empleado </label>
+						<InputSelect id="empleado" class="form-control" @bind-Value="reserva.EmpleadoId">
+							@if (Empleados.Any())
+							{
+								<option disabled value="0"> Selecciona un Empleado</option>
+								@foreach (var emp in Empleados)
+								{
+									<option value="@emp.Id"> @emp.Nombre</option>
+								}
+							}
+							else
+							{
+								<option disabled selected> Sin Empleados registrados</option>
+							}
+						</InputSelect>
+						@if (!Empleados.Any())
+						{
+							<a href="empleados" class="text-warning">Registrar Empleado</a>
+						}
+					</div>
+
+					@* Fecha Inicio *@
+					<div class="mb-3">
+						<label for="Inicio" class="form-label">Fecha</label>
+						<input type="datetime-local"
+							   class="form-control"
+							   @bind-value="reserva.Inicio"
+							   id="Inicio"
+							   name="Inicio" />
+					</div>
+
+
+					@*Notas adicionales*@
+					<div class="mb-3">
+						<label for="notas" class="form-label">Mensaje Adicional</label>
+						<InputText id="notas" class="form-control" @bind-Value="reserva.NotasAdicionales"></InputText>
+
+					</div>
+
+					@* Estado *@
+					<div class="mb-3">
+						<label for="estado" class="form-label">Estado</label>
+						<InputSelect id="estado" class="form-control" @bind-Value="reserva.Estado">
+							<option disabled value=""> Selecciona un estado</option>
+							<option selected value="pendiente">Pendiente</option>
+							<option value="realizada">Realizada</option>
+						</InputSelect>
+					</div>
+
+					<button type="submit" class="btn btn-primary">@((reserva.Id == 0) ? "Crear Reserva" : "Actualizar Reserva")</button>
+					<span class="btn btn-outline-dark" @onclick="Limpiar">cancelar</span>
+				</EditForm>
 			</div>
 		</div>
 	}
 	else
 	{
-		<p>Sin reservas registrados</p>
-	}
-}
+		<div class="mb-4">
+			<span class="btn btn-outline-primary" @onclick="btnAgregarReserva">
+				<i class="bi bi-file-plus"></i> Agregar reserva
+			</span>
+		</div>
 
+		@if (reservas.Any())
+		{
+			<!-- Tabla de Reservas -->
+			<div class="card">
+				<div class="card-header">
+					<h5 class="card-title">Lista de Reservas</h5>
+				</div>
+				<div class="card-body">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>Nombre Cliente</th>
+								<th>Fecha</th>
+								<th>Detalles</th>
+								<th>Estado</th>
+								<th>Acciones</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var item in reservas)
+							{
+								<tr>
+									<td>@item.Cliente.Nombre</td>
+									<td>@item.Inicio.ToShortDateString()</td>
+									<td>@item.NotasAdicionales</td>
+									<td>@item.Estado</td>
+									<td>
+										<button class="btn btn-warning btn-sm" @onclick="() => btnEditarReserva(item.ToRequest())">Editar</button>
+										<button class="btn btn-danger btn-sm" @onclick="() => EliminarReserva(item.Id)">Eliminar</button>
+
+										<span class="bi bi-printer btn btn-outline-danger"
+											  @onclick="()=>btnImprimir(item)">
+											Imprimir
+										</span>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		}
+		else
+		{
+			<p>Sin reservas registrados</p>
+		}
+	}
+</div>
+
+@* Modelo imprimir *@
+<div class="d-none d-print-block">
+	<div class="container">
+		<!-- Titulo Principal -->
+		<div class="report-title">
+			EcoWash
+		</div>
+		<!-- Fila con Teléfono y Fecha -->
+		<div class="row">
+			<div class="col-md-6">
+				<span class="label">Teléfono:</span> 849-423-5803
+			</div>
+			<div class="col-md-6 text-right">
+				<span class="label">Fecha:</span> @ReservaImprimir.Inicio
+			</div>
+		</div>
+
+		<!-- Fila con Cliente y Dirección -->
+		<div class="row">
+			<div class="col-md-6">
+				<span class="label">Cliente:</span> @ReservaImprimir.Cliente.Nombre
+			</div>
+			<div class="col-md-6">
+				<span class="label">Tel. CLiente:</span> @ReservaImprimir.Cliente.Telefono
+			</div>
+		</div>
+
+		<!-- Fila con Nombre de Vehículo y Tipo de Servicio -->
+		<div class="row">
+			<div class="col-md-6">
+				<span class="label">Nombre de Vehículo:</span> @ReservaImprimir.Vehiculo.Marca - @ReservaImprimir.Vehiculo.Modelo - @ReservaImprimir.Vehiculo.Color
+			</div>
+			<div class="col-md-6">
+				<span class="label">Tipo de Servicio:</span> @ReservaImprimir.Servicio.Nombre
+				<span class="label">Empleado:</span> @ReservaImprimir.Empleado.Nombre
+			</div>
+		</div>
+
+		<!-- Fila con Total -->
+		<div class="row">
+			<div class="col-md-12 text-right">
+				<span class="label">Total:</span> @ReservaImprimir.Servicio.Precio
+			</div>
+		</div>
+	</div>
+
+</div>
 
 @code {
 
@@ -202,7 +255,18 @@ else
 	private List<VehiculoResponse> Vehiculos = new List<VehiculoResponse>();
 	private List<EmpleadoResponse> Empleados = new List<EmpleadoResponse>();
 
+	public ReservaResponse ReservaImprimir { get; set; } = new(){
+				Estado = "pendiente",
+				EmpleadoId = 0,	
+				ClienteId = 0,
+				VehiculoId = 0,
+				ServicioId = 0,
+				Empleado = new (),
+				Cliente = new (),
+				Vehiculo = new (),
+				Servicio = new ()
 
+			};
 	public bool MostrarForm { get; set; }
 
 	#endregion
@@ -325,5 +389,12 @@ else
 		MostrarForm = false;
 		reserva = new();
 		StateHasChanged();
+	}
+
+	private async Task btnImprimir(ReservaResponse resevaImprimir)
+	{
+		ReservaImprimir = resevaImprimir;
+		await Task.Delay(2000);
+		await js.InvokeVoidAsync("Imprimir");
 	}
 }
