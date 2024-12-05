@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APP2024P4.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241130175652_AddImgToProducto")]
-    partial class AddImgToProducto
+    [Migration("20241205025303_Productos")]
+    partial class Productos
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
