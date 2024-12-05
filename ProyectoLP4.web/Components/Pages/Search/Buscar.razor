@@ -6,240 +6,266 @@
 
 <h2>Buscar</h2>
 
-
-
 <input type="text" @bind="query" class="form-control" placeholder="Busque una pelicula o serie" />
-<span class="btn btn-outline-primary mt-2" @onclick="BuscarPeliculas">Buscar</span>
+<span class="btn btn-outline-success mt-2" @onclick="BuscarPeliculas">
+	<i class="bi bi-search"></i>
+	Buscar
+</span>
 
 <style>
 
-    /* General */
-    body {
-        font-family: 'Arial', sans-serif;
-        line-height: 1.6;
-        background-color: #f5f5f5;
-        color: #333;
-        margin: 0;
-    }
+	/* General */
+	body {
+		font-family: 'Arial', sans-serif;
+		line-height: 1.6;
+		background-color: #f5f5f5;
+		color: #333;
+		margin: 0;
+	}
 
-    img {
-        cursor: pointer;
-    }
+	img {
+		cursor: pointer;
+	}
 
-    /* Loading text */
-    p {
-        font-size: 1.2em;
-        color: #888;
-        text-align: center;
-        margin-top: 50px;
-    }
+	/* Loading text */
+	p {
+		font-size: 1.2em;
+		color: #888;
+		text-align: center;
+		margin-top: 50px;
+	}
 
-    /* Movie List */
-    ul {
-        list-style: none;
-        padding: 0;
-        margin: 20px 0;
-    }
+	/* Movie List */
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 20px 0;
+	}
 
-        ul li {
-            margin: 10px 0;
-            font-size: 1.1em;
-        }
+		ul li {
+			margin: 10px 0;
+			font-size: 1.1em;
+		}
 
-            ul li a {
-                text-decoration: none;
-                color: #007bff;
-                font-weight: bold;
-                transition: color 0.3s ease;
-            }
+			ul li a {
+				text-decoration: none;
+				color: #007bff;
+				font-weight: bold;
+				transition: color 0.3s ease;
+			}
 
-                ul li a:hover {
-                    color: #0056b3;
-                }
+				ul li a:hover {
+					color: #0056b3;
+				}
 
-    /* Selected Movie Details */
-    h4 {
-        font-size: 1.5em;
-        color: #444;
-        margin-bottom: 10px;
-    }
+	/* Selected Movie Details */
+	h4 {
+		font-size: 1.5em;
+		color: #444;
+		margin-bottom: 10px;
+	}
 
-    p {
-        font-size: 1.2em;
-        color: #555;
-        margin: 10px 0 20px;
-    }
+	p {
+		font-size: 1.2em;
+		color: #555;
+		margin: 10px 0 20px;
+	}
 
-    /* Dropdown */
-    select {
-        padding: 10px;
-        font-size: 1em;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #fff;
-        width: 100%;
-        max-width: 300px;
-        margin-top: 10px;
-    }
+	/* Dropdown */
+	select {
+		padding: 10px;
+		font-size: 1em;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		background-color: #fff;
+		width: 100%;
+		max-width: 300px;
+		margin-top: 10px;
+	}
 
-        select:focus {
-            outline: none;
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-        }
+		select:focus {
+			outline: none;
+			border-color: #007bff;
+			box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+		}
 
-    /* Titles */
-    h5 {
-        font-size: 1.3em;
-        color: #333;
-        margin-top: 30px;
-    }
+	/* Titles */
+	h5 {
+		font-size: 1.3em;
+		color: #333;
+		margin-top: 30px;
+	}
 
 </style>
 
+
+
 @if (IsLoading)
 {
-    <p>Cargando...</p>
+	<p>Cargando...</p>
 }
 
 @if (Movies != null && Movies.Any())
 {
-    <div class="container">
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            @foreach (var movie in Movies)
-            {
-                <div class="card">
-                    <span class="btn btn-outline-dark" @onclick="()=>{MostrarDetalles(movie);}">
-                        <i class="bi bi-file-plus"></i>
-                    </span>
-                    @if (TituloSeleccionado?.TMDbId == movie.TMDbId)
-                    {
-                        <div class="mb-3">
-                            <label for="lista" class="form-label"> Agregar a:</label>
-                            <select id="lista" class="form-control" @bind="SelectedListId">
-                                <option disabled value="">-- Selecciona una lista --</option>
-                                @foreach (var list in UserLists)
-                                {
-                                    <option value="@list.Id">@list.Name</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="btn btn-group">
-                            <span class="btn btn-success mt-2 col-9" @onclick="AgregarALista" disabled="@(!CanAddToList)">Agregar</span>
-                            <span class="btn btn-outline-dark mt-2" @onclick="CancelarAgregarALista">Cancelar</span>
-                        </div>
-                    }
-                    <CompMovie movie="movie"></CompMovie>
+	<div class="container">
+		<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+			@foreach (var movie in Movies)
+			{
+				<div class="card">
+					<span class="btn btn-outline-dark" @onclick="()=>{MostrarDetalles(movie);}">
+						<i class="bi bi-file-plus"></i>
+					</span>
+					@if (TituloSeleccionado?.TMDbId == movie.TMDbId)
+					{
+						<div class="mb-3">
+							<label for="lista" class="form-label"> Agregar a:</label>
+							<select id="lista" class="form-control" @bind="SelectedListId">
+								<option disabled value="">-- Selecciona una lista --</option>
+								@foreach (var list in UserLists)
+								{
+									<option value="@list.Id">@list.Name</option>
+								}
+							</select>
+						</div>
+						<div class="btn btn-group">
+							<span class="btn btn-success mt-2 col-9" @onclick="AgregarALista" disabled="@(!CanAddToList)">Agregar</span>
+							<span class="btn btn-outline-dark mt-2" @onclick="CancelarAgregarALista">Cancelar</span>
+						</div>
+					}
+					<CompMovie movie="movie"></CompMovie>
 
-                </div>
-            }
+				</div>
+			}
 
-        </div>
+		</div>
 
-    </div>
+	</div>
 }
 
 @if (Movies == null || !Movies.Any())
 {
-    <p> No hay resultados </p>
+	@* <div class="card m-5 ">
+		<div class="card-header text-info"> <i class="bi bi-ban"></i> Sin resultados </div>
+		<div class="card-body">
+			<img class="h-50 w-25" src="/bootstrap/NoFoundResult.png" />
+		</div>
+	</div> *@
+	@if (AntesPrimeraBusqueda)
+	{
+		<div class="m-5 justify-content-center text-center">
+			<div class="text-success"> Realiza una busqueda </div>
+			<img class="h-50 w-25 m-5" src="/bootstrap/HacerBusqueda.png" />
+
+		</div>
+	}
+	else
+	{
+		<div class="m-5 justify-content-center text-center">
+			<div class="text-success"><i class="bi bi-ban"></i> Sin resultados </div>
+			<img class="h-50 w-25 m-5" src="/bootstrap/NoFoundResult.png" />
+		</div>
+	}
 }
 
 @code {
-    private string query;
-    private bool IsLoading;
-    private List<Movie> Movies = new();
-    private Movie TituloSeleccionado;
+	private string query;
+	private bool IsLoading;
+	private List<Movie> Movies = new();
+	private Movie TituloSeleccionado;
 
-    private List<UserList> UserLists = new();
-    private int? SelectedListId;
-    private bool CanAddToList => TituloSeleccionado != null && SelectedListId.HasValue;
+	private List<UserList> UserLists = new();
+	private int? SelectedListId;
+	private bool CanAddToList => TituloSeleccionado != null && SelectedListId.HasValue;
 
-    //NEW
-    private List<Movie> resultados;
+	public bool AntesPrimeraBusqueda { get; set; } = true;
+	//NEW
+	private List<Movie> resultados;
 
-    protected override async Task OnInitializedAsync()
-    {
-        var r = await ListService.GetListsAsync();
-        if (r.Succeeded)
-        {
-            UserLists = r?.Data?.ToList() ?? new();
-        }
+	protected override async Task OnInitializedAsync()
+	{
+		var r = await ListService.GetListsAsync();
+		if (r.Succeeded)
+		{
+			UserLists = r?.Data?.ToList() ?? new();
+		}
 
-    }
-
-    private string GetPosterUrl(string posterPath)
-    {
-        if (string.IsNullOrEmpty(posterPath))
-            return "https://via.placeholder.com/100x150?text=No+Image"; // Imagen de reemplazo por si no hay póster
-
-        return $"https://image.tmdb.org/t/p/w200{posterPath}"; // "w200" es para ajustar el tamaño de imagen
-    }
+	}
 
 
-    private async Task BuscarPeliculas()
-    {
-        Console.WriteLine("BuscarPeliculas ejecutado.");
+	private string GetPosterUrl(string posterPath)
+	{
+		if (string.IsNullOrEmpty(posterPath))
+			return "https://via.placeholder.com/100x150?text=No+Image"; // Imagen de reemplazo por si no hay póster
 
-        if (string.IsNullOrWhiteSpace(query))
-        {
-            Console.WriteLine("El campo esta vacio");
-            return;
-        }
+		return $"https://image.tmdb.org/t/p/w200{posterPath}"; // "w200" es para ajustar el tamaño de imagen
+	}
 
 
-        IsLoading = true;
+	private async Task BuscarPeliculas()
+	{
 
-        try
-        {
-            Movies = await TmdbService.SearchTitlesAsync(query);
-            Console.WriteLine($"Se encontraron {Movies.Count} resultados para '{query}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error al buscar películas: {ex.Message}");
-        }
-        finally
-        {
-            IsLoading = false;
-        }
-    }
+		if (string.IsNullOrWhiteSpace(query))
+		{
+			Console.WriteLine("El campo esta vacio");
+			AntesPrimeraBusqueda = true;
 
-    private void MostrarDetalles(Movie movie)
-    {
-        TituloSeleccionado = movie;
-    }
+			return;
+		}
+		AntesPrimeraBusqueda = false;
 
-    private async Task AgregarALista()
-    {
+		IsLoading = true;
 
-        if (CanAddToList)
-        {
-            TituloSeleccionado.Poster_path = GetPosterUrl(TituloSeleccionado.Poster_path);
-            TituloSeleccionado.Release_date = TituloSeleccionado.Release_date ?? "";
-            TituloSeleccionado.Name = TituloSeleccionado.Name ?? "";
-            TituloSeleccionado.Title = TituloSeleccionado.Title ?? "";
+		try
+		{
+			Movies = await TmdbService.SearchTitlesAsync(query);
+			Console.WriteLine($"Se encontraron {Movies.Count} resultados para '{query}'.");
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error al buscar películas: {ex.Message}");
+		}
+		finally
+		{
+			IsLoading = false;
+		}
+	}
 
-            await ListService.AddMovieToListAsync(SelectedListId.Value, TituloSeleccionado);
-            if (TituloSeleccionado.Poster_path == "https://via.placeholder.com/100x150?text=No+Image")
-            {
-                TituloSeleccionado.Poster_path = string.Empty;
-            }
-            // Esto no esta funcionando ( drop hide )
-            SelectedListId = null; //Reinicia el dropdown
-            Console.WriteLine($"'{TituloSeleccionado.Title}' agregado a la lista con exito.");
-            StateHasChanged();
-        }
-    }
+	private void MostrarDetalles(Movie movie)
+	{
+		TituloSeleccionado = movie;
+	}
 
-    private void CancelarAgregarALista()
-    {
-        TituloSeleccionado = null;
-        StateHasChanged();
-    }
-    private async Task BuscarPrueba()
-    {
-        Console.WriteLine($"Buscando: {query}");
-        resultados = await TmdbService.SearchTitlesAsync(query);
-        Console.WriteLine($"Resultados encontrados: {resultados.Count}");
-    }
+	private async Task AgregarALista()
+	{
+
+		if (CanAddToList)
+		{
+			TituloSeleccionado.Poster_path = GetPosterUrl(TituloSeleccionado.Poster_path);
+			TituloSeleccionado.Release_date = TituloSeleccionado.Release_date ?? "";
+			TituloSeleccionado.Name = TituloSeleccionado.Name ?? "";
+			TituloSeleccionado.Title = TituloSeleccionado.Title ?? "";
+
+			await ListService.AddMovieToListAsync(SelectedListId.Value, TituloSeleccionado);
+			if (TituloSeleccionado.Poster_path == "https://via.placeholder.com/100x150?text=No+Image")
+			{
+				TituloSeleccionado.Poster_path = string.Empty;
+			}
+			// Esto no esta funcionando ( drop hide )
+			SelectedListId = null; //Reinicia el dropdown
+			Console.WriteLine($"'{TituloSeleccionado.Title}' agregado a la lista con exito.");
+			StateHasChanged();
+		}
+	}
+
+	private void CancelarAgregarALista()
+	{
+		TituloSeleccionado = null;
+		StateHasChanged();
+	}
+	private async Task BuscarPrueba()
+	{
+		Console.WriteLine($"Buscando: {query}");
+		resultados = await TmdbService.SearchTitlesAsync(query);
+		Console.WriteLine($"Resultados encontrados: {resultados.Count}");
+	}
 }

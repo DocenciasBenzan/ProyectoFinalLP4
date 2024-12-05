@@ -3,235 +3,263 @@
 @page "/listas"
 @using ProyectoLP4.web.Models
 
-<h2>Mis listas</h2>
-
 @* Formulario de creación de la lista *@
 @if (ShowForm)
 {
-    <div class="card shadow-sm">
-        <h5 class="card-header text-center bg-success text-white">Crear Lista</h5>
-        <div class="card-body">
-            <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre de la lista</label>
-                <input type="text" @bind="NuevaLista" class="form-control" id="nombre" placeholder="Nombre de la lista" />
-                <div class="form-text text-muted">Introduce el nombre para tu nueva lista.</div>
-            </div>
-            <div class="d-flex justify-content-between">
-                <button @onclick="CrearLista" class="btn btn-outline-success">Crear Lista</button>
-                <button @onclick="btnCancelarCrearLista" class="btn btn-outline-danger">Cancelar</button>
-            </div>
-        </div>
-    </div>
-}
-else
-{
-    <button class="btn btn-outline-primary" @onclick="btnShowAddList">Crear Lista</button>
-}
+	<div class="card shadow-sm border-0">
+		<h5 class="card-header text-center text-white bg-dark fw-semibold">Crear Lista</h5>
+		<div class="card-body">
+			<div class="mb-3">
+				<label for="nombre" class="form-label fw-light">Nombre de la lista</label>
+				<input type="text" @bind="NuevaLista" class="form-control border-secondary" id="nombre" placeholder="Nombre de la lista" />
+				<div class="form-text text-muted">Introduce el nombre para tu nueva lista.</div>
+			</div>
+			<div class="d-flex justify-content-between mt-4">
+				<button @onclick="CrearLista" class="btn btn-outline-success ">Crear </button>
+				<button @onclick="btnCancelarCrearLista" class="btn btn-outline-secondary">Cancelar</button>
+			</div>
+		</div>
+	</div>
 
+	<div hidden class="card shadow-sm">
+		<h5 class="card-header text-center  text-white ">Crear Lista</h5>
+		<div class="card-body">
+			<div class="mb-3">
+				<label for="nombre" class="form-label">Nombre de la lista</label>
+				<input type="text" @bind="NuevaLista" class="form-control" id="nombre" placeholder="Nombre de la lista" />
+				<div class="form-text text-muted">Introduce el nombre para tu nueva lista.</div>
+			</div>
+			<div class="d-flex justify-content-between">
+				<button @onclick="CrearLista" class="btn btn-outline-success">Crear Lista</button>
+				<button @onclick="btnCancelarCrearLista" class="btn btn-outline-danger">Cancelar</button>
+			</div>
+		</div>
+	</div>
+}
 @* Muestra las listas guardadas *@
 @if (Lists != null && Lists.Any())
 {
-    <div class="card mt-3">
-        <h5 class="card-header text-center">Listas Creadas</h5>
-        <div class="card-body">
-            <ul class="list-group">
-                @foreach (var list in Lists)
-                {
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <strong>@list.Name</strong>
+	<div class="card mt-3">
+		<div class="card-header d-flex align-items-center justify-content-between">
+			@if (!ShowForm)
+			{
+				<span class="btn btn-outline-dark" @onclick="btnShowAddList">
+					<i class="bi bi-plus-lg"></i>
+					Agregar
+				</span>
+			}
+			<h5 class="fw-bold mb-0 mx-auto">Mis Listas</h5>
+		</div>
 
-                        <div class="justify-content-end">
-                            @* Botón para editar lista *@
-                            <span class="btn btn-outline-warning btn-sm me-2" @onclick="() => EditarLista(list.Id, list.Name)">
-                                <i class="bi bi-pencil"></i> Editar
-                            </span>
+		<div class="card-body">
+			<ul class="list-group">
+				@foreach (var list in Lists)
+				{
 
-                            @* Boton para eliminar listas *@
-                            <span class="btn btn-outline-danger btn-sm me-2" @onclick="() => EliminarLista(list.Id)">
-                                <i class="bi bi-pencil"></i> Eliminar
-                            </span>
-                        </div>
+					<li class="list-group-item d-flex justify-content-between align-items-center" @onclick="()=>btnVerMovies(list.Id)">
+						@if (EditingListId != list.Id)
+						{
+							@if (IdVerMoviesList == list.Id)
+							{
+								<i class="bi bi-caret-up"></i>
+							}
+							else
+							{
+								<i class="bi bi-caret-down"></i>
+							}
+							<strong>@list.Name</strong>
+						}
+						<div class="justify-content-end ">
+							@* Botón para editar lista *@
+							@if (EditingListId != list.Id)
+							{
+								<span class="btn btn-outline-warning   border-0" @onclick="() => EditarLista(list.Id, list.Name)">
+									<i class="bi bi-pencil"></i>
+								</span>
 
-                        @* Formulario para editar el nombre *@
-                        @if (EditingListId != 0 && EditingListId == list.Id)
-                        {
-                            <div class="card shadow-sm mt-3">
-                                <h5 class="card-header text-center bg-warning text-white">Editar Lista</h5>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="nuevoNombre" class="form-label">Nuevo nombre de la lista</label>
-                                        <input type="text" @bind="NuevoNombreLista" class="form-control" id="nuevoNombre" placeholder="Nuevo nombre" />
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <span @onclick="GuardarNombreLista" class="btn btn-outline-success">Guardar</span>
-                                        <span @onclick="btnCancelarEditarLista" class="btn btn-outline-danger">Cancelar</span>
-                                    </div>
-                                </div>
-                            </div>
-                        }
+								@* Boton para eliminar listas *@
+								<span class="btn btn-outline-danger btn-sm me-2 border-0" @onclick="() => EliminarLista(list.Id)">
+									<i class="bi bi-trash"></i>
+								</span>
+							}
+						</div>
 
-                        <span class="btn btn-outline-dark btn-sm" @onclick="()=>btnVerMovies(list.Id)">
-                            @if (IdVerMoviesList == list.Id)
-                            {
+						@* Formulario para editar el nombre *@
+						@if ( EditingListId == list.Id)
+						{
+							<div class="card shadow-sm mt-3">
+								<h5 class="card-header text-center bg-warning text-white">Editar Lista</h5>
+								<div class="card-body">
+									<div class="mb-3">
+										<label for="nuevoNombre" class="form-label">  Nuevo nombre</label>
+										<input type="text" @bind="NuevoNombreLista" class="form-control" id="nuevoNombre" placeholder="Nuevo nombre" />
+									</div>
+									<div class="d-flex justify-content-between">
+										<span @onclick="GuardarNombreLista" class="btn btn-outline-success">Guardar</span>
+										<span @onclick="btnCancelarEditarLista" class="btn btn-outline-danger">Cancelar</span>
+									</div>
+								</div>
+							</div>
+						}
 
-                                <i class="bi bi-arrow-bar-up"></i>
-                            }
-                            else
-                            {
-                                <i class="bi bi-arrow-bar-down"></i>
-                            }
-                            <span class="m-2">
-                                @list.Movies.Count
-                                <i class="bi bi-film"></i>
-                            </span>
+						@if (EditingListId != list.Id)
+						{
+							<span class="btn btn-outline-dark btn-sm">
 
-                        </span>
-                    </li>
-                    @if (IdVerMoviesList == list.Id)
-                    {
-                        @if (list.Movies.Any())
-                        {
-                            <div class="row">
-                                @foreach (var movie in list.Movies)
-                                {
-                                    <CompMovie movie="movie" OnMovieDeleted="CargarDatos"></CompMovie>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="card mt-3">
-                                <div class="card-header text-center">Sin contenido agregado</div>
-                                <div class="card-body">
-                                    <div>
-                                        <NavLink class="nav-link" href="buscar">
-                                            <span class="btn btn-outline-info">Buscar titulos</span>
-                                        </NavLink>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                        <span class="btn btn-outline-danger col-2" @onclick="()=>btnVerMovies(list.Id)">Cerrar</span>
-                    }
-                }
-            </ul>
-        </div>
-    </div>
+								<span class="m-2">
+									@list.Movies.Count
+									<i class="bi bi-film"></i>
+								</span>
+
+							</span>
+						}
+					</li>
+					@if (IdVerMoviesList == list.Id)
+					{
+						@if (list.Movies.Any())
+						{
+							<div class="row">
+								@foreach (var movie in list.Movies)
+								{
+									<CompMovie movie="movie" OnMovieDeleted="CargarDatos"></CompMovie>
+								}
+							</div>
+						}
+						else
+						{
+							<div class="card mt-3">
+								<div class="card-header text-center">Sin contenido agregado</div>
+								<div class="card-body">
+									<div>
+										<NavLink class="nav-link" href="buscar">
+											<span class="btn btn-outline-info">Buscar titulos</span>
+										</NavLink>
+									</div>
+								</div>
+							</div>
+						}
+						<span class="btn btn-outline-danger col-2" @onclick="()=>btnVerMovies(list.Id)">Cerrar</span>
+					}
+				}
+			</ul>
+		</div>
+	</div>
 }
 else
 {
-    <div class="card mt-3">
-        <div class="card-header text-center">Sin Listas Creadas</div>
-        <div class="card-body">
-            <span class="btn btn-outline-success" @onclick="btnShowAddList">Crear Lista</span>
-        </div>
-    </div>
+	<div class="card mt-3">
+		<div class="card-header text-center">Sin Listas Creadas</div>
+		<div class="card-body">
+			<span class="btn btn-outline-success" @onclick="btnShowAddList">Crear Lista</span>
+		</div>
+	</div>
 }
 
 
 
 @code {
-    public bool ShowForm = false;
-    public bool ShowList = false;
+	public bool ShowForm = false;
+	public bool ShowList = false;
 
-    public int IdVerMoviesList { get; set; }
-    private string NuevaLista;
-    private List<UserList> Lists;
+	public int IdVerMoviesList { get; set; }
+	private string NuevaLista;
+	private List<UserList> Lists;
 
-    private int EditingListId = 0;
-    private string NuevoNombreLista = string.Empty;
+	private int EditingListId = 0;
+	private string NuevoNombreLista = string.Empty;
 
 
-    protected override async Task OnInitializedAsync()
-    {
-        CargarDatos();
-    }
-    public async void CargarDatos()
-    {
-        var r = await ListService.GetListsAsync();
-        if (r.Succeeded)
-        {
-            Lists = r.Data?.ToList() ?? new();
-        }
-        StateHasChanged();
-    }
+	protected override async Task OnInitializedAsync()
+	{
+		CargarDatos();
+	}
+	public async void CargarDatos()
+	{
+		var r = await ListService.GetListsAsync();
+		if (r.Succeeded)
+		{
+			Lists = r.Data?.ToList() ?? new();
+		}
+		StateHasChanged();
+	}
 
-    private async Task CrearLista()
-    {
-        if (!string.IsNullOrWhiteSpace(NuevaLista))
-        {
-            await ListService.CrearListaAsync(NuevaLista);
-            NuevaLista = string.Empty;
-            StateHasChanged();
-            this.CargarDatos();
-            this.btnCancelarCrearLista();
-        }
-    }
+	private async Task CrearLista()
+	{
+		if (!string.IsNullOrWhiteSpace(NuevaLista))
+		{
+			await ListService.CrearListaAsync(NuevaLista);
+			NuevaLista = string.Empty;
+			StateHasChanged();
+			this.CargarDatos();
+			this.btnCancelarCrearLista();
+		}
+	}
 
-    private void EditarLista(int id, string nombreActual)
-    {
-        EditingListId = id;
-        NuevoNombreLista = nombreActual;
-    }
-    private async Task GuardarNombreLista()
-    {
-        if (!string.IsNullOrWhiteSpace(NuevoNombreLista))
-        {
-            var result = await ListService.UpdateListAsync(EditingListId, NuevoNombreLista);
-            if (result.Succeeded)
-            {
-                EditingListId = 0;
-                NuevoNombreLista = string.Empty;
-                CargarDatos();
-            }
-            else
-            {
-                Console.WriteLine(result.Message);
-            }
-        }
-    }
-    private void btnCancelarEditarLista()
-    {
-        EditingListId = 0;
-        NuevoNombreLista = string.Empty;
-    }
+	private void EditarLista(int id, string nombreActual)
+	{
+		ShowForm = false;
+		EditingListId = id;
+		NuevoNombreLista = nombreActual;
+	}
+	private async Task GuardarNombreLista()
+	{
+		if (!string.IsNullOrWhiteSpace(NuevoNombreLista))
+		{
+			var result = await ListService.UpdateListAsync(EditingListId, NuevoNombreLista);
+			if (result.Succeeded)
+			{
+				EditingListId = 0;
+				NuevoNombreLista = string.Empty;
+				CargarDatos();
+			}
+			else
+			{
+				Console.WriteLine(result.Message);
+			}
+		}
+	}
+	private void btnCancelarEditarLista()
+	{
+		EditingListId = 0;
+		NuevoNombreLista = string.Empty;
+	}
 
-    private async Task EliminarLista(int listaId)
-    {
-        var result = await ListService.DeleteListAsync(listaId);
-        if (result.Succeeded)
-        {
-            CargarDatos();
-        }
-        else
-        {
-            Console.WriteLine(result.Message);
-        }
-    }
+	private async Task EliminarLista(int listaId)
+	{
+		var result = await ListService.DeleteListAsync(listaId);
+		if (result.Succeeded)
+		{
+			CargarDatos();
+		}
+		else
+		{
+			Console.WriteLine(result.Message);
+		}
+	}
 
-    private void btnShowAddList()
-    {
-        ShowForm = true;
-        NuevaLista = "";
-    }
+	private void btnShowAddList()
+	{
+		ShowForm = true;
+		NuevaLista = "";
+	}
 
-    private void btnCancelarCrearLista()
-    {
-        ShowForm = false;
-        NuevaLista = "";
-    }
+	private void btnCancelarCrearLista()
+	{
+		ShowForm = false;
+		NuevaLista = "";
+	}
 
-    private void btnVerMovies(int idUserList)
-    {
-        if (this.IdVerMoviesList != 0)
-        {
-            this.IdVerMoviesList = 0;
-        }
-        else
-        {
-            this.IdVerMoviesList = idUserList;
+	private void btnVerMovies(int idUserList)
+	{
+		if (this.IdVerMoviesList != 0)
+		{
+			this.IdVerMoviesList = 0;
+		}
+		else
+		{
+			this.IdVerMoviesList = idUserList;
 
-        }
-        StateHasChanged();
-    }
+		}
+		StateHasChanged();
+	}
 }

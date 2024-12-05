@@ -4,15 +4,22 @@ using Microsoft.EntityFrameworkCore;
 using ProyectoLP4.web.Data;
 using ProyectoLP4.web;
 
-
+/// <summary>
+/// Servicio para el gesitonamiento de las listas
+/// </summary>
 public class ListService : IListService
 {
+
     public ListService(IApplicationDbContext context)
     {
         this.context = context;
     }
     private readonly IApplicationDbContext context;
 
+    /// <summary>
+    ///     Obtienes todas las listas existentes en la base de datos
+    /// </summary>
+    /// <returns></returns>
     public async Task<ResultList<UserList>> GetListsAsync()
     {
         try
@@ -31,7 +38,11 @@ public class ListService : IListService
             return ResultList<UserList>.Failure($"Ocurrio un error al obtener las listas ::: {ex.Message}");
         }
     }
-
+    /// <summary>
+    /// Crea una nueva lista
+    /// </summary>
+    /// <param name="nombre"></param>
+    /// <returns></returns>
     public async Task<Result> CrearListaAsync(string nombre)
     {
         try
@@ -47,6 +58,12 @@ public class ListService : IListService
         }
     }
 
+    /// <summary>
+    ///     Agrega una lista
+    /// </summary>
+    /// <param name="listaId"></param>
+    /// <param name="movie"></param>
+    /// <returns></returns>
     public async Task<Result> AddMovieToListAsync(int listaId, Movie movie)
     {
         try
@@ -69,6 +86,11 @@ public class ListService : IListService
 
     }
 
+    /// <summary>
+    ///     Obtiene lista por su id
+    /// </summary>
+    /// <param name="listaId"></param>
+    /// <returns></returns>
     public async Task<Result<UserList>> GetListByIdAsync(int listaId)
     {
         try
@@ -87,6 +109,12 @@ public class ListService : IListService
         }
     }
 
+    /// <summary>
+    ///     Actualiza una lista
+    /// </summary>
+    /// <param name="listaId"></param>
+    /// <param name="nuevoNombre"></param>
+    /// <returns></returns>
 	public async Task<Result> UpdateListAsync(int listaId, string nuevoNombre)
 	{
 		try
@@ -108,6 +136,11 @@ public class ListService : IListService
 		}
 	}
 
+    /// <summary>
+    /// Elimina una lista
+    /// </summary>
+    /// <param name="listaId"></param>
+    /// <returns></returns>
 	public async Task<Result> DeleteListAsync(int listaId)
 	{
 		try
@@ -129,7 +162,11 @@ public class ListService : IListService
 			return Result.Failure($"Error trying to delete list: {ex.Message}");
 		}
 	}
-
+    /// <summary>
+    /// Elimina una pelicula de una lista
+    /// </summary>
+    /// <param name="movieId"></param>
+    /// <returns></returns>
 	public async Task<Result> DeleteMovieFromListAsync(int movieId)
 	{
 		try
