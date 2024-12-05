@@ -18,16 +18,12 @@
                     <!-- Nav -->
                     <div class="navbar-nav mx-lg-auto">
                         <a class="nav-item nav-link @(IsActivePage(""))" href="" aria-current="page">Home</a>
-                        <a class="nav-item nav-link @(IsActivePage("productos"))" href="productos">Add_Productos</a>
+                        <AuthorizeView>
+                        <a class="nav-item nav-link @(IsActivePage("productos"))" href="productos">Add_Productos</a
                         <a class="nav-item nav-link @(IsActivePage("categorias"))" href="categorias">Add_Categorias</a>
+                        </AuthorizeView>
                         <a class="nav-item nav-link @(IsActivePage("especiales"))" href="especiales">Productos</a>
-                        <a class="nav-item nav-link @(IsActivePage("carrito"))" href="#">Carrito</a>
                     </div>
-                    <!-- Search Form -->
-                    <form class="d-flex align-items-lg-center mt-3 mt-lg-0" role="search">
-                        <input class="form-control align-items-lg-center mt-3 mt-lg-0" type="search" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-outline-success" type="submit">Search</button>
-                    </form>
                     <!-- Right navigation -->
                     <div id="elemnt" class="navbar-nav ms-lg-4">
                         <AuthorizeView>
@@ -38,13 +34,6 @@
                     </div>
                     <!-- Action -->
                     <AuthorizeView>
-                        <Authorized>
-                            <div class="d-flex align-items-lg-center mt-3 mt-lg-0">
-                                <a href="#" class=" p-3 avatar bg-danger rounded-circle text-white">
-                                    RG
-                                </a>
-                            </div>
-                        </Authorized>
                         <NotAuthorized>
                             <div id="elemnt" class="d-flex align-items-lg-center mt-3 mt-lg-0">
                                 <a id="elemnt" href="Account/Register" class="btn btn-sm btn-primary w-full w-lg-auto">
