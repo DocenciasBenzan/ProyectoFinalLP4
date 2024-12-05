@@ -3,7 +3,6 @@
 @attribute [Authorize]
 @page "/notificaciones"
 
-
 <div class="notification-container">
     <div class="notification-header">
         <h4>Notificaciones</h4>
@@ -73,6 +72,7 @@
         }
         catch (Exception ex)
         {
+            await ConsultarNotificaciones();
             Console.WriteLine($"☠️ Error: {ex.Message}");
         }
     }
