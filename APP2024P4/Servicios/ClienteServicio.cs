@@ -22,7 +22,10 @@ public class ClienteServicio : IClienteServicio
 	{
 		_dbContext = dbContext;
 	}
-
+	/// <summary>
+	///		oBTIENE TODOS LOS CLIENTES EXISTENTES
+	/// </summary>
+	/// <returns></returns>
 	public async Task<ResultList<ClienteResponse>> ObtenerTodosLosClientes()
 	{
 		try
@@ -42,6 +45,11 @@ public class ClienteServicio : IClienteServicio
 		}
 	}
 
+	/// <summary>
+	///		Permite registrar clientes en la base de datos. Para su posterior uso en el programa
+	/// </summary>
+	/// <param name="request"></param>
+	/// <returns></returns>
 	public async Task<Result> CrearCliente(ClienteRequest request)
 	{
 		try
@@ -61,6 +69,12 @@ public class ClienteServicio : IClienteServicio
 		}
 	}
 
+	/// <summary>
+	///		Pemrite actualizar un cliente
+	/// </summary>
+	/// <param name="id"></param>
+	/// <param name="request"></param>
+	/// <returns></returns>
 	public async Task<Result> ActualizarCliente(int id, ClienteRequest request)
 	{
 		try
@@ -80,6 +94,11 @@ public class ClienteServicio : IClienteServicio
 		}
 	}
 
+	/// <summary>
+	///		Encargado de eliminar clientes en la base de datos
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns></returns>
 	public async Task<Result> EliminarCliente(int id)
 	{
 		try

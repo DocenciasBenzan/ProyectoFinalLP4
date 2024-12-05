@@ -42,6 +42,11 @@ builder.Services.AddScoped<IFacturaServicio, FacturaServicio>();
 // Servicos
 
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    ApplicationDbContextSeeder.Seed(dbContext);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -13,7 +13,9 @@ public interface IPiezaServicio
 	Task<Result> EliminarPieza(int id);
 	Task<ResultList<PiezaResponse>> ObtenerTodasLasPiezas();
 }
-
+/// <summary>
+/// Servicio para la gesiton de las piezas
+/// </summary>
 public class PiezaServicio : IPiezaServicio
 {
 	private readonly ApplicationDbContext _dbContext;
@@ -22,7 +24,10 @@ public class PiezaServicio : IPiezaServicio
 	{
 		_dbContext = dbContext;
 	}
-
+	/// <summary>
+	/// Obtiene todas las piezas existentes en la base de datos
+	/// </summary>
+	/// <returns></returns>
 	public async Task<ResultList<PiezaResponse>> ObtenerTodasLasPiezas()
 	{
 		try
@@ -36,6 +41,11 @@ public class PiezaServicio : IPiezaServicio
 			return ResultList<PiezaResponse>.Failure($"Error al obtener piezas: {ex.Message}");
 		}
 	}
+	/// <summary>
+	/// Permite registrar piezas  en la base de datos
+	/// </summary>
+	/// <param name="request"></param>
+	/// <returns></returns>
 	public async Task<Result> CrearPieza(PiezaRequest request)
 	{
 		try
@@ -58,7 +68,12 @@ public class PiezaServicio : IPiezaServicio
 			return Result.Failure($"Error al crear la pieza: {ex.Message}");
 		}
 	}
-
+	/// <summary>
+	///		Permite actualizar una pieza existente en la base de datos
+	/// </summary>
+	/// <param name="id"></param>
+	/// <param name="request"></param>
+	/// <returns></returns>
 	public async Task<Result> ActualizarPieza(int id, PiezaRequest request)
 	{
 		try
@@ -80,7 +95,11 @@ public class PiezaServicio : IPiezaServicio
 			return Result.Failure($"Error al actualizar la pieza: {ex.Message}");
 		}
 	}
-
+	/// <summary>
+	/// Elimina una pieza de la base de datos
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns></returns>
 	public async Task<Result> EliminarPieza(int id)
 	{
 		try

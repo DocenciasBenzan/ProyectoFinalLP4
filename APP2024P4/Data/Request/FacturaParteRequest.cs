@@ -1,4 +1,6 @@
-﻿namespace APP2024P4.Data.Request;
+﻿using APP2024P4.Data.Entities;
+
+namespace APP2024P4.Data.Request;
 
 public class FacturaParteRequest
 {
@@ -8,5 +10,8 @@ public class FacturaParteRequest
 	public int PiezaId { get; set; }
 	public PiezaRequest Pieza { get; set; }
 	public int Cantidad { get; set; }
+
+
+
 }
 

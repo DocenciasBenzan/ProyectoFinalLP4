@@ -3,44 +3,368 @@
 @using APP2024P4.Data.Response
 @using APP2024P4.Servicios
 @rendermode InteractiveServer
-@inject IFacturaServicio FacturaServicio
+@inject IFacturaServicio facturaServicio
+@inject IClienteServicio ClienteServicio
+@inject IPiezaServicio piezaServicio
+@inject IJSRuntime js
 
 
-
-
-
-
-@if (facturas.Any())
-{
-	@foreach (var fact in facturas)
+<div class="d-print-none">
+	@if (MostrarFormulario)
 	{
-		<p>Factura a nombre de @fact.Cliente.Nombre</p>
-		@* @foreach (var part in fact.FacturaPartes)
-		{
-			<p> @part.pieza.Nombre - (@part.Cantidad)</p>
-		} *@
+		<div class="container mt-5">
+			<h2 class="mb-4 text-center text-primary">Registrar Factura</h2>
+			<EditForm Model="request" OnValidSubmit="GuardarFactura">
+				<DataAnnotationsValidator></DataAnnotationsValidator>
+				<ValidationSummary></ValidationSummary>
+				<div class="card shadow-lg">
+					<div class="card-body">
+						<!-- Fecha -->
+						<div class="mb-3">
+							<label for="fecha" class="form-label fw-bold">Fecha</label>
+							<InputDate id="fecha" class="form-control" @bind-Value="request.Fecha" />
+						</div>
+						<!-- Cliente -->
+						<div class="mb-3">
+							<label for="cliente" class="form-label fw-bold">Cliente</label>
+							@if (Clientes.Any())
+							{
+								<select id="cliente" class="form-select" @bind="request.Cliente.Id">
+									<option value="">Seleccione un cliente</option>
+									@foreach (var cliente in Clientes)
+									{
+										<option value="@cliente.Id">@cliente.Nombre</option>
+									}
+								</select>
+							}
+							else
+							{
+								<p class="text-warning"> Sin clientes registrados</p>
+							}
+						</div>
+						<!-- Piezas -->
+						<div class="mb-3">
+							<label for="piezas" class="form-label fw-bold">Agregar Piezas</label>
+							<div class="row g-2 align-items-center">
+								<div class="col-md-6">
+									@if (piezas.Any())
+									{
+										<select class="form-select" @bind="NuevaPiezaId">
+											<option value="">Seleccione una pieza</option>
+											@foreach (var pieza in piezas)
+											{
+												<option value="@pieza.Id" disable="@(pieza.CantidadDisponible == 0)">
+													@pieza.Nombre @if (pieza.CantidadDisponible == 0)
+													{
+														<span class="text-danger">[Agotado]</span>
+													}
+												</option>
+											}
+										</select>
+									}
+									else
+									{
+										<p class="text-warning"> Sin piezas disponibles</p>
+									}
+								</div>
+								<div class="col-md-3">
+									<label class="form-label">Cantidad</label>
+									<InputNumber class="form-control" @bind-Value="CantidadNuevaPieza" placeholder="Cantidad" Min="1" />
+								</div>
+								<div class="col-md-3">
+									<button type="button" class="btn btn-primary w-100" @onclick="AgregarPieza">Agregar</button>
+								</div>
+							</div>
+							@if (!string.IsNullOrWhiteSpace(MensageCantidadDisponible))
+							{
+								<p class="text-warning mt-2">@MensageCantidadDisponible</p>
+							}
+						</div>
+
+						<!-- Lista de Piezas Agregadas -->
+						@if (request.FacturaPartes.Any())
+						{
+							<p>Piezas agregadas</p>
+							<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+								@foreach (var parte in request.FacturaPartes)
+								{
+									<div class="col">
+										<div class="card mt-2">
+											<div class="card-header d-flex justify-content-between align-items-center">
+												<div class="d-flex align-items-center">
+													@parte.Cantidad
+													@parte.Pieza.Nombre
+												</div>
+												<span class="btn btn-outline-danger btn-sm" @onclick="()=>EliminarPieza(parte)">
+													<i class="bi bi-trash"></i>
+												</span>
+											</div>
+											<div class="card-body">
+												<div class="d-flex justify-content-between align-items-center">
+													<div>
+														<h5 class="mb-1">Precio Unitario</h5>
+														<span class="text-muted">@parte.Pieza.Precio.ToString("C")</span>
+													</div>
+													<div>
+														<h5 class="mb-1">Subtotal</h5>
+														<span class="text-success">@((parte.Cantidad * parte.Pieza.Precio).ToString("C"))</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								}
+							</div>
+
+						}
+						else
+						{
+							<p class="text-warning"> Sin piezas agregadas</p>
+						}
+
+						<!-- Total -->
+						<div class="mt-4 text-end">
+							<h5>Total: @request.Total.ToString("C")</h5>
+						</div>
+					</div>
+					<div class="card-footer text-end">
+						<button type="submit" class="btn btn-success">Guardar Factura</button>
+					</div>
+				</div>
+			</EditForm>
+		</div>
 	}
-}
-else
-{
-	<p> Sin facturas registrada</p>
-}
+	else
+	{
+		<span class="btn btn-outline-dark mb-4" @onclick="btnNuevaFactura">Nueva Factura</span>
+	}
+	@if (facturas.Any())
+	{
+		@foreach (var fact in facturas)
+		{
+			<div class="card mt-3 shadow-sm">
+				<div class="card-header d-flex justify-content-between align-items-center bg-dark text-white">
+					<div>
+						Cliente: @fact.Cliente.Nombre | @fact.FacturaPartes.Count() Items | Total:
+						<span class="text-success">@fact.FacturaPartes.Sum(x => x.pieza.Precio * x.Cantidad)$</span>
+					</div>
+					<div class="text-light">
+						<span class="bi bi-printer btn btn-outline-success"
+							  @onclick="()=>btnPrintClick(fact)">
+							Imprimir
+						</span>
+						<button class="btn btn-outline-danger btn-sm" @onclick="() => EliminarFactura(fact.FacturaID)">
+							Eliminar
+						</button>
+					</div>
+				</div>
+				<div class="card-body">
+					@foreach (var part in fact.FacturaPartes)
+					{
+						<p class="mb-1">
+							@part.Cantidad x @part.pieza.Nombre -
+							@part.pieza.Precio.ToString("C") =
+							<span class="text-success">@(part.Cantidad * part.pieza.Precio) $</span>
+						</p>
+					}
+				</div>
+			</div>
+		}
+	}
+	else
+	{
+		<p>No hay facturas registradas</p>
+	}
+</div>
+@*MOdo impresion *@
 
+<div class="container mt-5 d-none d-print-block">
+	<h1> Part Sales</h1>
+	<h2 class="mb-4 text-center">Factura Detallada</h2>
+	<!-- Información del cliente -->
+	<div class="mb-3">
+		<h4>Información del Cliente</h4>
+		<p><strong>Nombre:</strong> @MostrarPrint.Cliente.Nombre</p>
+		<p><strong>Fecha:</strong> @MostrarPrint.Fecha</p>
+	</div>
 
+	<!-- Tabla de piezas -->
+	<table class="table table-bordered table-hover">
+		<thead class="table-dark">
+			<tr>
+				<th>Cantidad</th>
+				<th>Nombre de la Pieza</th>
+				<th>Precio Unitario</th>
+				<th>Subtotal</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var part in MostrarPrint.FacturaPartes)
+			{
+				<tr>
+					<td>@part.Cantidad</td>
+					<td>@part.pieza.Nombre</td>
+					<td>@part.pieza.Precio</td>
+					<td>@(part.Cantidad * part.pieza.Precio)</td>
+				</tr>
+			}
+		</tbody>
+		<tfoot>
+			<tr>
+				<th colspan="5" class="text-end">Total</th>
+				<th>@MostrarPrint.FacturaPartes.Sum(x => x.Cantidad * x.pieza.Precio)</th>
+			</tr>
+		</tfoot>
+	</table>
 
-
+</div>
 @code {
+	#region	Propiedades
 	public List<FacturaResponse> facturas { get; set; } = new();
+	public List<PiezaResponse> piezas { get; set; } = new();
+	private List<ClienteResponse> Clientes = new();
+	public FacturaRequest request { get; set; } = new()
+		{
+			Fecha = DateTime.Now,
+			FacturaPartes = new List<FacturaParteRequest>(),
+			Cliente = new(),
+		};
+	public bool MostrarFormulario { get; set; }
+	private int NuevaPiezaId;
+	private int CantidadNuevaPieza = 1;
+	string MensageCantidadDisponible = "";
+	public FacturaResponse MostrarPrint { get; set; } = new()
+		{
+			Fecha = DateTime.Now,
+			FacturaPartes = new List<FacturaParteResponse>(),
+			Cliente = new(),
+		};
+
+	#endregion
 
 	protected override async Task OnInitializedAsync()
 	{
-		base.OnInitializedAsync();
-		var rFacturas = await FacturaServicio.ObtenerTodasLasFacturas();
-
+		await base.OnInitializedAsync();
+		await CargarFacturas();
+		var rPiezas = await piezaServicio.ObtenerTodasLasPiezas();
+		if (rPiezas.Ok)
+		{
+			piezas = rPiezas?.Data?.ToList() ?? new();
+		}
+		var rClientes = await ClienteServicio.ObtenerTodosLosClientes();
+		if (rClientes.Ok)
+		{
+			Clientes = rClientes?.Data?.ToList() ?? new();
+		}
+	}
+	private async Task CargarFacturas()
+	{
+		var rFacturas = await facturaServicio.ObtenerTodasLasFacturas();
 		if (rFacturas.Ok)
 		{
-			facturas = rFacturas.Data.ToList();
+			facturas = rFacturas?.Data?.ToList() ?? new();
+			StateHasChanged();
 		}
+	}
+	private void AgregarPieza()
+	{
+		if (NuevaPiezaId == 0 || CantidadNuevaPieza <= 0)
+			return;
+		var pieza = piezas.FirstOrDefault(p => p.Id == NuevaPiezaId);
+		if (pieza != null)
+		{
 
+			var piezaSeleccionada = piezas.First(x => x.Id == NuevaPiezaId);
+
+			if (piezaSeleccionada.CantidadDisponible >= CantidadNuevaPieza)
+			{
+				MensageCantidadDisponible = string.Empty;
+				request.FacturaPartes.Add(new FacturaParteRequest
+					{
+						PiezaId = pieza.Id,
+						Cantidad = CantidadNuevaPieza,
+						Pieza = new()
+						{
+							Nombre = pieza.Nombre,
+							Precio = pieza.Precio,
+							Imagen = pieza.Imagen,
+							Marca = pieza.Marca,
+							CantidadDisponible = pieza.CantidadDisponible
+						}
+					});
+				ActualizarTotal();
+				piezaSeleccionada.CantidadDisponible -= CantidadNuevaPieza;
+			}
+			else
+			{
+				MensageCantidadDisponible = $"Solo tenemos {piezaSeleccionada.CantidadDisponible}/{CantidadNuevaPieza} Disponibles";
+			}
+		}
+		ActualizarTotal();
+		StateHasChanged();
+	}
+	private void EliminarPieza(FacturaParteRequest parte)
+	{
+		var piezaSeleccionada = piezas.First(x => x.Id == NuevaPiezaId);
+		piezaSeleccionada.CantidadDisponible += parte.Cantidad;
+		request.FacturaPartes.Remove(parte);
+		ActualizarTotal();
+	}
+	private void ActualizarTotal()
+	{
+		request.Total = request.FacturaPartes.Sum(fp => fp.Cantidad * fp.Pieza.Precio);
+	}
+	private async Task GuardarFactura()
+	{
+		var result = await facturaServicio.CrearFactura(request);
+		if (result.Ok)
+		{
+			request = new()
+				{
+					Fecha = DateTime.Now,
+					FacturaPartes = new List<FacturaParteRequest>(),
+					Cliente = new(),
+				};
+			await CargarFacturas();
+			NuevaPiezaId = 0;
+			CantidadNuevaPieza = 1;
+			MostrarFormulario = false;
+			StateHasChanged();
+		}
+	}
+	private async Task EliminarFactura(int id)
+	{
+		var r = await facturaServicio.EliminarFactura(id);
+		if (r.Ok)
+		{
+			await CargarFacturas();
+
+		}
+	}
+
+
+	private void btnNuevaFactura()
+	{
+		MostrarFormulario = true;
+		request = new()
+			{
+				Fecha = DateTime.Now,
+				FacturaPartes = new List<FacturaParteRequest>(),
+				Cliente = new(),
+			};
+	}
+	private async Task btnPrintClick(FacturaResponse fact)
+	{
+		MostrarPrint = new()
+			{
+				FacturaPartes = fact.FacturaPartes,
+				FacturaID = fact.FacturaID,
+				Cliente = fact.Cliente,
+				Fecha = fact.Fecha,
+				Total = fact.Total
+			};
+		StateHasChanged();
+		//MostrarPrint = fact;
+		await js.InvokeVoidAsync("PrintPage");
 	}
 }

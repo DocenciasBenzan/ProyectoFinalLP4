@@ -8,59 +8,129 @@ namespace APP2024P4.Servicios;
 
 public interface IFacturaServicio
 {
-	Task<Result> ActualizarFactura(int id, FacturaRequest request);
 	Task<Result> CrearFactura(FacturaRequest request);
 	Task<Result> EliminarFactura(int id);
+	Task<Result> GuardarItemFactura(List<FacturaParteRequest> request);
+	Result<FacturaResponse> ObtenerFacturaPorId(int id);
 	Task<ResultList<FacturaResponse>> ObtenerTodasLasFacturas();
 }
 
 public class FacturaServicio : IFacturaServicio
 {
 	private readonly ApplicationDbContext _dbContext;
-	private readonly IJSRuntime js;
+	private readonly IPiezaServicio piezaServicio;
 
-	public FacturaServicio(ApplicationDbContext dbContext, IJSRuntime js)
+	public FacturaServicio(ApplicationDbContext dbContext, IPiezaServicio piezaServicio)
 	{
 		_dbContext = dbContext;
-		this.js = js;
+		this.piezaServicio = piezaServicio;
 	}
 
+	/// <summary>
+	/// Permite obtner todas las facturas existentes en la base de datos
+	/// </summary>
+	/// <returns></returns>
 	public async Task<ResultList<FacturaResponse>> ObtenerTodasLasFacturas()
 	{
 		try
 		{
-			//var facturas = await _dbContext.Facturas
-			//	.Include(f => f.FacturaPartes)
-			//		.ThenInclude(fp => fp.Pieza)
-			//	.Include(f => f.Cliente)
-			//	.ToListAsync();
-			var facturas = _dbContext.Facturas.Include(x=>x.FacturaPartes).ToList();
+			var facturas = _dbContext.Facturas
+					.Include(c => c.Cliente)
+					.Include(x => x.FacturaPartes)
+						.ThenInclude(x => x.Pieza)
+					.ToList();
 
-			if (facturas != null)
+			var data = facturas.Select(x => new FacturaResponse()
 			{
-				foreach (var x in facturas)
+				FacturaID = x.FacturaID,
+				Fecha = x.Fecha,
+				Total = x.Total, // ¿cambiar a parte de la factura?
+				Cliente = new ClienteResponse()
 				{
-					Console.WriteLine($"ID: {x.FacturaID} - partes: {x.FacturaPartes.Count}");
-				}
-			}
-			else
-			{
-				Console.WriteLine("SIn facturas registradas");
-			}
-
-			await js.InvokeVoidAsync("console.log", facturas);
-
-			//var response = facturas.Select(f => f.ToResponse()).ToList();
-			//return ResultList<FacturaResponse>.Success(response);
-			return ResultList<FacturaResponse>.Success(new List<FacturaResponse>());
+					Id = x.Cliente.Id,
+					Nombre = x.Cliente.Nombre,
+				},
+				FacturaPartes = x.FacturaPartes.Select(p => new FacturaParteResponse()
+				{
+					Id = p.Id,
+					Cantidad = p.Cantidad,
+					FacturaID = x.FacturaID,
+					// FACTURA
+					PiezaId = p.PiezaId,
+					pieza = new PiezaResponse()
+					{
+						Id = p.PiezaId,
+						Nombre = p.Pieza.Nombre,
+						Precio = p.Pieza.Precio,
+						Imagen = p.Pieza.Imagen,
+						Marca = p.Pieza.Marca,
+						CantidadDisponible = p.Pieza.CantidadDisponible,
+					}
+				}).ToList()
+			}).ToList();
+			return ResultList<FacturaResponse>.Success(data);
 		}
 		catch (Exception ex)
 		{
 			return ResultList<FacturaResponse>.Failure($"Error al obtener facturas: {ex.Message}");
 		}
 	}
+	/// <summary>
+	/// Obtiene una factura en especifica atraves de su ID
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns></returns>
+	public Result<FacturaResponse> ObtenerFacturaPorId(int id)
+	{
+		try
+		{
+			var factura = _dbContext.Facturas
+					.Include(c => c.Cliente)
+					.Include(x => x.FacturaPartes)
+						.ThenInclude(x => x.Pieza)
+					.FirstOrDefault();
 
+			var data = new FacturaResponse()
+			{
+				FacturaID = factura.FacturaID,
+				Fecha = factura.Fecha,
+				Total = factura.Total, // ¿cambiar a parte de la factura?
+				Cliente = new ClienteResponse()
+				{
+					Id = factura.Cliente.Id,
+					Nombre = factura.Cliente.Nombre,
+				},
+				FacturaPartes = factura.FacturaPartes.Select(p => new FacturaParteResponse()
+				{
+					Id = p.Id,
+					Cantidad = p.Cantidad,
+					FacturaID = factura.FacturaID,
+					// FACTURA
+					PiezaId = p.PiezaId,
+					pieza = new PiezaResponse()
+					{
+						Id = p.PiezaId,
+						Nombre = p.Pieza.Nombre,
+						Precio = p.Pieza.Precio,
+						Imagen = p.Pieza.Imagen,
+						Marca = p.Pieza.Marca,
+						CantidadDisponible = p.Pieza.CantidadDisponible,
+					}
+				}).ToList()
+			};
 
+			return Result<FacturaResponse>.Success(data);
+		}
+		catch (Exception ex)
+		{
+			return Result<FacturaResponse>.Failure($"Error al obtener la factura: {ex.Message}");
+		}
+	}
+	/// <summary>
+	/// Permite registar facturas
+	/// </summary>
+	/// <param name="request"></param>
+	/// <returns></returns>
 	public async Task<Result> CrearFactura(FacturaRequest request)
 	{
 		try
@@ -70,16 +140,27 @@ public class FacturaServicio : IFacturaServicio
 				Fecha = request.Fecha,
 				Total = request.FacturaPartes.Sum(fp => fp.Cantidad * fp.Pieza.Precio),
 				ClienteId = request.Cliente.Id,
-				//FacturaPartes = request.FacturaPartes.Select(fp => new FacturaParte
-				//{
-				//	PiezaId = fp.PiezaId,
-				//	Cantidad = fp.Cantidad
-				//}).ToList()
 			};
 
 			_dbContext.Facturas.Add(nuevaFactura);
+
+
 			await _dbContext.SaveChangesAsync();
-			return Result.Success("Factura creada exitosamente.");
+			var id = _dbContext.Facturas.OrderBy(x => x.FacturaID).LastOrDefault()?.FacturaID ?? 0;
+			Console.WriteLine($"---------- Nuevo id factura:: {id}");
+
+			if (id != 0)
+			{
+				request.FacturaID = id;
+				request.FacturaPartes.ForEach(x => x.FacturaID = id);
+				var r = await GuardarItemFactura(request.FacturaPartes);
+				if (r.Ok)
+				{
+					return Result.Success("Factura creada");
+
+				}
+			}
+			return Result.Failure("Error al crear la factura");
 		}
 		catch (Exception ex)
 		{
@@ -87,39 +168,11 @@ public class FacturaServicio : IFacturaServicio
 		}
 	}
 
-	public async Task<Result> ActualizarFactura(int id, FacturaRequest request)
-	{
-		try
-		{
-			var factura = await _dbContext.Facturas
-				.Include(f => f.FacturaPartes)
-				.FirstOrDefaultAsync(f => f.FacturaID == id);
-
-			if (factura == null)
-				return Result.Failure($"No se encontró la factura con ID {id}.");
-
-			factura.Fecha = request.Fecha;
-			factura.Total = request.FacturaPartes.Sum(fp => fp.Cantidad * fp.Pieza.Precio);
-			factura.ClienteId = request.Cliente.Id;
-
-			// Manejo de FacturaPartes
-			factura.FacturaPartes.Clear();
-			factura.FacturaPartes.AddRange(request.FacturaPartes.Select(fp => new FacturaParte
-			{
-				PiezaId = fp.PiezaId,
-				Cantidad = fp.Cantidad
-			}));
-
-			_dbContext.Facturas.Update(factura);
-			await _dbContext.SaveChangesAsync();
-			return Result.Success("Factura actualizada exitosamente.");
-		}
-		catch (Exception ex)
-		{
-			return Result.Failure($"Error al actualizar la factura: {ex.Message}");
-		}
-	}
-
+	/// <summary>
+	/// Permite la eliminacion de facturas existentes
+	/// </summary>
+	/// <param name="id"></param>
+	/// <returns></returns>
 	public async Task<Result> EliminarFactura(int id)
 	{
 		try
@@ -130,9 +183,10 @@ public class FacturaServicio : IFacturaServicio
 
 			if (factura == null)
 				return Result.Failure($"No se encontró la factura con ID {id}.");
-
+			_dbContext.FacturaPartes.RemoveRange(factura.FacturaPartes);
 			_dbContext.Facturas.Remove(factura);
 			await _dbContext.SaveChangesAsync();
+
 			return Result.Success("Factura eliminada exitosamente.");
 		}
 		catch (Exception ex)
@@ -140,6 +194,44 @@ public class FacturaServicio : IFacturaServicio
 			return Result.Failure($"Error al eliminar la factura: {ex.Message}");
 		}
 	}
+
+	/// <summary>
+	/// Encargado de guardar las piezas seleccionadas en su correspondiente tabla
+	/// </summary>
+	/// <param name="request"></param>
+	/// <returns></returns>
+	public async Task<Result> GuardarItemFactura(List<FacturaParteRequest> request)
+	{
+		try
+		{
+			var items = request.Select(i =>
+				new FacturaParte()
+				{
+					FacturaID = i.FacturaID,
+					PiezaId = i.PiezaId,
+					Cantidad = i.Cantidad
+				}
+			).ToList();
+
+			_dbContext.FacturaPartes.AddRange(items);
+			await _dbContext.SaveChangesAsync();
+
+
+			foreach (var p in request)
+			{
+				await piezaServicio.ActualizarPieza(p.PiezaId, p.Pieza);
+			}
+			return Result.Success("Items agregados");
+
+		}
+		catch (Exception ex)
+		{
+			return Result.Failure($"Error al guardar la factura: {ex.Message}");
+		}
+	}
+
+
+
 }
 
 

@@ -40,7 +40,7 @@
 
 			@if (!string.IsNullOrWhiteSpace(pieza.Imagen))
 			{
-				<img src="@pieza.Imagen" alt="Imagen de @pieza.Nombre"/>
+				<img src="@pieza.Imagen" alt="Imagen de @pieza.Nombre" />
 			}
 		</div>
 
@@ -51,34 +51,32 @@
 
 @if (piezas != null && piezas.Count > 0)
 {
-	<table class="table table-striped">
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>Nombre</th>
-				<th>Precio</th>
-				<th>Cantidad</th>
-				<th>Marca</th>
-				<th>Acciones</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var p in piezas)
-			{
-				<tr>
-					<td>@p.Id</td>
-					<td>@p.Nombre</td>
-					<td>@p.Precio</td>
-					<td>@p.CantidadDisponible</td>
-					<td>@p.Marca</td>
-					<td>
-						<button class="btn btn-warning me-2" @onclick="() => EditarPieza(p)">Editar</button>
-						<button class="btn btn-danger" @onclick="() => EliminarPieza(p.Id)">Eliminar</button>
-					</td>
-				</tr>
-			}
-		</tbody>
-	</table>
+	<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+
+		@foreach (var pieza in piezas)
+		{
+			<div class="col-md-4 mb-3">
+				<div class="card">
+					<img src="@pieza.Imagen" class="card-img-top" alt="@pieza.Nombre" style="height: 200px; object-fit: cover;">
+					<div class="card-body">
+						<h5 class="card-title">@pieza.Nombre</h5>
+						<p class="card-text">
+							<strong>Marca:</strong> @pieza.Marca<br />
+							<strong>Precio:</strong> @pieza.Precio.ToString("C")<br />
+							<strong>Cantidad Disponible:</strong> @pieza.CantidadDisponible
+						</p>
+						<div class="d-flex justify-content-between">
+							<div>
+								<button class="btn btn-warning me-2" @onclick="() => EditarPieza(pieza)">Editar</button>
+								<button class="btn btn-danger" @onclick="() => EliminarPieza(pieza.Id)">Eliminar</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+
+	</div>
 }
 else
 {
