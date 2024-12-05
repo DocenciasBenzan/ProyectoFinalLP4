@@ -1,0 +1,11 @@
+﻿@inject IJSRuntime js;
+<button class="btn btn-info d-print-none"
+      @onclick="btnPrintClick">
+    <i class="bi bi-plus"></i> Imprimir
+</button>
+@code {
+    async Task btnPrintClick()
+    {
+        await js.InvokeVoidAsync("PrintPage");
+    }
+}

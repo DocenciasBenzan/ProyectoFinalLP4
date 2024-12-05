@@ -8,7 +8,7 @@
     <div class="card mb-4 shadow-sm border-0">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Tareas del Colaborador</h5>
-            <NavLink >
+        <NavLink href="tareas">
             <button class="btn btn-sm btn-light">
                 <i class="fas fa-plus"></i> Nueva Tarea
             </button>
@@ -34,10 +34,12 @@
                     <tbody>
                         @if (ListaTareas.Any())
                     {
+                        int rowIndex = 1;
+
                         @foreach (var tarea in ListaTareas)
                         {
                             <tr>
-                                <th scope="row" class="align-middle">@tarea.Id</th>
+                                <th scope="row" class="align-middle">@rowIndex</th>
                                 <td class="align-middle">@tarea.Titulo</td>
                                 <td class="align-middle">@tarea.Descripcion</td>
                                 <td class="align-middle">
@@ -86,8 +88,12 @@
                                                                         <i class="fas fa-trash-alt"></i> Eliminar
                                                                     </button>
                                                                 </li>
+
                                                             }
                                                         </ul>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                                        </div>
                                                     }
                                                     else
                                                     {
@@ -109,6 +115,7 @@
                                     </button>
                                 </td>
                             </tr>
+                            rowIndex++;
                         }
                     }
                     else

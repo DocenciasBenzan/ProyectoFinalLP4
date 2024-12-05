@@ -3,10 +3,11 @@
 @attribute [Authorize]
 
 @page "/tareas"
+@using APP2024P4.Components.Elements
 
 @if (ShowForm)
 {
-    <div class="card">
+    <div class="card d-print-none">
         <h5 class="card-header text-center">@Accion Tarea</h5>
         <div class="card-body">
             @if (ShowSelect)
@@ -86,10 +87,14 @@ else
 {
     <div class="card mb-4 shadow-sm border-0">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Tareas en proceso</h5>
-            <button class="btn btn-success" @onclick="btnAgregarClick">
-                <i class="bi bi-plus"></i> Agregar
-            </button>
+            <h5 class="mb-0 d-print-none">Tareas en proceso</h5>
+            <h1 class="d-none d-print-inline">Reporte de productos</h1>
+            <div class="btn-group">
+                <button class="btn btn-success d-print-none" @onclick="btnAgregarClick">
+                    <i class="bi bi-plus"></i> Agregar
+                </button>
+                <PrintButton />
+            </div>
         </div>
         <div class="card-body">
             <table class="table table-bordered table-striped table-hover">
@@ -102,16 +107,17 @@ else
                         <th scope="col">Estado</th>
                         <th scope="col">Creación</th>
                         <th scope="col">Límite</th>
-                        <th scope="col">Acciones</th>
+                        <th class="d-print-none" scope="col">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (TareaList?.Count > 0)
                     {
+                        int rowIndex = 1; 
                         @foreach (var p in TareaList)
                         {
                             <tr>
-                                <th scope="row">@p.Id</th>
+                                <th scope="row">@rowIndex</th> 
                                 <td>@p.Titulo</td>
                                 <td>@p.Descripcion</td>
                                 <td>@p.Prioridad</td>
@@ -119,7 +125,7 @@ else
                                 <td>@p.FechaCreacion?.ToShortDateString()</td>
                                 <td>@p.FechaLimite?.ToShortDateString()</td>
                                 <td>
-                                    <div class="btn-group" role="group">
+                                    <div class="btn-group d-print-none" role="group">
                                         <button class="btn btn-outline-warning btn-sm me-2" @onclick="() => btnEditarClick(p)">
                                             <i class="bi bi-pencil"></i> Editar
                                         </button>
@@ -138,6 +144,7 @@ else
                                     </div>
                                 </td>
                             </tr>
+                            rowIndex++; 
                         }
                     }
                     else

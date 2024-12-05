@@ -1,7 +1,59 @@
 ﻿@page "/"
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager Navigation
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Inicio - Gestor de Tareas</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container mt-5">
+    <!-- Sección de encabezado -->
+    <div class="text-center">
+        <h1 class="display-4">Bienvenido al Gestor de Tareas</h1>
+        <p class="lead">Tu solución para mantenerte organizado y productivo.</p>
+        <p>Administra tus tareas de manera eficiente y colabora con tu equipo fácilmente.</p>
+    </div>
 
-Welcome to your new app.
+    <!-- Sección de funcionalidades -->
+    <AuthorizeView>
+        <Authorized>
+            <div class="row mt-5">
+                <!-- Administrar tareas -->
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white text-center">
+                            <h5>📋 Administrar Tareas</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Crea, actualiza y organiza tus tareas de manera sencilla.</p>
+                            <a href="/tareas" class="btn btn-primary btn-block">Ver Tareas</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Colaborar -->
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white text-center">
+                            <h5>👥 Colaborar</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Asigna tareas, comparte avances y trabaja en equipo.</p>
+                            <a href="/colaboradores" class="btn btn-success btn-block">Colaborar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <!-- Redirección a inicio de sesión si no está autenticado -->
+            <div class="text-center mt-5">
+                <h3>Por favor, inicia sesión para continuar</h3>
+                <a href="/Account/Login" class="btn btn-primary btn-lg">Iniciar Sesión</a>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+
+    <!-- Pie de página -->
+    <footer class="mt-5 text-muted text-center">
+        <p>&copy; 2024 Gestor de Tareas. Todos los derechos reservados.</p>
+    </footer>
+</div>
