@@ -1,9 +1,8 @@
-﻿@inject IJSRuntime JSRuntime
-@page "/colaboradores"
+﻿
 @rendermode InteractiveServer
 @attribute [Authorize]
 @attribute [StreamRendering]
-@inject IComentatioService ComentatioService
+@page "/colaboradores"
 
 <!-- Table Tareas de Colaboradores-->
     <div class="card mb-4 shadow-sm border-0">
@@ -156,14 +155,16 @@
                                         <h5 class="card-title">@c.creadorEmail</h5>
                                         <p class="card-text">@c.contenido</p>
                                         <small class="text-muted">
-                                            @if (c.fechaActualizacion > c.fechaCreacion)
-                                            {
-                                                <a>Creado: @c.fechaCreacion.ToString("g") | Modificado: @c.fechaActualizacion.ToString("g")</a>
-                                            }
-                                            else
-                                            {
-                                                <a>Creado: @c.fechaCreacion.ToString("g")</a>
-                                            }
+                                            <small class="text-muted">
+                                                @if (c.fechaActualizacion.HasValue && c.fechaActualizacion > c.fechaCreacion)
+                                                {
+                                                    <a>Creado: @c.fechaCreacion?.ToString("g") | Modificado: @c.fechaActualizacion?.ToString("g")</a>
+                                                }
+                                                else
+                                                {
+                                                    <a>Creado: @c.fechaCreacion?.ToString("g")</a>
+                                                }
+                                            </small>
                                         </small>
                                         <div class="mt-2">
                                             <button class="btn btn-warning btn-sm" @onclick="() => EditComentario(c)">Editar</button>

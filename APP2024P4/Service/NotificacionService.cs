@@ -30,11 +30,22 @@ public partial class NotificationService : INotificationService
     {
         try
         {
+            // Verifica si ya existe una notificación para este usuario y tarea
             var existingNotification = await _context.Notificaciones
-            .FirstOrDefaultAsync(n => n.UserId == userId && n.TareaId == tareaId && n.RenderEmail == renderEmail || n.Isread == true);
+                .FirstOrDefaultAsync(n =>
+                    n.UserId == userId &&
+                    n.TareaId == tareaId &&
+                    n.RenderEmail == renderEmail);
+
+            // Si ya existe una notificación y fue gestionada, no envía otra
             if (existingNotification != null)
             {
-                
+                if (existingNotification.Isread || existingNotification.Status == "Accepted")
+                {
+                    return Result.Failure("⚠️ El usuario ya recibió y gestionó esta invitación.");
+                }
+
+                // Si existe pero no fue gestionada, se actualiza la notificación
                 existingNotification.Message = notificacion.Message;
                 existingNotification.Isread = notificacion.Isread;
                 existingNotification.FechaCreacion = DateTime.UtcNow;
@@ -42,6 +53,8 @@ public partial class NotificationService : INotificationService
                 await _context.SaveChangesAsync();
                 return Result.Success("✅ Notificación actualizada con éxito.");
             }
+
+            // Si no existe, crea una nueva notificación
             var entity = Notificacion.Create(
                 notificacion.UserId,
                 notificacion.SenderEmail,
@@ -63,11 +76,14 @@ public partial class NotificationService : INotificationService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
     public async Task<ResultList<NotificacionDto>> GetNotificacionByEmail(string renderEmail, bool isread)
     {
         try
         {
-            var entity = await _context.Notificaciones.Where(n => n.RenderEmail == renderEmail || n.Isread == isread)
+            // Filtra las notificaciones por correo y estado leído
+            var entity = await _context.Notificaciones
+                .Where(n => n.RenderEmail == renderEmail && n.Isread == isread)
                 .Select(n => new NotificacionDto(
                     n.Id,
                     n.UserId,
@@ -79,40 +95,52 @@ public partial class NotificationService : INotificationService
                     n.Isread,
                     n.FechaCreacion))
                 .ToListAsync();
-            if (entity == null)
-                return ResultList<NotificacionDto>.Failure($"El producto no existe!");
+
+            // Valida si hay resultados
+            if (entity == null || !entity.Any())
+                return ResultList<NotificacionDto>.Failure("No se encontraron notificaciones.");
 
             return ResultList<NotificacionDto>.Success(entity);
         }
-        catch (Exception Ex)
+        catch (Exception ex)
         {
-            return ResultList<NotificacionDto>.Failure($"☠️ Error: {Ex.Message}");
+            return ResultList<NotificacionDto>.Failure($"☠️ Error: {ex.Message}");
         }
     }
     public async Task<Result> RespondToInvitationAsync(int notificationId, bool isAccepted, string userId, int tareaId)
     {
         try
         {
+            // Busca la notificación por su ID
             var notification = await _context.Notificaciones.FindAsync(notificationId);
             if (notification == null)
             {
                 return Result.Failure("Notificación no encontrada.");
             }
 
+            // Verifica si ya se gestionó la invitación
+            if (notification.Status == "Accepted" || notification.Status == "Rejected")
+            {
+                return Result.Failure("La invitación ya fue gestionada previamente.");
+            }
+
             if (isAccepted)
             {
+                // Aceptar la invitación
                 notification.Status = "Accepted";
+                notification.Isread = true; // Marca como leída
 
-                // Agregar al colaborador
+                // Crear solicitud para agregar al colaborador
                 var colaboradorRequest = new ColaboradorRequest
                 {
                     CreadorEmail = notification.SenderEmail,
                     ColaboradorEmail = notification.RenderEmail,
                     IsApproved = true,
                     UserId = userId,
-                    TareaId = notification.TareaId,
+                    TareaId = tareaId,
                 };
 
+                // Intenta agregar al colaborador
                 var addResult = await _colaboradorService.Addcolaborador(colaboradorRequest);
                 if (!addResult.Succesd)
                 {
@@ -121,9 +149,12 @@ public partial class NotificationService : INotificationService
             }
             else
             {
+                // Rechazar la invitación
                 notification.Status = "Rejected";
+                notification.Isread = true; // Marca como leída
             }
 
+            // Guarda los cambios en la base de datos
             await _context.SaveChangesAsync();
             return Result.Success("Respuesta a la invitación procesada con éxito.");
         }
@@ -132,6 +163,8 @@ public partial class NotificationService : INotificationService
             return Result.Failure($"☠️ Error: {ex.Message}");
         }
     }
+
+    // Método para eliminar una notificación por su ID
     public async Task<Result> Delete(int Id)
     {
         try

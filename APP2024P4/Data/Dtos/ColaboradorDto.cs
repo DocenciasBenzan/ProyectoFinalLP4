@@ -6,7 +6,8 @@
         int TareaId,
         string CreadorEmail,
         string ColaboradorEmail,
-        bool IsApproved
+        bool IsApproved,
+        bool IsCompleted
         )
     {
         public ColaboradorRequest ToRequest()
@@ -17,7 +18,8 @@
             UserId = UserId,
             CreadorEmail = CreadorEmail,
             ColaboradorEmail = ColaboradorEmail,
-            IsApproved = IsApproved
+            IsApproved = IsApproved,
+            IsCompleted = IsCompleted
         };
     };
 }

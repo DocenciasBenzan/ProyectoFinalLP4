@@ -1,6 +1,7 @@
 ﻿@rendermode InteractiveServer
-@attribute [Authorize]
 @attribute [StreamRendering]
+@attribute [Authorize]
+
 @page "/tareas"
 
 @if (ShowForm)
@@ -180,6 +181,7 @@ else
 
     public async void btnAgregarClick()
     {
+        // Este método sirve para agregar una nueva tarea.
         Accion = Constants.Acciones.Registrar;
         ShowForm = true;
         StateHasChanged();
@@ -190,6 +192,7 @@ else
 
     public void btnEditarClick(TareaDto dto)
     {
+        // Este método sirve para editar una tarea existente.
         Accion = Constants.Acciones.Modificar;
         ShowForm = true;
         DisableInputs = false;
@@ -198,6 +201,7 @@ else
 
     public void btnEliminarClick(TareaDto dto)
     {
+        // Este método sirve para eliminar una tarea seleccionada.
         Accion = Constants.Acciones.Eliminar;
         ShowForm = true;
         DisableInputs = true;
@@ -206,6 +210,7 @@ else
 
     public void btnVerClick(TareaDto dto)
     {
+        // Este método sirve para visualizar los detalles de una tarea.
         Accion = Constants.Acciones.Ver;
         ShowForm = true;
         DisableInputs = true;
@@ -214,28 +219,30 @@ else
 
     public void btnCancelarClick()
     {
+        // Este método sirve para cancelar la acción actual.
         Limpiar();
         ShowSelect = false;
-
     }
+
     public void btnFinalizarClick()
     {
-
+        // Este método sirve para marcar una tarea como finalizada.
     }
 
-    public async Task btnAgregarColaborador(int tareaId ,TareaDto dto)
+    public async Task btnAgregarColaborador(int tareaId, TareaDto dto)
     {
+        // Este método sirve para agregar un colaborador a una tarea.
         await ConsultarUser();
         ShowSelect = true;
         ShowForm = true;
         Accion = Constants.Acciones.AgregarColabor;
         tareaId = tareaIdActual;
         MiTarea = dto.ToRequest();
-
     }
 
     public async Task<Result> SendInvitacion(int tareaId)
     {
+        // Este método sirve para enviar una invitación a un colaborador.
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -261,6 +268,7 @@ else
 
     async Task Consultar()
     {
+        // Este método sirve para consultar la lista de tareas del usuario actual.
         if (currentUser is not { Identity.IsAuthenticated: true }) return;
 
         var userId = currentUser.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -284,7 +292,7 @@ else
 
     async Task ConsultarUser()
     {
-
+        // Este método sirve para obtener la lista de correos de posibles colaboradores.
         var result = await UserService.GetAllUserEmailsAsync(CurrentUserEmail);
         if (result.Succesd)
         {
@@ -297,6 +305,7 @@ else
 
     public void Limpiar()
     {
+        // Este método sirve para limpiar el formulario y las variables.
         ShowForm = false;
         MiTarea = new();
         MiNotificacion = new();
@@ -304,6 +313,7 @@ else
 
     public async Task Aceptar()
     {
+        // Este método sirve para confirmar la acción actual (crear, editar, eliminar).
         var userId = currentUser?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId)) return;
         Result r =
@@ -322,6 +332,7 @@ else
 
     public async Task Tiempo()
     {
+        // Este método sirve para validar que la fecha límite no sea anterior a la fecha actual.
         if (MiTarea.FechaLimite < DateTime.Now.Date)
         {
             await jsRuntime.InvokeVoidAsync("alert", "La fecha límite no puede ser anterior al día de hoy.");

@@ -20,12 +20,13 @@ public partial class UserService : IUserService
         _context = context;
     }
 
+    // Obtiene una lista de correos electrónicos, excluyendo el del usuario actual
     public async Task<ResultList<string>> GetAllUserEmailsAsync(string currentUserEmail)
     {
         try
         {
             List<string?> list = await _userManager.Users
-                .Where(u => u.Email != currentUserEmail) // Excluir el correo del usuario actual
+                .Where(u => u.Email != currentUserEmail)
                 .Select(u => u.Email)
                 .ToListAsync();
 

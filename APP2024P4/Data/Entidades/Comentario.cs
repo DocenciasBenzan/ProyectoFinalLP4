@@ -12,16 +12,16 @@ public class Comentario
     public string UserId { get; set; } = null!;
     public string CreadorEmail { get; set; } = null!;
     public int TareaId { get; set; }
-    public DateTime FechaCreacion { get; set; }
-    public DateTime FechaActualizacion { get; set; }
+    public DateTime? FechaCreacion { get; set; }
+    public DateTime? FechaActualizacion { get; set; }
 
     public static Comentario Create(
        string contenido,
        string userId,
        string creadorEmail,
        int tareaId,
-       DateTime fechaCreacion,
-       DateTime fechaActualizacion
+       DateTime? fechaCreacion,
+       DateTime? fechaActualizacion
        )
           => new()
           {
@@ -37,8 +37,8 @@ public class Comentario
        string userId,
        string creadorEmail,
        int tareaId,
-       DateTime fechaCreacion,
-       DateTime fechaActualizacion
+       DateTime? fechaCreacion,
+       DateTime? fechaActualizacion
         )
     {
         var save = false;

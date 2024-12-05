@@ -3,7 +3,6 @@ using APP2024P4.Data.Entidades;
 using APP2024P4.Data;
 using TaskMaster;
 using Microsoft.EntityFrameworkCore;
-
 namespace APP2024P4.Service;
 
 public interface IColaboradorService
@@ -23,6 +22,7 @@ public partial class ColaboradorService : IColaboradorService
         this._context = _context;
     }
 
+    // Agrega un nuevo colaborador
     public async Task<Result> Addcolaborador(ColaboradorRequest colaborador)
     {
         try
@@ -32,88 +32,96 @@ public partial class ColaboradorService : IColaboradorService
                 colaborador.ColaboradorEmail,
                 colaborador.IsApproved,
                 colaborador.TareaId,
+                colaborador.IsCompleted,
                 colaborador.UserId
-                );
+            );
             _context.Colaboradores.Add(entity);
             await _context.SaveChangesAsync();
 
-            return Result.Success("✅Notificaion registrado con éxito!");
-
+            return Result.Success("Colaborador registrado con éxito!");
         }
         catch (Exception Ex)
         {
-            return Result.Failure($"☠️ Error: {Ex.Message}");
+            return Result.Failure($"Error: {Ex.Message}");
         }
     }
 
+    // Actualiza un colaborador existente
     public async Task<Result> Update(ColaboradorRequest colaborador)
     {
         try
         {
-            var entity = _context.Colaboradores.Where(p => p.Id == colaborador.Id).FirstOrDefault();
+            var entity = _context.Colaboradores.FirstOrDefault(p => p.Id == colaborador.Id);
             if (entity == null)
-                return Result.Failure($"El producto '{colaborador.Id}' no existe!");
+                return Result.Failure($"El colaborador '{colaborador.Id}' no existe!");
+
             if (entity.Update(
                 colaborador.UserId,
                 colaborador.CreadorEmail,
+                colaborador.IsCompleted,
                 colaborador.TareaId,
                 colaborador.ColaboradorEmail,
                 colaborador.IsApproved
-                ))
+            ))
             {
                 await _context.SaveChangesAsync();
-                return Result.Success("✅Producto modificado con exito!");
+                return Result.Success("Colaborador modificado con éxito!");
             }
-            return Result.Success("🐫 No has realizado ningun cambio!");
+
+            return Result.Success("No se realizaron cambios.");
         }
         catch (Exception Ex)
         {
-            return Result.Failure($"☠️ Error: {Ex.Message}");
+            return Result.Failure($"Error: {Ex.Message}");
         }
     }
 
+    // Elimina un colaborador por su ID
     public async Task<Result> Delete(int Id)
     {
         try
         {
-            var entity = _context.Colaboradores.Where(p => p.Id == Id).FirstOrDefault();
+            var entity = _context.Colaboradores.FirstOrDefault(p => p.Id == Id);
             if (entity == null)
-                return Result.Failure($"La categoría '{Id}' no existe!");
+                return Result.Failure($"El colaborador '{Id}' no existe!");
+
             _context.Colaboradores.Remove(entity);
             await _context.SaveChangesAsync();
-            return Result.Success("✅Categoría eliminada con exito!");
+
+            return Result.Success("Colaborador eliminado con éxito!");
         }
         catch (Exception Ex)
         {
-            return Result.Failure($"☠️ Error: {Ex.Message}");
+            return Result.Failure($"Error: {Ex.Message}");
         }
     }
 
+    // Obtiene colaboradores por el correo del creador
     public async Task<ResultList<ColaboradorDto>> GetByEmail(string creadorEmail)
     {
         try
         {
-
-            var entity = await _context.Colaboradores.Where(p => p.CreadorEmail == creadorEmail)
-
+            var entity = await _context.Colaboradores
+                .Where(p => p.CreadorEmail == creadorEmail)
                 .Select(c => new ColaboradorDto(
                     c.Id,
                     c.UserId,
                     c.TareaId,
                     c.CreadorEmail,
                     c.ColaboradorEmail,
-                    c.IsApproved
-                    ))
+                    c.IsApproved,
+                    c.IsCompleted
+                ))
                 .ToListAsync();
-            if (entity == null)
-                return ResultList<ColaboradorDto>.Failure($"El producto no existe!");
+
+            if (!entity.Any())
+                return ResultList<ColaboradorDto>.Failure("No se encontraron colaboradores para este correo.");
 
             return ResultList<ColaboradorDto>.Success(entity);
         }
         catch (Exception Ex)
         {
-            return ResultList<ColaboradorDto>.Failure($"☠️ Error: {Ex.Message}");
+            return ResultList<ColaboradorDto>.Failure($"Error: {Ex.Message}");
         }
     }
-
 }

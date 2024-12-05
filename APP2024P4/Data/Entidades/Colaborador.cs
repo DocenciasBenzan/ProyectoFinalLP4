@@ -13,11 +13,13 @@ namespace APP2024P4.Data.Entidades
         public string CreadorEmail { get; set; } = null!;
         public string ColaboradorEmail { get; set; } = null!;
         public bool IsApproved { get; set; }
-        public static Colaborador Create(string creadorEmail, string colaboradorEmail, bool isApproved,int tareaId, string userId = null!)
+        public bool IsCompleted { get; set; }
+        public static Colaborador Create(string creadorEmail, string colaboradorEmail, bool isApproved,int tareaId, bool isCompleted, string userId = null!)
      => new()
      {
          UserId = userId,
          TareaId = tareaId,
+         IsCompleted = isCompleted,
          CreadorEmail = creadorEmail,
          ColaboradorEmail = colaboradorEmail,
          IsApproved = isApproved
@@ -30,9 +32,10 @@ namespace APP2024P4.Data.Entidades
             CreadorEmail = this.CreadorEmail,
             ColaboradorEmail = this.ColaboradorEmail,
             IsApproved = this.IsApproved
+            
         };
 
-        public bool Update(string userId, string creadorEmail, int tareaId, string colaboradorEmail, bool isApproved)
+        public bool Update(string userId, string creadorEmail, bool isCompleted, int tareaId, string colaboradorEmail, bool isApproved)
         {
             var save = false;
 
@@ -60,6 +63,11 @@ namespace APP2024P4.Data.Entidades
             if (IsApproved != isApproved)
             {
                 this.IsApproved = isApproved;
+                save = true;
+            }
+            if (IsCompleted != isCompleted)
+            {
+                this.IsCompleted = isCompleted;
                 save = true;
             }
             return save;

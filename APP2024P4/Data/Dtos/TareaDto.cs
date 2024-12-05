@@ -51,5 +51,7 @@ public class ColaboradorRequest
     public string CreadorEmail { get; set; } = null!;
     public string ColaboradorEmail { get; set; } = null!;
     public bool IsApproved { get; set; }
+    public bool IsCompleted { get; set; }
+
 }
 

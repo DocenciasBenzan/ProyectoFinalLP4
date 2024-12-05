@@ -26,6 +26,7 @@ public partial class TareaService : ITareaService
         _dbContext = dbContext;
     }
 
+    // Crea una nueva tarea
     public async Task<Result> Create(TareaRequest tarea, string userId)
     {
         try
@@ -52,6 +53,7 @@ public partial class TareaService : ITareaService
         }
     }
 
+    // Actualiza una tarea existente
     public async Task<Result> Update(TareaRequest tarea)
     {
         try
@@ -72,6 +74,7 @@ public partial class TareaService : ITareaService
                 await _dbContext.SaveChangesAsync();
                 return Result.Success("Tarea actualizada con éxito!");
             }
+
             return Result.Success("No se realizaron cambios.");
         }
         catch (Exception ex)
@@ -80,6 +83,7 @@ public partial class TareaService : ITareaService
         }
     }
 
+    // Elimina una tarea por ID
     public async Task<Result> Delete(int id)
     {
         try
@@ -99,33 +103,35 @@ public partial class TareaService : ITareaService
         }
     }
 
+    // Obtiene las tareas de un usuario por ID
     public async Task<ResultList<TareaDto>> GetById(string userId)
     {
         try
         {
             var tareas = await _dbContext.Tareas
-           .Where(p => p.UserId == userId)
-           .Include(t => t.Colaboradores)
-           .Select(t => new TareaDto(
-           t.Id,
-           t.UserId,
-           t.Titulo,
-           t.Descripcion!,
-           t.Estado,
-           t.Prioridad,
-           t.FechaCreacion,
-           t.FechaLimite,
-           t.IsCompleted,
-           t.Colaboradores!.Select(c => new ColaboradorDto(
-               c.Id,
-               c.UserId,
-               c.TareaId,
-               c.CreadorEmail,
-               c.ColaboradorEmail,
-               c.IsApproved
-           )).ToList()
-        ))
-        .ToListAsync();
+                .Where(p => p.UserId == userId)
+                .Include(t => t.Colaboradores)
+                .Select(t => new TareaDto(
+                    t.Id,
+                    t.UserId,
+                    t.Titulo,
+                    t.Descripcion!,
+                    t.Estado,
+                    t.Prioridad,
+                    t.FechaCreacion,
+                    t.FechaLimite,
+                    t.IsCompleted,
+                    t.Colaboradores!.Select(c => new ColaboradorDto(
+                        c.Id,
+                        c.UserId,
+                        c.TareaId,
+                        c.CreadorEmail,
+                        c.ColaboradorEmail,
+                        c.IsApproved,
+                        c.IsCompleted
+                    )).ToList()
+                ))
+                .ToListAsync();
 
             return ResultList<TareaDto>.Success(tareas);
         }
@@ -135,6 +141,7 @@ public partial class TareaService : ITareaService
         }
     }
 
+    // Filtra tareas por título
     public async Task<ResultList<TareaDto>> Get(string filtro = "")
     {
         try
@@ -143,25 +150,26 @@ public partial class TareaService : ITareaService
                 .Where(p => p.Titulo.ToLower().Contains(filtro.ToLower()))
                 .Include(t => t.Colaboradores)
                 .Select(t => new TareaDto(
-                t.Id,
-                t.UserId,
-                t.Titulo,
-                t.Descripcion!,
-                t.Estado,
-                t.Prioridad,
-                t.FechaCreacion,
-                t.FechaLimite,
-                t.IsCompleted,
-                t.Colaboradores!.Select(c => new ColaboradorDto(
-                    c.Id,
-                    c.UserId,
-                    c.TareaId,
-                    c.CreadorEmail,
-                    c.ColaboradorEmail,
-                    c.IsApproved
-                )).ToList()
-             ))
-            .ToListAsync();
+                    t.Id,
+                    t.UserId,
+                    t.Titulo,
+                    t.Descripcion!,
+                    t.Estado,
+                    t.Prioridad,
+                    t.FechaCreacion,
+                    t.FechaLimite,
+                    t.IsCompleted,
+                    t.Colaboradores!.Select(c => new ColaboradorDto(
+                        c.Id,
+                        c.UserId,
+                        c.TareaId,
+                        c.CreadorEmail,
+                        c.ColaboradorEmail,
+                        c.IsApproved,
+                        c.IsCompleted
+                    )).ToList()
+                ))
+                .ToListAsync();
 
             return ResultList<TareaDto>.Success(tareas);
         }
@@ -171,6 +179,7 @@ public partial class TareaService : ITareaService
         }
     }
 
+    // Obtiene tareas asociadas a un colaborador por su email
     public async Task<ResultList<TareaDto>> ObtenerTareasPorColaborador(string email)
     {
         try
@@ -189,15 +198,17 @@ public partial class TareaService : ITareaService
                     t.FechaLimite,
                     t.IsCompleted,
                     t.Colaboradores!.Select(c => new ColaboradorDto(
-                    c.Id,
-                    c.UserId,
-                    c.TareaId,
-                    c.CreadorEmail,
-                    c.ColaboradorEmail,
-                    c.IsApproved
+                        c.Id,
+                        c.UserId,
+                        c.TareaId,
+                        c.CreadorEmail,
+                        c.ColaboradorEmail,
+                        c.IsApproved,
+                        c.IsCompleted
                     )).ToList()
                 ))
-               .ToListAsync();
+                .ToListAsync();
+
             if (!tareas.Any())
                 return ResultList<TareaDto>.Failure("No se encontraron tareas asociadas a este colaborador.");
 

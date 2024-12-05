@@ -9,7 +9,7 @@
         <h4>Notificaciones</h4>
     </div>
     <div class="notification-body">
-        @if (Notifications!.Count > 0)
+        @if (Notifications.Count > 0)
         {
             @foreach (var p in Notifications)
             {
@@ -36,8 +36,7 @@
 </div>
 
 @code {
-
-    private List<NotificacionDto>? Notifications;
+    private List<NotificacionDto> Notifications = new();
     private string CurrentUserEmail = null!;
     private ClaimsPrincipal? currentUser;
     public bool Isread;
@@ -69,6 +68,7 @@
             if (result.Succesd)
             {
                 Isread = true;
+                await ConsultarNotificaciones();
                 StateHasChanged();
             }
         }
