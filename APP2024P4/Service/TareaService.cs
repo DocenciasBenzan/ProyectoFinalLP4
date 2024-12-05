@@ -12,9 +12,10 @@ public interface ITareaService
     Task<Result> Create(TareaRequest tarea, string userId);
     Task<Result> Delete(int id);
     Task<ResultList<TareaDto>> Get(string filtro = "");
-    Task<ResultList<TareaDto>> GetById(string userId);
+    Task<ResultList<TareaDto>> GetById(string userId, bool isCompleted);
     Task<Result> Update(TareaRequest tarea);
     Task<ResultList<TareaDto>> ObtenerTareasPorColaborador(string email);
+    Task<Result> MarcarTareaComoCompletada(int tareaId, string userId);
 }
 
 public partial class TareaService : ITareaService
@@ -104,12 +105,12 @@ public partial class TareaService : ITareaService
     }
 
     // Obtiene las tareas de un usuario por ID
-    public async Task<ResultList<TareaDto>> GetById(string userId)
+    public async Task<ResultList<TareaDto>> GetById(string userId,bool isCompleted)
     {
         try
         {
             var tareas = await _dbContext.Tareas
-                .Where(p => p.UserId == userId)
+                .Where(p => p.UserId == userId && p.IsCompleted == isCompleted)
                 .Include(t => t.Colaboradores)
                 .Select(t => new TareaDto(
                     t.Id,
@@ -217,6 +218,43 @@ public partial class TareaService : ITareaService
         catch (Exception ex)
         {
             return ResultList<TareaDto>.Failure($"Error: {ex.Message}");
+        }
+    }
+    // Marca la tarea como completada (solo el creador puede hacerlo)
+    public async Task<Result> MarcarTareaComoCompletada(int tareaId, string userId)
+    {
+        try
+        {
+            // Busca la tarea por ID
+            var tarea = await _dbContext.Tareas
+                .Include(t => t.Colaboradores)
+                .FirstOrDefaultAsync(t => t.Id == tareaId);
+
+            if (tarea == null)
+                return Result.Failure($"La tarea con ID '{tareaId}' no existe!");
+
+            // Verifica si el usuario actual es el creador de la tarea
+            if (tarea.UserId != userId)
+                return Result.Failure("Solo el creador de la tarea puede marcarla como completada.");
+
+            // Marca la tarea y los colaboradores como completados
+            tarea.IsCompleted = true;
+            tarea.Estado = "Completado";
+
+            if (tarea.Colaboradores != null)
+            {
+                foreach (var colaborador in tarea.Colaboradores)
+                {
+                    colaborador.IsCompleted = true;
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+            return Result.Success("La tarea se marcó como completada con éxito!");
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure($"Error: {ex.Message}");
         }
     }
 }

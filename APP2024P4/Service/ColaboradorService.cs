@@ -81,14 +81,28 @@ public partial class ColaboradorService : IColaboradorService
     {
         try
         {
-            var entity = _context.Colaboradores.FirstOrDefault(p => p.Id == Id);
+            // Busca el colaborador por su ID
+            var entity = _context.Colaboradores.FirstOrDefault(p => p.Id == Id || p.TareaId == Id);
             if (entity == null)
                 return Result.Failure($"El colaborador '{Id}' no existe!");
 
+            // Busca las notificaciones asociadas al colaborador
+            var notificaciones = _context.Notificaciones
+                .Where(n => n.TareaId == entity.TareaId && n.RenderEmail == entity.ColaboradorEmail);
+
+            // Elimina las notificaciones asociadas
+            if (notificaciones.Any())
+            {
+                _context.Notificaciones.RemoveRange(notificaciones);
+            }
+
+            // Elimina el colaborador
             _context.Colaboradores.Remove(entity);
+
+            // Guarda los cambios en la base de datos
             await _context.SaveChangesAsync();
 
-            return Result.Success("Colaborador eliminado con éxito!");
+            return Result.Success("Colaborador y notificaciones asociadas eliminados con éxito!");
         }
         catch (Exception Ex)
         {

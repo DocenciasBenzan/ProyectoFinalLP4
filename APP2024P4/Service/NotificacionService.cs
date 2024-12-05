@@ -126,6 +126,26 @@ public partial class NotificationService : INotificationService
 
             if (isAccepted)
             {
+                // Verifica si ya existe una colaboracion para este usuario y tarea
+                var colaboaracionExiste = await _context.Colaboradores
+                    .FirstOrDefaultAsync(n =>
+                        n.UserId == userId &&
+                        n.TareaId == tareaId
+                        );
+
+                // Si ya existe una notificación y fue gestionada, no envía otra
+                if (colaboaracionExiste != null)
+                {
+                    if (colaboaracionExiste.UserId == userId || colaboaracionExiste.TareaId == tareaId )
+                    {
+                        return Result.Failure("⚠️ Los Usuario ya estan conlaborando");
+                    }
+                    colaboaracionExiste.UserId = userId;
+                    colaboaracionExiste.TareaId = tareaId;
+
+                    await _context.SaveChangesAsync();
+                    return Result.Success("✅ Notificación actualizada con éxito.");
+                }
                 // Aceptar la invitación
                 notification.Status = "Accepted";
                 notification.Isread = true; // Marca como leída
