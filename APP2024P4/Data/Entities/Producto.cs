@@ -53,7 +53,7 @@ namespace APP2024P4.Data.Entities
             };
 
         // Método para actualizar los valores del producto. Retorna true si hay cambios.
-        public bool Update(string nombre, byte[] img = null, int? categoriaId = null, decimal precio = 0)
+        public bool Update(string nombre, byte[]? img = null, int? categoriaId = null, decimal precio = 0)
         {
             var save = false;
             if (Nombre != nombre)
