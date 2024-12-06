@@ -18,6 +18,7 @@ public partial class ProductoService : IProductoService
 
     //CRUD
 
+    //Metodo para registrar
     public async Task<Result> Create(ProductoRequest producto)
     {
         try
@@ -32,6 +33,8 @@ public partial class ProductoService : IProductoService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
+    //Metodo para Editar
     public async Task<Result> Update(ProductoRequest producto)
     {
         try
@@ -51,6 +54,8 @@ public partial class ProductoService : IProductoService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
+    //Metodo para eliminar
     public async Task<Result> Delete(int Id)
     {
         try
@@ -67,6 +72,8 @@ public partial class ProductoService : IProductoService
             return Result.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
+    //Metodo para obtener ID
     public async Task<Result<ProductoDatos>> GetById(int Id)
     {
         try
@@ -84,6 +91,8 @@ public partial class ProductoService : IProductoService
             return Result<ProductoDatos>.Failure($"☠️ Error: {Ex.Message}");
         }
     }
+
+    //Metodo para consultar
     public async Task<ResultList<ProductoDatos>> Get(string filtro = "")
     {
         try

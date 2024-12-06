@@ -1,5 +1,7 @@
 ﻿namespace APP2024P4.Constants
 {
+
+    //Acciones constantes
     public static class Acciones
     {
         public const string Registrar = "Registrar";

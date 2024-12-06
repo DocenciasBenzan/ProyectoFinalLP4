@@ -1,0 +1,66 @@
+﻿@page "/calculadora"
+@rendermode InteractiveServer
+<link href="css/calculadora.css" rel="stylesheet" />
+
+<div class="calculator-container">
+    <h3>Calculadora <i class="bi bi-calculator"></i></h3>
+
+    <div class="calculator">
+        <div class="row">
+            <input @bind="num1" type="number" class="calc-input" placeholder="Número 1" />
+        </div>
+
+        <div class="row">
+            <select @bind="operacion" class="calc-select">
+                <option value="1">+</option>
+                <option value="2">-</option>
+                <option value="3">×</option>
+                <option value="4">÷</option>
+            </select>
+        </div>
+
+        <div class="row">
+            <input @bind="num2" type="number" class="calc-input" placeholder="Número 2" />
+        </div>
+
+        <div class="row">
+            <span class="btn btn-primary calc-btn" @onclick="Calcular">=</span>
+        </div>
+
+        <div class="row">
+            <input @bind="resultado" type="number" class="calc-result" placeholder="Resultado" disabled />
+        </div>
+    </div>
+</div>
+
+@code {
+    int operacion = 1;
+    decimal num1, num2, resultado;
+
+    //Metodo
+    private void Calcular()
+    {
+        switch (operacion)
+        {
+            case 1:
+                resultado = num1 + num2;
+                break;
+            case 2:
+                resultado = num1 - num2;
+                break;
+            case 3:
+                resultado = num1 * num2;
+                break;
+            case 4:
+                if (num2 != 0)
+                    resultado = num1 / num2;
+                else
+                    resultado = 0; // Manejo de división por cero
+                break;
+            default:
+                resultado = 0;
+                break;
+        }
+    }
+}
+

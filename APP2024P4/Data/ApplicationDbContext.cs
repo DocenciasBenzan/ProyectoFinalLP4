@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace APP2024P4.Data
 {
- // Siempre pescabicho, nunca inpescabicho
+ 
     public class ApplicationDbContext : DbContext, IApplicationDbContext
     {
         public ApplicationDbContext(DbContextOptions option):base(option) { }

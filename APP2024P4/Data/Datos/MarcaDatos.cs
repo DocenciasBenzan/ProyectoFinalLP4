@@ -12,6 +12,7 @@
         };
     }
 
+    //Peticion de una Marca
     public class MarcaRequest
     {
         public int Id { get; set; } 

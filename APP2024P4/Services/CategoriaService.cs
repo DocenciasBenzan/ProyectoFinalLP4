@@ -16,6 +16,8 @@ namespace APP2024P4.Services
         }
 
         //CRUD
+
+        //Metodo para registrar
         public async Task<Result> Create(CategoriaRequest request)
         {
             try
@@ -30,6 +32,8 @@ namespace APP2024P4.Services
                 return Result.Failure($"☠️ Error: {Ex.Message}");
             }
         }
+
+        //Metodo para Editar
         public async Task<Result> Update(CategoriaRequest request)
         {
             try
@@ -49,6 +53,8 @@ namespace APP2024P4.Services
                 return Result.Failure($"☠️ Error: {Ex.Message}");
             }
         }
+
+        //Metodo para eliminar
         public async Task<Result> Delete(int Id)
         {
             try
@@ -65,6 +71,8 @@ namespace APP2024P4.Services
                 return Result.Failure($"☠️ Error: {Ex.Message}");
             }
         }
+
+        //Metodo para consultar
         public async Task<ResultList<CategoriaDatos>> GetAll(string filtro = "")
         {
             try

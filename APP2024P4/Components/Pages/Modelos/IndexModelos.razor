@@ -54,7 +54,7 @@ else
                 </div>
 
 				<div class="text-center">
-					<img src="/Icon/W&W Tech Inventory.jpg" alt="Icono" class="img-fluid mt-2 d-none d-print-inline" style="max-width: 150px; height: auto;" /><br />
+					<img src="/Icon/W&W_Tech Inventory.jpg" alt="Icono" class="img-fluid mt-2 d-none d-print-inline" style="max-width: 150px; height: auto;" /><br />
 					<br /><h1 class="d-none d-print-inline mt-2">Reporte de modelos</h1>
 				</div>
 
@@ -89,6 +89,7 @@ else
                                     <td>@m.Nombre</td>
                                     <td>@m.Marca.Nombre</td>
                                     <td>
+                                        @* Botones de Acciones *@
                                         <div class="btn-group d-print-none" role="group" aria-label="Basic mixed styles example">
                                             <span @onclick="()=>btnEditarClick(m)" class="btn btn-secondary rounded me-2">
                                                 <i class="bi bi-pencil"></i> Editar
@@ -116,6 +117,7 @@ else
     public List<MarcaDatos> Marcas { get; set; } = new();
     public string Accion { get; set; } = "Registrar";
     public ModeloRequest MiModelo { get; set; } = new();
+    private string searchText { get; set; } = "";
 
     public List<ModeloDatos>? ModeloList { get; set; } = new();
     bool ShowForm = false, DisableInputs = false;
@@ -187,6 +189,21 @@ else
             new List<ModeloDatos>();
         }
     }
+
+    public List<ModeloDatos>? ModeloFiltradoList
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(searchText))
+                return ModeloList;
+
+            return ModeloList?
+                .Where(c => c.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                            c.Marca.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
+
     public void Limpiar()
     {
         ShowForm = false;
@@ -208,19 +225,4 @@ else
     }
     #endregion Métodos
 
-    private string searchText { get; set; } = "";
-
-    public List<ModeloDatos>? ModeloFiltradoList
-    {
-        get
-        {
-            if (string.IsNullOrWhiteSpace(searchText))
-                return ModeloList;
-
-            return ModeloList?
-                .Where(c => c.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-                            c.Marca.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
-    }
 }

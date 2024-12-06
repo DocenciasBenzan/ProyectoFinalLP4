@@ -3,6 +3,7 @@ using APP2024P4.Data.Entities;
 
 namespace APP2024P4.Services;
 
+//Interfaz de Porducto
 public interface IProductoService
 {
     Task<Result> Create(ProductoRequest producto);

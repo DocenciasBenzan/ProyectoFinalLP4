@@ -37,7 +37,7 @@ else
                 </div>
 
 				<div class="text-center">
-					<img src="/Icon/W&W Tech Inventory.jpg" alt="Icono" class="img-fluid mt-2 d-none d-print-inline" style="max-width: 150px; height: auto;" /><br />
+					<img src="/Icon/W&W_Tech Inventory.jpg" alt="Icono" class="img-fluid mt-2 d-none d-print-inline" style="max-width: 150px; height: auto;" /><br />
 					<br /><h1 class="d-none d-print-inline mt-2">Reporte de categorías</h1>
 				</div>
 
@@ -102,6 +102,7 @@ else
     #region Propiedades del componente Index.Razor
     public string Accion { get; set; } = "Registrar";
     public CategoriaRequest MiCategoria { get; set; } = new();
+    private string searchText { get; set; } = ""; //filtro
 
     public List<CategoriaDatos>? CategoriaList { get; set; } = new();
     bool ShowForm = false, DisableInputs = false;
@@ -162,6 +163,20 @@ else
             new List<CategoriaDatos>();
         }
     }
+
+    public List<CategoriaDatos>? CategoriaFiltradoList
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(searchText))
+                return CategoriaList;
+
+            return CategoriaList?
+                .Where(c => c.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+    }
+
     public void Limpiar()
     {
         ShowForm = false;
@@ -182,19 +197,5 @@ else
         }
     }
     #endregion Métodos
-
-    private string searchText { get; set; } = "";
-
-    public List<CategoriaDatos>? CategoriaFiltradoList
-    {
-        get
-        {
-            if (string.IsNullOrWhiteSpace(searchText))
-                return CategoriaList;
-
-            return CategoriaList?
-                .Where(c => c.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-                .ToList();
-        }
-    }
+ 
 }

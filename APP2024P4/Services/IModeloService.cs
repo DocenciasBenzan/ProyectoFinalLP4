@@ -2,6 +2,7 @@
 
 namespace APP2024P4.Services
 {
+    //Interfaz de Modelo
     public interface IModeloService
     {
         Task<Result> Create(ModeloRequest modelo);

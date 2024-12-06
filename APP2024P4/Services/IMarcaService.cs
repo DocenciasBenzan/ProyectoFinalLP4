@@ -2,6 +2,7 @@
 
 namespace APP2024P4.Services
 {
+    //Interfaz de Marca
     public interface IMarcaService
     {
         Task<Result> Create(MarcaRequest marca);

@@ -14,6 +14,7 @@ public class CategoriaDatos(){
 	}
 }
 
+//Peticion de una acategoria
 public class CategoriaRequest 
 {
     public int Id { get; set; }

@@ -8,16 +8,9 @@
 @using System.ComponentModel.DataAnnotations
 @* @using Microsoft.AspNetCore.Authorization
 @attribute [Authorize] *@
-@*  Lo  voy a poner aqui, luego lo ubicar. Que codigo diosmiio *@
 @*                  AGREGAR PRODUCTO *@
 
-@* @MiProducto.CategoriaId
-Modelo
-@MiProducto.ModeloId
 
-Imagen
-@MiProducto.Imagen.Count() VS
-@ImagenActual.Count() *@
 @if (ShowForm)
 {
 	@* Formularion de accion*@
@@ -147,7 +140,7 @@ else
 				</div>
 
 				<div class="text-center">
-					<img src="/Icon/W&W Tech Inventory.jpg" alt="Icono" class="img-fluid mt-2 d-none d-print-inline" style="max-width: 150px; height: auto;" /><br />
+					<img src="/Icon/W&W_Tech Inventory.jpg" alt="Icono" class="img-fluid mt-2 d-none d-print-inline" style="max-width: 150px; height: auto;" /><br />
 					<br /><h1 class="d-none d-print-inline mt-2">Reporte de productos</h1>
 				</div>
 
@@ -187,6 +180,7 @@ else
 									<td>@p.Categoria.Nombre</td>
 									<td>@p.PrecioText</td>
 									<td>
+										@* Botones de acciones *@
 										<div class="btn-group d-print-none" role="group" aria-label="Basic mixed styles example">
 											<span @onclick="()=>btnEditarClick(p)" class="btn btn-secondary rounded me-2">
 												<i class="bi bi-pencil"></i> Editar
@@ -230,6 +224,9 @@ else
 	public int MarcaActualId { get; set; }
 	public string messageImage { get; set; }
 	public string ImagenActual { get; set; }
+	private string searchText { get; set; } = ""; /* Buscador */
+	private DateTime? fechaLanzamiento { get; set; }
+	private int? cantidad { get; set; } = 1;
 
 
 	public List<ProductoDatos>? ProductoList { get; set; } = new();
@@ -368,6 +365,22 @@ else
 			new List<ProductoDatos>();
 		}
 	}
+
+	public List<ProductoDatos>? ProductoFiltradoList
+	{
+		get
+		{
+			if (string.IsNullOrWhiteSpace(searchText))
+				return ProductoList;
+
+			return ProductoList?
+				.Where(p => p.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+							p.Modelo.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+							p.Categoria.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+				.ToList();
+		}
+	}
+
 	public void Limpiar()
 	{
 		ShowForm = false;
@@ -406,23 +419,9 @@ else
 	}
 	#endregion Métodos
 
-	private string searchText { get; set; } = "";
+	
 
-	public List<ProductoDatos>? ProductoFiltradoList
-	{
-		get
-		{
-			if (string.IsNullOrWhiteSpace(searchText))
-				return ProductoList;
+	
 
-			return ProductoList?
-				.Where(p => p.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-							p.Modelo.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-							p.Categoria.Nombre.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-				.ToList();
-		}
-	}
-
-	private DateTime? fechaLanzamiento { get; set; }
-	private int? cantidad { get; set; } = 1;
+	
 }

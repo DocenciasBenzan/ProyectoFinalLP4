@@ -2,6 +2,7 @@
 
 namespace APP2024P4.Services
 {
+    //Interfaz de Categoria
     public interface ICategoriaService
     {
         Task<Result> Create(CategoriaRequest categoria);
